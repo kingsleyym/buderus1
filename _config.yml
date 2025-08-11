@@ -1,0 +1,36 @@
+# GitHub Pages Configuration für Jekyll
+title: "Buderus Systeme Team Cards"
+description: "Digital Business Cards for Team Members"
+
+# Wichtige Einstellungen für GitHub Pages
+plugins:
+  - jekyll-sitemap
+
+# Include wichtige Dateien
+include:
+  - "*.json"
+  - "*.js"
+  - ".htaccess"
+
+# Exclude bestimmte Dateien vom Build
+exclude:
+  - "README.md"
+  - "deploy.sh"
+
+# Collections für besseres Routing (optional)
+collections:
+  employees:
+    output: false
+
+# Sass Konfiguration
+sass:
+  sass_dir: _sass
+  style: compressed
+
+# Routing für GitHub Pages
+kramdown:
+  input: GFM
+  hard_wrap: false
+
+# Zeitzone
+timezone: Europe/Berlin

@@ -21,7 +21,7 @@ class EmployeeCardManager {
         // GitHub Pages Redirect-Parameter prüfen
         const urlParams = new URLSearchParams(window.location.search);
         const redirect = urlParams.get('redirect');
-
+        
         let path;
         if (redirect) {
             // Von 404.html weitergeleitet
@@ -31,9 +31,9 @@ class EmployeeCardManager {
         } else {
             path = window.location.pathname;
         }
-
+        
         const employeeId = this.extractEmployeeId(path);
-
+        
         if (employeeId) {
             this.showEmployee(employeeId);
         } else {
@@ -44,10 +44,10 @@ class EmployeeCardManager {
     extractEmployeeId(path) {
         // Entferne Basis-Pfad für GitHub Pages (z.B. /repository-name/)
         let cleanPath = path;
-
+        
         // Für GitHub Pages: /repository-name/employee-id
         const pathParts = path.split('/').filter(part => part.length > 0);
-
+        
         // Wenn es ein GitHub Pages Repository ist (username.github.io/repo-name)
         if (pathParts.length >= 2 && window.location.hostname.includes('github.io')) {
             // Zweiter Teil ist die Employee-ID
@@ -56,7 +56,7 @@ class EmployeeCardManager {
                 return employeeId;
             }
         }
-
+        
         // Fallback: Letzter Teil als Employee-ID
         if (pathParts.length > 0) {
             const lastPart = pathParts[pathParts.length - 1];
@@ -64,7 +64,7 @@ class EmployeeCardManager {
                 return lastPart;
             }
         }
-
+        
         return null;
     }
 
@@ -83,13 +83,13 @@ class EmployeeCardManager {
     updatePageContent(employee) {
         // Avatar automatisch finden oder Fallback verwenden
         const avatarPath = this.getAvatarPath(employee);
-
+        
         // Avatar aktualisieren
         const avatarImg = document.querySelector('.profile-avatar img');
         if (avatarImg) {
             avatarImg.src = avatarPath;
             avatarImg.alt = `Profilbild von ${employee.name}`;
-
+            
             // Fallback wenn Avatar nicht existiert
             avatarImg.onerror = () => {
                 avatarImg.src = 'assets/avatars/default.png';
@@ -119,7 +119,7 @@ class EmployeeCardManager {
         if (employee.avatar) {
             return employee.avatar;
         }
-
+        
         // 2. Automatische Erkennung basierend auf ID
         const possiblePaths = [
             `assets/avatars/${employee.id}.png`,
@@ -127,7 +127,7 @@ class EmployeeCardManager {
             `assets/avatars/${employee.id}.jpeg`,
             `assets/avatars/${employee.id}.webp`
         ];
-
+        
         // Für jetzt verwenden wir den ersten Pfad
         // In einer echten Anwendung würde man prüfen ob die Datei existiert
         return possiblePaths[0];
@@ -185,24 +185,24 @@ class EmployeeCardManager {
 }
 
 // Globale Funktion zum Aktualisieren der Kontaktdaten
-window.updateContactData = function (employee) {
+window.updateContactData = function(employee) {
     // Telefonnummer aktualisieren
     if (window.makeCall) {
-        window.makeCall = function () {
+        window.makeCall = function() {
             window.location.href = `tel:${employee.phone}`;
         };
     }
 
     // E-Mail aktualisieren
     if (window.sendEmail) {
-        window.sendEmail = function () {
+        window.sendEmail = function() {
             window.location.href = `mailto:${employee.email}?subject=Kontakt%20von%20Website`;
         };
     }
 
     // vCard Daten aktualisieren
     if (window.saveContact) {
-        window.saveContact = function () {
+        window.saveContact = function() {
             const vCardData = `BEGIN:VCARD
 VERSION:3.0
 FN:${employee.name}
@@ -227,12 +227,12 @@ END:VCARD`;
 };
 
 // Initialisierung
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function() {
     window.employeeManager = new EmployeeCardManager();
 });
 
 // Browser History API für Clean URLs
-window.addEventListener('popstate', function () {
+window.addEventListener('popstate', function() {
     if (window.employeeManager) {
         window.employeeManager.handleRouting();
     }
