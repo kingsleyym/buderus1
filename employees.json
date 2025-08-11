@@ -1,0 +1,29 @@
+[
+  {
+    "id": "max-mustermann",
+    "name": "Max Mustermann",
+    "title": "Senior Webentwickler & UI/UX Designer",
+    "phone": "+49 123 456789",
+    "email": "max.mustermann@buderus-systeme.com",
+    "website": "https://buderus-systeme.com",
+    "company": "Buderus Systeme"
+  },
+  {
+    "id": "anna-schmidt",
+    "name": "Anna Schmidt", 
+    "title": "Marketing Managerin",
+    "phone": "+49 123 456790",
+    "email": "anna.schmidt@buderus-systeme.com",
+    "website": "https://buderus-systeme.com",
+    "company": "Buderus Systeme"
+  },
+  {
+    "id": "peter-mueller",
+    "name": "Peter Müller",
+    "title": "Sales Director",
+    "phone": "+49 123 456791", 
+    "email": "peter.mueller@buderus-systeme.com",
+    "website": "https://buderus-systeme.com",
+    "company": "Buderus Systeme"
+  }
+]
