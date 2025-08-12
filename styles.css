@@ -15,6 +15,8 @@ body {
     position: relative;
     width: 100%;
     height: 100vh;
+    padding-top: env(safe-area-inset-top, 24px);
+    padding-bottom: env(safe-area-inset-bottom, 24px);
 }
 
 /* Hintergrund Bild */
@@ -63,6 +65,7 @@ body {
     /* Weiße Unterkante */
     z-index: 3;
     /* Über dem Verlauf */
+    padding-top: env(safe-area-inset-top, 24px);
 }
 
 /* Logo auf der Border rechts */
@@ -107,7 +110,8 @@ body {
     bottom: 0;
     z-index: 2; /* Unter dem Header */
     overflow-y: auto; /* Scrollbar für den Inhalt */
-    padding: 0 20px 20px 20px; /* oben kein Padding, Abstand über .profile-avatar */
+    padding: calc(env(safe-area-inset-top, 24px) + 0px) 20px calc(env(safe-area-inset-bottom, 24px) + 20px) 20px;
+    /* oben kein Padding, Abstand über .profile-avatar */
     text-align: center;
 }
 
@@ -248,7 +252,7 @@ body {
 /* QR Code unten mittig */
 .qr-code {
     position: absolute;
-    bottom: 30px;
+    bottom: calc(env(safe-area-inset-bottom, 24px) + 30px);
     left: 50%;
     transform: translateX(-50%);
     z-index: 3;
