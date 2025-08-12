@@ -107,7 +107,7 @@ body {
     bottom: 0;
     z-index: 2; /* Unter dem Header */
     overflow-y: auto; /* Scrollbar für den Inhalt */
-    padding: 40px 20px 20px 20px;
+    padding: 0 20px 20px 20px; /* oben kein Padding, Abstand über .profile-avatar */
     text-align: center;
 }
 
@@ -134,7 +134,7 @@ body {
     /* 20px (2px kleiner) */
     color: white;
     text-align: center;
-    margin-bottom: 10px;
+    margin-top: 80px; /* Abstand nach unten verschieben */
 }
 
 /* Jobbeschreibung */
