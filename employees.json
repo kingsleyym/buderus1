@@ -1,28 +1,55 @@
 [
   {
-    "id": "max-mustermann",
-    "name": "Max Mustermann",
-    "title": "Senior Webentwickler & UI/UX Designer",
-    "phone": "+49 123 456789",
-    "email": "max.mustermann@buderus-systeme.com",
+    "id": "agim-beciri",
+    "name": "Agim Beciri",
+    "title": "Verkäufer",
+    "phone": "+4915170568859",
+    "email": "agim.beciri@buderus-systeme.com",
     "website": "https://buderus-systeme.com",
     "company": "Buderus Systeme"
   },
   {
-    "id": "anna-schmidt",
-    "name": "Anna Schmidt", 
-    "title": "Marketing Managerin",
-    "phone": "+49 123 456790",
-    "email": "anna.schmidt@buderus-systeme.com",
+    "id": "david-sawall",
+    "name": "David Sawall", 
+    "title": "Verkäufer",
+    "phone": "+491605533940",
+    "email": "david.sawall@buderus-systeme.com",
     "website": "https://buderus-systeme.com",
     "company": "Buderus Systeme"
   },
   {
-    "id": "peter-mueller",
-    "name": "Peter Müller",
-    "title": "Sales Director",
-    "phone": "+49 123 456791", 
-    "email": "peter.mueller@buderus-systeme.com",
+    "id": "roland-neu",
+    "name": "Roland Neu",
+    "title": "Verkäufer",
+    "phone": "+491735379084", 
+    "email": "roland.neu@buderus-systeme.com",
+    "website": "https://buderus-systeme.com",
+    "company": "Buderus Systeme"
+  },
+  {
+    "id": "ahmet-cakmakci",
+    "name": "Ahmet Cakmakci",
+    "title": "Verkäufer",
+    "phone": "+491732557518",
+    "email": "ahmet.cakmakci@buderus-systeme.com",
+    "website": "https://buderus-systeme.com",
+    "company": "Buderus Systeme"
+  },
+  {
+    "id": "filonid-kaciu",
+    "name": "Filonid Kaciu",
+    "title": "Verkäufer",
+    "phone": "+49176625749579",
+    "email": "filonid.kaciu@buderus-systeme.com",
+    "website": "https://buderus-systeme.com",
+    "company": "Buderus Systeme"
+  },
+  {
+    "id": "josua-ganglbauer",
+    "name": "Josua Ganglbauer",
+    "title": "Verkäufer",
+    "phone": "+491738861043",
+    "email": "josua.ganglbauer@buderus-systeme.com",
     "website": "https://buderus-systeme.com",
     "company": "Buderus Systeme"
   }

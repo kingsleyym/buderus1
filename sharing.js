@@ -1,13 +1,13 @@
 // NFC und Link Sharing Funktionalität
 class ContactSharing {
     constructor() {
-        this.websiteUrl = window.location.href;
+        this.websiteUrl = window.location.origin + window.location.pathname;
         this.contactData = {
             name: "Max Mustermann",
             title: "Senior Webentwickler & UI/UX Designer",
             phone: "+49123456789",
-            email: "max.mustermann@example.com",
-            website: "https://www.ihre-website.com"
+            email: "max.mustermann@buderus-systeme.com",
+            website: "https://buderus-systeme.com"
         };
     }
 

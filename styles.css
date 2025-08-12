@@ -8,7 +8,7 @@ body {
     font-family: 'Poppins', sans-serif;
     height: 100vh;
     overflow: hidden;
-    /* Keine Scrollbar */
+    /* Keine Scrollbar für body */
 }
 
 .container {
@@ -100,15 +100,15 @@ body {
 
 /* Hauptinhalt */
 .content {
-    position: relative;
-    z-index: 4;
-    /* Über allem anderen */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    padding: 20px;
+    position: absolute;
+    top: 119px; /* Beginnt nach dem schwarzen Container */
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2; /* Unter dem Header */
+    overflow-y: auto; /* Scrollbar für den Inhalt */
+    padding: 40px 20px 20px 20px;
+    text-align: center;
 }
 
 /* Profilbild */
@@ -156,8 +156,7 @@ body {
     width: 80%;
     gap: 10px;
     /* Lücke zwischen den Buttons */
-    margin-top: 20px;
-    /* 20px mehr Abstand nach unten */
+    margin: 20px auto 0 auto; /* Zentriert die Button-Reihe */
 }
 
 /* Hauptbutton */
@@ -176,11 +175,11 @@ body {
     /* Medium */
     font-size: 15px;
     /* 15px */
-    margin-top: 15px;
-    /* Abstand zu den Buttons darüber */
+    margin: 15px auto 20px auto; /* Zentriert und weniger Abstand nach unten */
     cursor: pointer;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: block; /* Block-Element für Zentrierung */
 }
 
 .main-button:hover {

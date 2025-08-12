@@ -12,51 +12,67 @@
     margin-bottom: 40px;
 }
 
-.employee-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 30px;
-    max-width: 1200px;
-    margin: 0 auto;
+.employee-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 400px;
+    margin: 20px auto;
+    padding-bottom: 40px; /* Extra Platz unten */
 }
 
 .employee-card {
     background: rgba(255, 255, 255, 0.1);
     border-radius: 20px;
-    padding: 30px 20px;
+    padding: 20px;
     text-decoration: none;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 20px;
 }
 
 .employee-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
 }
 
 .employee-avatar {
-    width: 120px;
-    height: 120px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
-    border: 3px solid white;
-    margin-bottom: 20px;
+    border: 2px solid white;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.employee-avatar img {
+    width: 100%;
+    height: 100%;
     object-fit: cover;
 }
 
-.employee-name {
-    font-family: 'Poppins', sans-serif;
-    font-weight: 600;
-    font-size: 20px;
-    color: white;
-    margin-bottom: 8px;
+.employee-info {
+    text-align: left;
+    flex-grow: 1;
 }
 
-.employee-title {
+.employee-info h3 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 18px;
+    color: white;
+    margin-bottom: 5px;
+}
+
+.employee-info p {
     font-family: 'Poppins', sans-serif;
     font-weight: 300;
-    font-size: 16px;
+    font-size: 14px;
     color: rgba(255, 255, 255, 0.8);
+    margin: 0;
 }
 
 .error-message {

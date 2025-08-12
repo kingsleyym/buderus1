@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Josua Ganglbauer - Verkäufer | Buderus Systeme</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="employee-directory.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Hintergrund mit Verlauf -->
+        <div class="background"></div>
+        
+        <!-- Schwarzer Container -->
+        <div class="header-container">
+            <!-- Think Text oben links -->
+            <div class="think-text">
+                Think intelligent.<br>
+                Think blue.
+            </div>
+            
+            <!-- Logo oben rechts -->
+            <div class="logo">
+                <img src="assets/logo.png" alt="Logo">
+            </div>
+        </div>
+        
+        <!-- Hauptinhalt -->
+        <div class="content">
+            <!-- Profilbild -->
+            <div class="profile-avatar">
+                <img src="assets/avatars/josua-ganglbauer.png" alt="Profilbild von Josua Ganglbauer">
+            </div>
+            
+            <!-- Name -->
+            <h1 class="name">Josua Ganglbauer</h1>
+            
+            <!-- Jobbeschreibung -->
+            <p class="job-description">Verkäufer</p>
+            <div class="employee-actions">
+                <div class="button-row">
+                    <button class="secondary-button phone-button" onclick="makeCall()">
+                        <img src="assets/phone-call-icon.png" alt="Anrufen" class="button-icon">
+                        Anrufen
+                    </button>
+                    <button class="secondary-button email-button" onclick="sendEmail()">
+                        <img src="assets/mail-filled.png" alt="E-Mail" class="button-icon">
+                        E-Mail
+                    </button>
+                </div>
+                <button class="main-button" onclick="saveContact()">Kontakt speichern</button>
+                <div class="qr-code">
+                    <img src="assets/qr.png" alt="QR Code">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Kontaktdaten für Josua Ganglbauer
+        const employeeData = {
+            name: "Josua Ganglbauer",
+            title: "Verkäufer",
+            phone: "+491738861043",
+            email: "josua.ganglbauer@buderus-systeme.com",
+            company: "Buderus Systeme",
+            website: "https://buderus-systeme.com"
+        };
+
+        // Kontakt speichern
+        function saveContact() {
+            const vCardData = `BEGIN:VCARD
+VERSION:3.0
+FN:${employeeData.name}
+N:${employeeData.name.split(' ').reverse().join(';')};;;
+ORG:${employeeData.company}
+TITLE:${employeeData.title}
+TEL;TYPE=CELL:${employeeData.phone}
+EMAIL;TYPE=INTERNET:${employeeData.email}
+URL:${employeeData.website}
+END:VCARD`;
+
+            const blob = new Blob([vCardData], { type: 'text/vcard;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `${employeeData.name.replace(/\s+/g, '_')}.vcf`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
+        }
+
+        // Telefon anrufen
+        function makeCall() {
+            window.location.href = `tel:${employeeData.phone}`;
+        }
+
+        // E-Mail senden
+        function sendEmail() {
+            window.location.href = `mailto:${employeeData.email}?subject=Kontakt%20von%20Website`;
+        }
+    </script>
+</body>
+</html>
