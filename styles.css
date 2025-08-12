@@ -123,11 +123,12 @@ body {
 
 .profile-avatar img {
     width: 150px;
-    /* 150x150 */
     height: 150px;
     border-radius: 50%;
     border: 3px solid white;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    object-fit: cover;
+    object-position: center;
 }
 
 /* Name */
