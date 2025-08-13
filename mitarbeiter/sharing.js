@@ -77,21 +77,21 @@ class ContactSharing {
 
     // QR Code für Link-Sharing
     generateQRCode() {
-        // Der QR Code in Ihrem assets/qr.png sollte bereits den Link zu Ihrer Website enthalten
+        // Der QR Code in Ihrem ../assets/qr.png sollte bereits den Link zu Ihrer Website enthalten
         // Wenn Nutzer den QR Code scannen, öffnet sich automatisch die Website
         console.log('QR Code zeigt auf:', this.websiteUrl);
     }
 }
 
 // Initialisierung
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const sharing = new ContactSharing();
-    
+
     // QR Code klickbar machen für Sharing-Optionen
     const qrCode = document.querySelector('.qr-code img');
     if (qrCode) {
         qrCode.style.cursor = 'pointer';
-        qrCode.addEventListener('click', function() {
+        qrCode.addEventListener('click', function () {
             // Zeige Sharing-Optionen
             if (confirm('Möchten Sie diese Kontakt-Seite teilen?')) {
                 sharing.shareContact();
@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Optional: Double-tap für NFC (experimentell)
     let tapCount = 0;
     if (qrCode) {
-        qrCode.addEventListener('click', function() {
+        qrCode.addEventListener('click', function () {
             tapCount++;
             setTimeout(() => {
                 if (tapCount === 2) {

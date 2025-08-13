@@ -29,7 +29,7 @@ const htmlTemplate = `<!DOCTYPE html>
             
             <!-- Logo oben rechts -->
             <div class="logo">
-                <img src="assets/logo.png" alt="Logo">
+                <img src="../assets/logo.png" alt="Logo">
             </div>
         </div>
         
@@ -37,7 +37,7 @@ const htmlTemplate = `<!DOCTYPE html>
         <div class="content">
             <!-- Profilbild -->
             <div class="profile-avatar">
-                <img src="assets/avatars/{{id}}.png" alt="Profilbild von {{name}}">
+                <img src="../assets/avatars/{{id}}.png" alt="Profilbild von {{name}}">
             </div>
             
             <!-- Name -->
@@ -49,11 +49,11 @@ const htmlTemplate = `<!DOCTYPE html>
             <!-- Zwei kleinere Buttons -->
             <div class="button-row">
                 <button class="secondary-button phone-button" onclick="makeCall()">
-                    <img src="assets/phone-call-icon.png" alt="Anrufen" class="button-icon">
+                    <img src="../assets/phone-call-icon.png" alt="Anrufen" class="button-icon">
                     Anrufen
                 </button>
                 <button class="secondary-button email-button" onclick="sendEmail()">
-                    <img src="assets/mail-filled.png" alt="E-Mail" class="button-icon">
+                    <img src="../assets/mail-filled.png" alt="E-Mail" class="button-icon">
                     E-Mail
                 </button>
             </div>
@@ -63,7 +63,7 @@ const htmlTemplate = `<!DOCTYPE html>
             
             <!-- QR Code unten mittig -->
             <div class="qr-code">
-                <img src="assets/qr.png" alt="QR Code">
+                <img src="../assets/qr.png" alt="QR Code">
             </div>
         </div>
     </div>
@@ -128,30 +128,30 @@ function generateEmployeePages() {
         // Arbeitsverzeichnis setzen
         const workDir = '/Users/lucaschweiger/Documents/Clients/Website';
         process.chdir(workDir);
-        
+
         // Mitarbeiterdaten laden
         const employeesData = JSON.parse(fs.readFileSync('employees.json', 'utf8'));
-        
+
         console.log('🔄 Generiere individuelle Mitarbeiter-Seiten...');
-        
+
         employeesData.forEach(employee => {
             // HTML für diesen Mitarbeiter generieren
             const htmlContent = replacePlaceholders(htmlTemplate, employee);
-            
+
             // Dateiname erstellen
             const fileName = `${employee.id}.html`;
-            
+
             // Datei schreiben
             fs.writeFileSync(fileName, htmlContent, 'utf8');
             console.log(`✅ ${fileName} erfolgreich erstellt`);
         });
-        
+
         console.log('🎉 Alle Mitarbeiter-Seiten wurden erfolgreich generiert!');
         console.log('\n📝 Nächste Schritte:');
         console.log('1. Aktualisiere die index.html um direkt auf die individuellen HTML-Dateien zu verlinken');
-        console.log('2. Stelle sicher, dass alle Avatar-Bilder in assets/avatars/ vorhanden sind');
+        console.log('2. Stelle sicher, dass alle Avatar-Bilder in ../assets/avatars/ vorhanden sind');
         console.log('3. Committe und pushe alle Änderungen zu GitHub Pages');
-        
+
     } catch (error) {
         console.error('❌ Fehler beim Generieren der Mitarbeiter-Seiten:', error.message);
     }

@@ -1,20 +1,23 @@
 <!DOCTYPE html>
 <html lang="de">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>David Sawall - Verkäufer | Buderus Systeme</title>
+    <title>Josua Ganglbauer - Verkäufer | Buderus Systeme</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="employee-directory.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap"
+        rel="stylesheet">
 </head>
+
 <body>
     <div class="container">
         <!-- Hintergrund mit Verlauf -->
         <div class="background"></div>
-        
+
         <!-- Schwarzer Container -->
         <div class="header-container">
             <!-- Think Text oben links -->
@@ -22,51 +25,51 @@
                 Think intelligent.<br>
                 Think blue.
             </div>
-            
+
             <!-- Logo oben rechts -->
             <div class="logo">
-                <img src="assets/logo.png" alt="Logo">
+                <img src="../assets/logo.png" alt="Logo">
             </div>
         </div>
-        
+
         <!-- Hauptinhalt -->
         <div class="content">
             <!-- Profilbild -->
             <div class="profile-avatar">
-                <img src="assets/avatars/david-sawall.png" alt="Profilbild von David Sawall">
+                <img src="../assets/avatars/josua-ganglbauer.png" alt="Profilbild von Josua Ganglbauer">
             </div>
-            
+
             <!-- Name -->
-            <h1 class="name">David Sawall</h1>
-            
+            <h1 class="name">Josua Ganglbauer</h1>
+
             <!-- Jobbeschreibung -->
             <p class="job-description">Verkäufer</p>
             <div class="employee-actions">
                 <div class="button-row">
                     <button class="secondary-button phone-button" onclick="makeCall()">
-                        <img src="assets/phone-call-icon.png" alt="Anrufen" class="button-icon">
+                        <img src="../assets/phone-call-icon.png" alt="Anrufen" class="button-icon">
                         Anrufen
                     </button>
                     <button class="secondary-button email-button" onclick="sendEmail()">
-                        <img src="assets/mail-filled.png" alt="E-Mail" class="button-icon">
+                        <img src="../assets/mail-filled.png" alt="E-Mail" class="button-icon">
                         E-Mail
                     </button>
                 </div>
                 <button class="main-button" onclick="saveContact()">Kontakt speichern</button>
                 <div class="qr-code">
-                    <img src="assets/qr.png" alt="QR Code">
+                    <img src="../assets/qr.png" alt="QR Code">
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Kontaktdaten für David Sawall
+        // Kontaktdaten für Josua Ganglbauer
         const employeeData = {
-            name: "David Sawall",
+            name: "Josua Ganglbauer",
             title: "Verkäufer",
-            phone: "+491605533940",
-            email: "david.sawall@buderus-systeme.com",
+            phone: "+491738861043",
+            email: "josua.ganglbauer@buderus-systeme.com",
             company: "Buderus Systeme",
             website: "https://buderus-systeme.com"
         };
@@ -105,4 +108,5 @@ END:VCARD`;
         }
     </script>
 </body>
+
 </html>

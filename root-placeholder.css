@@ -1,0 +1,36 @@
+body {
+    min-height: 100vh;
+    margin: 0;
+    background: linear-gradient(135deg, #001D5D 0%, #009FE3 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Poppins', Arial, sans-serif;
+}
+
+.placeholder-container {
+    background: rgba(255,255,255,0.95);
+    border-radius: 24px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    padding: 48px 32px;
+    text-align: center;
+    max-width: 400px;
+}
+
+.placeholder-logo {
+    width: 90px;
+    margin-bottom: 24px;
+}
+
+.placeholder-title {
+    color: #001D5D;
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.placeholder-text {
+    color: #284E78;
+    font-size: 1.1rem;
+    margin-bottom: 0;
+}

@@ -5,12 +5,12 @@
 
 echo "🚀 Deploying Employee Cards to GitHub Pages..."
 
-# Erstelle assets/avatars Ordner falls nicht vorhanden
-mkdir -p assets/avatars
+# Erstelle ../assets/avatars Ordner falls nicht vorhanden
+mkdir -p ../assets/avatars
 
 # Kopiere Standard-Avatar falls Mitarbeiter-Avatar fehlt
-if [ ! -f "assets/avatars/default.png" ]; then
-    cp "assets/avatar.png" "assets/avatars/default.png"
+if [ ! -f "../assets/avatars/default.png" ]; then
+    cp "../assets/avatar.png" "../assets/avatars/default.png"
 fi
 
 # Erstelle .htaccess für Apache (falls verwendet)
@@ -68,7 +68,7 @@ EOF
 echo "✅ Deployment-Dateien erstellt!"
 echo ""
 echo "📋 Nächste Schritte:"
-echo "1. Fügen Sie Mitarbeiter-Avatars in assets/avatars/ hinzu"
+echo "1. Fügen Sie Mitarbeiter-Avatars in ../assets/avatars/ hinzu"
 echo "2. Aktualisieren Sie employees.json mit Ihren Mitarbeiterdaten"
 echo "3. Committen und pushen Sie zu GitHub"
 echo "4. Aktivieren Sie GitHub Pages in den Repository-Einstellungen"

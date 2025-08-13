@@ -16,7 +16,7 @@ Das ursprüngliche dynamische Routing-System funktionierte nicht auf GitHub Page
 ├── deploy-static-pages.sh       # 🚀 Deployment-Skript
 ├── styles.css                   # Haupt-Styles
 ├── employee-directory.css       # Directory-spezifische Styles
-└── assets/                      # Bilder, Icons, Avatare
+└── ../assets/                      # Bilder, Icons, Avatare
 ```
 
 ## 🚀 Deployment
@@ -43,7 +43,7 @@ Das ursprüngliche dynamische Routing-System funktionierte nicht auf GitHub Page
 
 2. **Avatar-Bild hinzufügen:**
 ```
-assets/avatars/neuer-mitarbeiter.png
+../assets/avatars/neuer-mitarbeiter.png
 ```
 
 3. **HTML-Seiten generieren:**
@@ -55,7 +55,7 @@ node generate-employee-pages.js
 ```html
 <a href="neuer-mitarbeiter.html" class="employee-card">
     <div class="employee-avatar">
-        <img src="assets/avatars/neuer-mitarbeiter.png" alt="Neuer Mitarbeiter">
+        <img src="../assets/avatars/neuer-mitarbeiter.png" alt="Neuer Mitarbeiter">
     </div>
     <div class="employee-info">
         <h3>Neuer Mitarbeiter</h3>

@@ -27,7 +27,7 @@ body {
     width: 100%;
     height: 148%;
     /* 100% + 24% oben + 24% unten */
-    background-image: url('assets/background.png');
+    background-image: url('../assets/background.png');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -104,12 +104,15 @@ body {
 /* Hauptinhalt */
 .content {
     position: absolute;
-    top: 119px; /* Beginnt nach dem schwarzen Container */
+    top: 119px;
+    /* Beginnt nach dem schwarzen Container */
     left: 0;
     right: 0;
     bottom: 0;
-    z-index: 2; /* Unter dem Header */
-    overflow-y: auto; /* Scrollbar für den Inhalt */
+    z-index: 2;
+    /* Unter dem Header */
+    overflow-y: auto;
+    /* Scrollbar für den Inhalt */
     padding: calc(env(safe-area-inset-top, 24px) + 0px) 20px calc(env(safe-area-inset-bottom, 24px) + 20px) 20px;
     /* oben kein Padding, Abstand über .profile-avatar */
     text-align: center;
@@ -140,7 +143,8 @@ body {
     /* 20px (2px kleiner) */
     color: white;
     text-align: center;
-    margin-top: 20px; /* Abstand nach Avatar */
+    margin-top: 20px;
+    /* Abstand nach Avatar */
 }
 
 /* Jobbeschreibung */
@@ -163,7 +167,8 @@ body {
     width: 80%;
     gap: 10px;
     /* Lücke zwischen den Buttons */
-    margin: 30px auto 0 auto; /* Mehr Abstand nach unten */
+    margin: 30px auto 0 auto;
+    /* Mehr Abstand nach unten */
 }
 
 /* Hauptbutton */
@@ -182,11 +187,13 @@ body {
     /* Medium */
     font-size: 15px;
     /* 15px */
-    margin: 15px auto 20px auto; /* Zentriert und weniger Abstand nach unten */
+    margin: 15px auto 20px auto;
+    /* Zentriert und weniger Abstand nach unten */
     cursor: pointer;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-    display: block; /* Block-Element für Zentrierung */
+    display: block;
+    /* Block-Element für Zentrierung */
 }
 
 .main-button:hover {
@@ -269,66 +276,68 @@ body {
 /* iPhone SE und sehr kleine Bildschirme (320px - 375px) */
 @media (max-width: 375px) {
     .header-container {
-        height: 80px; /* Kleinerer Header */
+        height: 80px;
+        /* Kleinerer Header */
     }
-    
+
     .logo {
-        top: 80px; /* Anpassung an kleineren Header */
+        top: 80px;
+        /* Anpassung an kleineren Header */
     }
-    
+
     .logo img {
         height: 70px;
         width: 70px;
     }
-    
+
     .think-text {
         top: 25px;
         left: 25px;
         font-size: 12px;
     }
-    
+
     .profile-avatar img {
         width: 100px;
         height: 100px;
     }
-    
+
     .name {
         font-size: 16px;
         margin-bottom: 8px;
     }
-    
+
     .job-description {
         font-size: 14px;
         margin-bottom: 20px;
         padding: 0 10px;
     }
-    
+
     .button-row {
         margin-top: 15px;
         gap: 8px;
     }
-    
+
     .main-button {
         font-size: 13px;
         padding: 12px 20px;
         margin-top: 12px;
     }
-    
+
     .secondary-button {
         font-size: 12px;
         padding: 12px 10px;
     }
-    
+
     .button-icon {
         width: 16px;
         height: 16px;
     }
-    
+
     .qr-code img {
         width: 60px;
         height: 60px;
     }
-    
+
     .qr-code {
         bottom: 20px;
     }
@@ -339,51 +348,51 @@ body {
     .header-container {
         height: 100px;
     }
-    
+
     .logo {
         top: 100px;
     }
-    
+
     .logo img {
         height: 90px;
         width: 90px;
     }
-    
+
     .think-text {
         top: 30px;
         left: 30px;
         font-size: 14px;
     }
-    
+
     .profile-avatar img {
         width: 120px;
         height: 120px;
     }
-    
+
     .name {
         font-size: 18px;
     }
-    
+
     .job-description {
         font-size: 16px;
         margin-bottom: 25px;
     }
-    
+
     .main-button {
         font-size: 14px;
         padding: 14px 22px;
     }
-    
+
     .secondary-button {
         font-size: 13px;
         padding: 14px 12px;
     }
-    
+
     .button-icon {
         width: 18px;
         height: 18px;
     }
-    
+
     .qr-code img {
         width: 70px;
         height: 70px;
@@ -395,63 +404,63 @@ body {
     .header-container {
         height: 140px;
     }
-    
+
     .logo {
         top: 140px;
     }
-    
+
     .logo img {
         height: 130px;
         width: 130px;
     }
-    
+
     .think-text {
         top: 50px;
         left: 50px;
         font-size: 18px;
     }
-    
+
     .profile-avatar img {
         width: 180px;
         height: 180px;
     }
-    
+
     .name {
         font-size: 24px;
         margin-bottom: 12px;
     }
-    
+
     .job-description {
         font-size: 20px;
         margin-bottom: 35px;
     }
-    
+
     .button-row {
         margin-top: 25px;
         gap: 15px;
     }
-    
+
     .main-button {
         font-size: 17px;
         padding: 18px 30px;
         margin-top: 18px;
     }
-    
+
     .secondary-button {
         font-size: 16px;
         padding: 18px 18px;
     }
-    
+
     .button-icon {
         width: 24px;
         height: 24px;
     }
-    
+
     .qr-code img {
         width: 100px;
         height: 100px;
     }
-    
+
     .qr-code {
         bottom: 40px;
     }
@@ -462,63 +471,63 @@ body {
     .header-container {
         height: 160px;
     }
-    
+
     .logo {
         top: 160px;
     }
-    
+
     .logo img {
         height: 150px;
         width: 150px;
     }
-    
+
     .think-text {
         top: 60px;
         left: 60px;
         font-size: 20px;
     }
-    
+
     .profile-avatar img {
         width: 200px;
         height: 200px;
     }
-    
+
     .name {
         font-size: 26px;
         margin-bottom: 15px;
     }
-    
+
     .job-description {
         font-size: 22px;
         margin-bottom: 40px;
     }
-    
+
     .button-row {
         margin-top: 30px;
         gap: 20px;
     }
-    
+
     .main-button {
         font-size: 18px;
         padding: 20px 35px;
         margin-top: 20px;
     }
-    
+
     .secondary-button {
         font-size: 17px;
         padding: 20px 20px;
     }
-    
+
     .button-icon {
         width: 26px;
         height: 26px;
     }
-    
+
     .qr-code img {
         width: 120px;
         height: 120px;
     }
-    
+
     .qr-code {
         bottom: 50px;
     }

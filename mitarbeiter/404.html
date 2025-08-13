@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weiterleitung | Buderus Systeme</title>
+    <script>
+        // GitHub Pages 404 Redirect Trick für Unterordner "mitarbeiter"
+        var path = location.pathname.replace(/^\/mitarbeiter\//, '/mitarbeiter/');
+        var redirectUrl = location.origin + '/mitarbeiter/index.html?redirect=' + encodeURIComponent(path);
+        sessionStorage.redirect = path;
+        location.replace(redirectUrl);
+    </script>
+</head>
+<body>
+    <div style="text-align: center; padding: 50px; font-family: Arial, sans-serif;">
+        <h2>Weiterleitung...</h2>
+        <p>Sie werden automatisch weitergeleitet.</p>
+    </div>
+</body>
+</html>
