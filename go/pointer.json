@@ -1,0 +1,5 @@
+{
+  "personal": { "default": "https://buderus-systeme.de/landing-personal" },
+  "info":     { "default": "https://buderus-systeme.de/landing-info" },
+  "default":  "https://buderus-systeme.de"
+}

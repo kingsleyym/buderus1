@@ -1,0 +1,20 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Weiterleitung …</title>
+<style>
+  html,body{height:100%;margin:0;display:grid;place-items:center;font:16px system-ui}
+</style>
+<div>Weiterleitung …</div>
+<script>
+(async () => {
+  try {
+    const q = new URLSearchParams(location.search);
+    const src = q.get('src') || 'personal';
+    const f   = q.get('f')   || 'default';
+    const res = await fetch('./pointer.json', { cache: 'no-store' });
+    const map = await res.json();
+    const url = (map[src] && (map[src][f] || map[src].default)) || map.default || '/';
+    location.replace(url);
+  } catch { location.replace('/'); }
+})();
+</script>
