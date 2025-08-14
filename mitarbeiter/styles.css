@@ -59,7 +59,7 @@ body {
     width: 100%;
     height: 119px;
     /* Genau 119px hoch */
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: #181B23;
     /* Schwarz mit 70% Deckkraft (dunkler) */
     border-bottom: 2px solid white;
     /* Weiße Unterkante */

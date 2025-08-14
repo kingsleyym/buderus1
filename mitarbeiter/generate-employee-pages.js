@@ -60,11 +60,6 @@ const htmlTemplate = `<!DOCTYPE html>
             
             <!-- Hauptbutton -->
             <button class="main-button" onclick="saveContact()">Kontakt speichern</button>
-            
-            <!-- QR Code unten mittig -->
-            <div class="qr-code">
-                <img src="../assets/qr.png" alt="QR Code">
-            </div>
         </div>
     </div>
 
