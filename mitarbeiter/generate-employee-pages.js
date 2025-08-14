@@ -37,7 +37,7 @@ const htmlTemplate = `<!DOCTYPE html>
         <div class="content">
             <!-- Profilbild -->
             <div class="profile-avatar">
-                <img src="../assets/avatars/{{id}}.png" alt="Profilbild von {{name}}">
+                <img src="../assets/avatars/{{id}}.{{avatarExt}}" alt="Profilbild von {{name}}">
             </div>
             
             <!-- Name -->
@@ -125,21 +125,19 @@ function replacePlaceholders(template, data) {
 // Hauptfunktion
 function generateEmployeePages() {
     try {
-        // Arbeitsverzeichnis setzen
-        const workDir = '/Users/lucaschweiger/Documents/Clients/Website';
-        process.chdir(workDir);
-
-        // Mitarbeiterdaten laden
-        const employeesData = JSON.parse(fs.readFileSync('employees.json', 'utf8'));
+        // Mitarbeiterdaten laden (im gleichen Ordner wie das Skript)
+        const employeesPath = path.join(__dirname, 'employees.json');
+        const employeesData = JSON.parse(fs.readFileSync(employeesPath, 'utf8'));
 
         console.log('🔄 Generiere individuelle Mitarbeiter-Seiten...');
 
         employeesData.forEach(employee => {
-            // HTML für diesen Mitarbeiter generieren
-            const htmlContent = replacePlaceholders(htmlTemplate, employee);
+            // Bildformat bestimmen: Standard png, außer avatarExt ist gesetzt
+            const avatarExt = employee.avatarExt || 'png';
+            const htmlContent = replacePlaceholders(htmlTemplate, { ...employee, avatarExt });
 
-            // Dateiname erstellen
-            const fileName = `${employee.id}.html`;
+            // Dateiname erstellen (im gleichen Ordner wie das Skript)
+            const fileName = path.join(__dirname, `${employee.id}.html`);
 
             // Datei schreiben
             fs.writeFileSync(fileName, htmlContent, 'utf8');

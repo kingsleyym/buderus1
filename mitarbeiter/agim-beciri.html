@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="de">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,15 +8,13 @@
     <link rel="stylesheet" href="employee-directory.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
-
 <body>
     <div class="container">
         <!-- Hintergrund mit Verlauf -->
         <div class="background"></div>
-
+        
         <!-- Schwarzer Container -->
         <div class="header-container">
             <!-- Think Text oben links -->
@@ -25,40 +22,44 @@
                 Think intelligent.<br>
                 Think blue.
             </div>
-
+            
             <!-- Logo oben rechts -->
             <div class="logo">
                 <img src="../assets/logo.png" alt="Logo">
             </div>
         </div>
-
+        
         <!-- Hauptinhalt -->
         <div class="content">
             <!-- Profilbild -->
             <div class="profile-avatar">
-                <img src="../assets/avatars/agim-beciri.jpg" alt="Profilbild von Agim Beciri">
+                <img src="../assets/avatars/agim-beciri.png" alt="Profilbild von Agim Beciri">
             </div>
-
+            
             <!-- Name -->
             <h1 class="name">Agim Beciri</h1>
-
+            
             <!-- Jobbeschreibung -->
             <p class="job-description">Verkäufer</p>
-            <div class="employee-actions">
-                <div class="button-row">
-                    <button class="secondary-button phone-button" onclick="makeCall()">
-                        <img src="../assets/phone-call-icon.png" alt="Anrufen" class="button-icon">
-                        Anrufen
-                    </button>
-                    <button class="secondary-button email-button" onclick="sendEmail()">
-                        <img src="../assets/mail-filled.png" alt="E-Mail" class="button-icon">
-                        E-Mail
-                    </button>
-                </div>
-                <button class="main-button" onclick="saveContact()">Kontakt speichern</button>
-                <div class="qr-code">
-                    <img src="../assets/qr.png" alt="QR Code">
-                </div>
+            
+            <!-- Zwei kleinere Buttons -->
+            <div class="button-row">
+                <button class="secondary-button phone-button" onclick="makeCall()">
+                    <img src="../assets/phone-call-icon.png" alt="Anrufen" class="button-icon">
+                    Anrufen
+                </button>
+                <button class="secondary-button email-button" onclick="sendEmail()">
+                    <img src="../assets/mail-filled.png" alt="E-Mail" class="button-icon">
+                    E-Mail
+                </button>
+            </div>
+            
+            <!-- Hauptbutton -->
+            <button class="main-button" onclick="saveContact()">Kontakt speichern</button>
+            
+            <!-- QR Code unten mittig -->
+            <div class="qr-code">
+                <img src="../assets/qr.png" alt="QR Code">
             </div>
         </div>
     </div>
@@ -108,5 +109,4 @@ END:VCARD`;
         }
     </script>
 </body>
-
 </html>
