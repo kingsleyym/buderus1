@@ -8,6 +8,10 @@ const htmlTemplate = `<!DOCTYPE html>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{name}} - {{title}} | Buderus Systeme</title>
+    <meta name="theme-color" content="#181A23">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="msapplication-navbutton-color" content="#181A23">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="../assets/favicon-ico-data.ico">
