@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Newsletter Bestätigung | Buderus Systeme</title>
+    <meta name="theme-color" content="#181A23">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="msapplication-navbutton-color" content="#181A23">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/assets/favicon-ico-data.ico">
+    <link rel="apple-touch-icon" href="/assets/apple-touch-icon-png-data.png">
+    
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/newsletter/newsletter.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Hintergrund mit Verlauf -->
+        <div class="background"></div>
+        
+        <!-- Header Container -->
+        <div class="header-container">
+            <div class="think-text">
+                Think intelligent.<br>
+                Think blue.
+            </div>
+            
+            <div class="logo">
+                <img src="/assets/logo.png" alt="Buderus Systeme Logo">
+            </div>
+        </div>
+        
+        <!-- Confirmation Content -->
+        <div class="content newsletter-content">
+            <div id="loadingState" class="loading-state">
+                <div class="loading-spinner">⟳</div>
+                <h2>Bestätigung wird verarbeitet...</h2>
+                <p>Bitte warten Sie einen Moment.</p>
+            </div>
+            
+            <div id="successState" class="success-message" style="display: none;">
+                <h1>✅ Newsletter Anmeldung bestätigt!</h1>
+                <p>Vielen Dank! Ihre E-Mail-Adresse wurde erfolgreich bestätigt. Sie erhalten ab sofort unseren Newsletter mit:</p>
+                
+                <ul style="text-align: left; max-width: 400px; margin: 2rem auto;">
+                    <li>Neueste Produkt-Updates</li>
+                    <li>Technische Tipps und Tricks</li>
+                    <li>Exklusive Angebote</li>
+                    <li>Branchen-Nachrichten</li>
+                </ul>
+                
+                <p><strong>Sie können sich jederzeit wieder abmelden</strong>, indem Sie auf den Abmelde-Link in unseren E-Mails klicken.</p>
+                
+                <div class="action-buttons">
+                    <a href="/index.html" class="main-button">Zur Startseite</a>
+                    <a href="/mitarbeiter/" class="secondary-button">Unsere Mitarbeiter</a>
+                </div>
+            </div>
+            
+            <div id="errorState" class="error-message" style="display: none;">
+                <h1>❌ Bestätigung fehlgeschlagen</h1>
+                <p id="errorText">Der Bestätigungslink ist ungültig oder bereits abgelaufen.</p>
+                
+                <div class="action-buttons">
+                    <a href="/newsletter/index.html" class="main-button">Erneut anmelden</a>
+                    <a href="/index.html" class="secondary-button">Zur Startseite</a>
+                </div>
+            </div>
+            
+            <div id="alreadyConfirmedState" class="success-message" style="display: none;">
+                <h1>✅ Bereits bestätigt</h1>
+                <p>Diese E-Mail-Adresse ist bereits für unseren Newsletter angemeldet.</p>
+                
+                <div class="action-buttons">
+                    <a href="/index.html" class="main-button">Zur Startseite</a>
+                    <a href="/newsletter/unsubscribe.html" class="secondary-button">Abmelden</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Firebase SDK
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+        import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js';
+        
+        // Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyDW_tTYVrU-8pZPqmFcx5BKhgZVs0pTzSQ",
+            authDomain: "buderus-systeme.firebaseapp.com",
+            projectId: "buderus-systeme",
+            storageBucket: "buderus-systeme.firebasestorage.app",
+            messagingSenderId: "384964671486",
+            appId: "1:384964671486:web:648152b8b7effb95df72af"
+        };
+        
+        // Firebase initialisieren
+        try {
+            const app = initializeApp(firebaseConfig);
+            const functions = getFunctions(app);
+            
+            window.firebase = { functions };
+            window.firebaseReady = true;
+            
+            console.log('Firebase erfolgreich initialisiert');
+        } catch (error) {
+            console.error('Firebase Initialisierung fehlgeschlagen:', error);
+            window.firebaseReady = false;
+        }
+        
+        class NewsletterConfirmation {
+            constructor() {
+                this.loadingState = document.getElementById('loadingState');
+                this.successState = document.getElementById('successState');
+                this.errorState = document.getElementById('errorState');
+                this.alreadyConfirmedState = document.getElementById('alreadyConfirmedState');
+                this.errorText = document.getElementById('errorText');
+                
+                this.init();
+            }
+            
+            async init() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const token = urlParams.get('token');
+                const email = urlParams.get('email');
+                
+                if (!token) {
+                    this.showError('Ungültiger Bestätigungslink. Bitte verwenden Sie den Link aus Ihrer Bestätigungs-E-Mail.');
+                    return;
+                }
+                
+                try {
+                    await this.confirmSubscription(token, email);
+                } catch (error) {
+                    console.error('Bestätigungsfehler:', error);
+                    this.showError(error.message);
+                }
+            }
+            
+            async confirmSubscription(token, email) {
+                try {
+                    // Prüfe ob Firebase verfügbar ist
+                    if (window.firebaseReady) {
+                        await this.confirmWithFirebase(token, email);
+                    } else {
+                        await this.confirmFallback(token, email);
+                    }
+                    
+                    this.showSuccess();
+                    this.trackConfirmation(email);
+                    
+                } catch (error) {
+                    if (error.message.includes('already confirmed')) {
+                        this.showAlreadyConfirmed();
+                    } else {
+                        throw error;
+                    }
+                }
+            }
+            
+            async confirmWithFirebase(token, email) {
+                const confirmFunction = window.firebase.functions().httpsCallable('confirmNewsletter');
+                const result = await confirmFunction({ token, email });
+                
+                if (!result.data.success) {
+                    throw new Error(result.data.error || 'Bestätigung fehlgeschlagen');
+                }
+                
+                return result.data;
+            }
+            
+            async confirmFallback(token, email) {
+                // Fallback: Lokale Bestätigung
+                const subscribers = JSON.parse(localStorage.getItem('newsletter_subscribers') || '[]');
+                const subscriber = subscribers.find(sub => 
+                    sub.subscriptionId === token || 
+                    (sub.email === email && sub.subscriptionId.includes(token.substring(0, 10)))
+                );
+                
+                if (!subscriber) {
+                    throw new Error('Bestätigungstoken nicht gefunden oder ungültig.');
+                }
+                
+                if (subscriber.confirmed) {
+                    throw new Error('already confirmed');
+                }
+                
+                // Bestätigung markieren
+                subscriber.confirmed = true;
+                subscriber.confirmedAt = new Date().toISOString();
+                
+                localStorage.setItem('newsletter_subscribers', JSON.stringify(subscribers));
+                
+                console.log('Newsletter Bestätigung erfolgreich (Fallback)');
+            }
+            
+            showSuccess() {
+                this.hideAllStates();
+                this.successState.style.display = 'block';
+            }
+            
+            showError(message) {
+                this.hideAllStates();
+                this.errorText.textContent = message;
+                this.errorState.style.display = 'block';
+            }
+            
+            showAlreadyConfirmed() {
+                this.hideAllStates();
+                this.alreadyConfirmedState.style.display = 'block';
+            }
+            
+            hideAllStates() {
+                this.loadingState.style.display = 'none';
+                this.successState.style.display = 'none';
+                this.errorState.style.display = 'none';
+                this.alreadyConfirmedState.style.display = 'none';
+            }
+            
+            trackConfirmation(email) {
+                // Analytics
+                if (typeof gtag !== 'undefined') {
+                    gtag('event', 'newsletter_confirmed', {
+                        event_category: 'Newsletter',
+                        email_domain: email ? email.split('@')[1] : 'unknown'
+                    });
+                }
+                
+                console.log('Newsletter Bestätigung getrackt');
+            }
+        }
+        
+        // Initialisierung
+        document.addEventListener('DOMContentLoaded', function() {
+            new NewsletterConfirmation();
+        });
+    </script>
+    
+    <style>
+        .loading-state {
+            text-align: center;
+            padding: 3rem 2rem;
+        }
+        
+        .loading-state .loading-spinner {
+            font-size: 3rem;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .action-buttons .secondary-button {
+            background-color: transparent;
+            border: 2px solid #007bff;
+            color: #007bff;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .action-buttons .secondary-button:hover {
+            background-color: #007bff;
+            color: white;
+        }
+        
+        .success-message ul {
+            color: #155724;
+        }
+        
+        @media (max-width: 768px) {
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .action-buttons .main-button,
+            .action-buttons .secondary-button {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+    </style>
+</body>
+</html>

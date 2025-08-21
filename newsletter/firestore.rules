@@ -1,0 +1,42 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Admin Users Collection - nur für authentifizierte User lesbar
+    match /users/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if request.auth != null;
+    }
+    
+    // Subscribers Collection - öffentlich lesbar/schreibbar für Newsletter-Funktionen
+    match /subscribers/{document} {
+      allow read, write: if true;
+    }
+    
+    // Newsletter Campaigns - nur für authentifizierte User
+    match /newsletters/{document} {
+      allow read, write: if request.auth != null;
+    }
+    
+    // Analytics - nur für authentifizierte User
+    match /analytics/{document} {
+      allow read, write: if request.auth != null;
+    }
+    
+    // Consent Records - nur für authentifizierte User
+    match /consent/{document} {
+      allow read, write: if request.auth != null;
+    }
+    
+    // Rewards - öffentlich lesbar/schreibbar für Newsletter-Funktionen
+    match /rewards/{document} {
+      allow read, write: if true;
+    }
+    
+    // Alle anderen Dokumente - blockiert
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

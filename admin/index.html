@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login | Buderus Systeme</title>
+    <meta name="theme-color" content="#181A23">
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/assets/favicon-ico-data.ico">
+    
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/admin/admin.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="admin-body">
+    <div class="admin-login-container">
+        <div class="admin-login-card">
+            <div class="admin-header">
+                <img src="/assets/logo.png" alt="Buderus Systeme Logo" class="admin-logo">
+                <h1>Admin Bereich</h1>
+                <p>Newsletter & Marketing Dashboard</p>
+            </div>
+            
+            <form id="adminLoginForm" class="admin-login-form">
+                <div class="form-group">
+                    <label for="email">E-Mail-Adresse</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Passwort</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                
+                <button type="submit" class="admin-login-btn">
+                    <span class="btn-text">Anmelden</span>
+                    <span class="btn-loader" style="display: none;">⟳</span>
+                </button>
+                
+                <div id="loginError" class="error-message" style="display: none;"></div>
+            </form>
+            
+            <div class="admin-footer">
+                <p>&copy; 2025 Buderus Systeme - Sicherer Admin-Bereich</p>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Firebase SDK
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+        import { getAuth, signInWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+        import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+        
+        // Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyDW_tTYVrU-8pZPqmFcx5BKhgZVs0pTzSQ",
+            authDomain: "buderus-systeme.firebaseapp.com",
+            projectId: "buderus-systeme",
+            storageBucket: "buderus-systeme.firebasestorage.app",
+            messagingSenderId: "384964671486",
+            appId: "1:384964671486:web:648152b8b7effb95df72af"
+        };
+        
+        // Firebase initialisieren
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        
+        class AdminLogin {
+            constructor() {
+                this.form = document.getElementById('adminLoginForm');
+                this.errorDiv = document.getElementById('loginError');
+                this.submitBtn = this.form.querySelector('button[type="submit"]');
+                this.btnText = this.submitBtn.querySelector('.btn-text');
+                this.btnLoader = this.submitBtn.querySelector('.btn-loader');
+                
+                this.init();
+            }
+            
+            init() {
+                this.form.addEventListener('submit', (e) => this.handleLogin(e));
+                
+                // Check if already logged in
+                auth.onAuthStateChanged((user) => {
+                    if (user) {
+                        this.checkAdminRole(user);
+                    }
+                });
+            }
+            
+            async handleLogin(e) {
+                e.preventDefault();
+                
+                const email = this.form.email.value;
+                const password = this.form.password.value;
+                
+                this.setLoading(true);
+                this.hideError();
+                
+                try {
+                    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                    await this.checkAdminRole(userCredential.user);
+                } catch (error) {
+                    console.error('Login Fehler:', error);
+                    this.showError(this.getErrorMessage(error.code));
+                    this.setLoading(false);
+                }
+            }
+            
+            async checkAdminRole(user) {
+                try {
+                    const userDoc = await getDoc(doc(db, 'users', user.uid));
+                    
+                    if (userDoc.exists() && userDoc.data().role === 'admin') {
+                        // Admin verified - redirect to dashboard
+                        window.location.href = '/admin/dashboard.html';
+                    } else {
+                        // Not an admin - sign out and show error
+                        await auth.signOut();
+                        this.showError('Sie haben keine Berechtigung für den Admin-Bereich.');
+                        this.setLoading(false);
+                    }
+                } catch (error) {
+                    console.error('Role Check Fehler:', error);
+                    this.showError('Fehler bei der Berechtigung. Bitte versuchen Sie es erneut.');
+                    this.setLoading(false);
+                }
+            }
+            
+            setLoading(loading) {
+                if (loading) {
+                    this.btnText.style.display = 'none';
+                    this.btnLoader.style.display = 'inline';
+                    this.submitBtn.disabled = true;
+                } else {
+                    this.btnText.style.display = 'inline';
+                    this.btnLoader.style.display = 'none';
+                    this.submitBtn.disabled = false;
+                }
+            }
+            
+            showError(message) {
+                this.errorDiv.textContent = message;
+                this.errorDiv.style.display = 'block';
+            }
+            
+            hideError() {
+                this.errorDiv.style.display = 'none';
+            }
+            
+            getErrorMessage(errorCode) {
+                switch (errorCode) {
+                    case 'auth/user-not-found':
+                    case 'auth/wrong-password':
+                        return 'Ungültige E-Mail oder Passwort.';
+                    case 'auth/too-many-requests':
+                        return 'Zu viele Anmeldeversuche. Bitte warten Sie einen Moment.';
+                    case 'auth/network-request-failed':
+                        return 'Netzwerkfehler. Bitte prüfen Sie Ihre Internetverbindung.';
+                    default:
+                        return 'Anmeldung fehlgeschlagen. Bitte versuchen Sie es erneut.';
+                }
+            }
+        }
+        
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            new AdminLogin();
+        });
+    </script>
+</body>
+</html>
