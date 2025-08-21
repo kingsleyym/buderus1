@@ -34,6 +34,16 @@ service cloud.firestore {
       allow read, write: if true;
     }
     
+    // QR-Codes Collection - nur für authentifizierte User
+    match /qr-codes/{document} {
+      allow read, write: if request.auth != null;
+    }
+    
+    // QR-Analytics Collection - nur für authentifizierte User  
+    match /qr-analytics/{document} {
+      allow read, write: if request.auth != null;
+    }
+    
     // Alle anderen Dokumente - blockiert
     match /{document=**} {
       allow read, write: if false;

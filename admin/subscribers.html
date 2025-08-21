@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abonnenten | Buderus Systeme</title>
+    <meta name="theme-color" content="#181A23">
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/assets/favicon-ico-data.ico">
+    
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/admin/admin.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="admin-body">
+    <!-- Mobile Navigation Toggle -->
+    <button class="mobile-nav-toggle" id="mobileNavToggle">☰</button>
+    
+    <!-- Mobile Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    
+    <div class="admin-dashboard">
+        <!-- Sidebar -->
+        <nav class="admin-sidebar">
+            <div class="sidebar-header">
+                <img src="/assets/logo.png" alt="Buderus Systeme" class="sidebar-logo">
+                <h2 class="sidebar-title">Admin Dashboard</h2>
+                <p class="sidebar-subtitle">Newsletter Management</p>
+            </div>
+            
+            <div class="sidebar-nav">
+                <a href="/admin/dashboard.html" class="nav-item">
+                    <i>📊</i> Dashboard
+                </a>
+                <a href="/admin/newsletter-editor.html" class="nav-item">
+                    <i>✏️</i> Newsletter erstellen
+                </a>
+                <a href="/admin/subscribers.html" class="nav-item active">
+                    <i>👥</i> Abonnenten
+                </a>
+                <a href="/admin/campaigns.html" class="nav-item">
+                    <i>📧</i> Kampagnen
+                </a>
+                <a href="/admin/qr-codes.html" class="nav-item">
+                    <i>📱</i> QR-Codes
+                </a>
+                <a href="/admin/rewards.html" class="nav-item">
+                    <i>🎁</i> Belohnungen
+                </a>
+                <a href="/admin/analytics.html" class="nav-item">
+                    <i>📈</i> Statistiken
+                </a>
+            </div>
+            
+            <div class="sidebar-footer">
+                <button id="logoutBtn" class="logout-btn">
+                    <i>🚪</i> Abmelden
+                </button>
+            </div>
+        </nav>
+        
+        <!-- Main Content -->
+        <main class="admin-main">
+            <div class="dashboard-header">
+                <h1 class="dashboard-title">Abonnenten</h1>
+                <p class="dashboard-subtitle">Verwalten Sie Ihre Newsletter-Abonnenten.</p>
+            </div>
+            
+            <div class="content-card">
+                <div class="card-content">
+                    <h3>🚧 In Entwicklung</h3>
+                    <p>Die Abonnenten-Verwaltung wird in Kürze verfügbar sein.</p>
+                    <p>Aktuell können Sie Abonnenten manuell über das Dashboard hinzufügen.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        // Firebase SDK
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+        
+        // Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyDW_tTYVrU-8pZPqmFcx5BKhgZVs0pTzSQ",
+            authDomain: "buderus-systeme.firebaseapp.com",
+            projectId: "buderus-systeme",
+            storageBucket: "buderus-systeme.firebasestorage.app",
+            messagingSenderId: "384964671486",
+            appId: "1:384964671486:web:648152b8b7effb95df72af"
+        };
+        
+        // Firebase initialisieren
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        
+        // Auth Check
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                window.location.href = '/admin/index.html';
+            }
+        });
+        
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            await signOut(auth);
+            window.location.href = '/admin/index.html';
+        });
+        
+        // Mobile Navigation
+        const mobileNavToggle = document.getElementById('mobileNavToggle');
+        const sidebar = document.querySelector('.admin-sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        
+        if (mobileNavToggle && sidebar && sidebarOverlay) {
+            mobileNavToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('open');
+                sidebarOverlay.classList.toggle('show');
+            });
+            
+            sidebarOverlay.addEventListener('click', () => {
+                sidebar.classList.remove('open');
+                sidebarOverlay.classList.remove('show');
+            });
+            
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    if (window.innerWidth <= 768) {
+                        sidebar.classList.remove('open');
+                        sidebarOverlay.classList.remove('show');
+                    }
+                });
+            });
+        }
+    </script>
+</body>
+</html>

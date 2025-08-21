@@ -554,3 +554,9 @@ exports.addManualSubscriber = adminFunctions.addManualSubscriber;
 exports.sendNewsletter = adminFunctions.sendNewsletter;
 exports.sendTestNewsletter = adminFunctions.sendTestNewsletter;
 exports.getAnalytics = adminFunctions.getAnalytics;
+
+// QR Code Functions importieren und exportieren
+const qrFunctions = require('./qr-functions');
+exports.qrRedirect = qrFunctions.qrRedirect;
+exports.getQRAnalytics = qrFunctions.getQRAnalytics;
+exports.exportQRCodes = qrFunctions.exportQRCodes;

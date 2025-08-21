@@ -12,6 +12,10 @@
     ],
     "rewrites": [
       {
+        "source": "/q/**",
+        "function": "qrRedirect"
+      },
+      {
         "source": "/newsletter/**",
         "destination": "/newsletter/index.html"
       }
