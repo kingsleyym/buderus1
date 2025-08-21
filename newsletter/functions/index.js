@@ -211,9 +211,20 @@ exports.subscribeNewsletter = functions.https.onCall(async (data, context) => {
  */
 exports.confirmNewsletter = functions.https.onCall(async (data, context) => {
     try {
-        const { token, email } = data;
+        console.log('ConfirmNewsletter aufgerufen - Datentyp:', typeof data);
+        console.log('Empfangene Daten:', data);
+
+        // Firebase Functions v2 Compatibility - Daten können verschachtelt sein
+        const actualData = data.data || data;
+        console.log('Tatsächliche Daten:', actualData);
+
+        const { token, email } = actualData;
+
+        console.log('Extrahierter Token:', token);
+        console.log('Extrahierte Email:', email);
 
         if (!token) {
+            console.log('Token-Validierung fehlgeschlagen - Token:', token);
             throw new functions.https.HttpsError('invalid-argument', 'Bestätigungstoken erforderlich');
         }
 
@@ -279,9 +290,20 @@ exports.confirmNewsletter = functions.https.onCall(async (data, context) => {
  */
 exports.unsubscribeNewsletter = functions.https.onCall(async (data, context) => {
     try {
-        const { email, token } = data;
+        console.log('UnsubscribeNewsletter aufgerufen - Datentyp:', typeof data);
+        console.log('Empfangene Daten:', data);
+
+        // Firebase Functions v2 Compatibility - Daten können verschachtelt sein
+        const actualData = data.data || data;
+        console.log('Tatsächliche Daten:', actualData);
+
+        const { email, token } = actualData;
+
+        console.log('Extrahierte Email:', email);
+        console.log('Extrahierter Token:', token);
 
         if (!email && !token) {
+            console.log('Validierung fehlgeschlagen - Email:', email, 'Token:', token);
             throw new functions.https.HttpsError('invalid-argument', 'E-Mail oder Abmelde-Token erforderlich');
         }
 
@@ -388,7 +410,7 @@ async function sendConfirmationEmail(email, token, userData) {
         console.log('E-Mail Transporter erstellt');
     }
 
-    const confirmUrl = `https://buderus-systeme.de/newsletter/confirm.html?token=${token}&email=${encodeURIComponent(email)}`;
+    const confirmUrl = `https://buderus-systeme.web.app/newsletter/confirm.html?token=${token}&email=${encodeURIComponent(email)}`;
     const name = userData.firstName ? ` ${userData.firstName}` : '';
     
     console.log('Bestätigungs-URL erstellt:', confirmUrl);
@@ -456,7 +478,7 @@ async function sendWelcomeEmail(email, userData) {
     if (!transporter) return; // Transporter Setup erforderlich
 
     const name = userData.firstName ? ` ${userData.firstName}` : '';
-    const unsubscribeUrl = `https://buderus-systeme.de/newsletter/unsubscribe.html?email=${encodeURIComponent(email)}`;
+    const unsubscribeUrl = `https://buderus-systeme.web.app/newsletter/unsubscribe.html?email=${encodeURIComponent(email)}`;
 
     const mailOptions = {
         from: '"Buderus Systeme" <newsletter@buderus-systeme.de>',
@@ -480,7 +502,7 @@ async function sendWelcomeEmail(email, userData) {
           </ul>
           
           <div style="text-align: center; margin: 2rem 0;">
-            <a href="https://buderus-systeme.de" style="background: #007bff; color: white; padding: 1rem 2rem; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 500;">
+            <a href="https://buderus-systeme.web.app" style="background: #007bff; color: white; padding: 1rem 2rem; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 500;">
               Unsere Website besuchen
             </a>
           </div>

@@ -284,12 +284,30 @@ exports.addManualSubscriber = functions.https.onCall(async (data, context) => {
  */
 exports.sendNewsletter = functions.https.onCall(async (data, context) => {
   try {
+    console.log('sendNewsletter aufgerufen - Context:', typeof context);
+    console.log('sendNewsletter Context Keys:', context ? Object.keys(context) : 'null/undefined');
+    console.log('sendNewsletter Auth in Context:', context?.auth);
+    console.log('sendNewsletter Auth in Data:', data?.auth);
+    
+    // Firebase Functions v2 - Auth ist in den Daten, nicht im Context!
+    const authUID = data?.auth?.uid || context?.auth?.uid;
+    
+    console.log('sendNewsletter aufgerufen von User:', authUID);
+    console.log('sendNewsletter Daten:', data);
+
     // Admin-Berechtigung prüfen
-    if (!context.auth || !await isAdmin(context.auth.uid)) {
+    if (!authUID || !await isAdmin(authUID)) {
+      console.log('Admin-Berechtigung fehlgeschlagen für UID:', authUID);
       throw new functions.https.HttpsError('permission-denied', 'Admin-Berechtigung erforderlich');
     }
+
+    console.log('Admin-Berechtigung bestätigt für UID:', authUID);
     
-    const { subject, content, recipientFilter = 'confirmed', testMode = false } = data;
+    // Firebase Functions v2 Compatibility - Daten können verschachtelt sein
+    const actualData = data.data || data;
+    console.log('Tatsächliche Newsletter-Daten:', actualData);
+
+    const { subject, content, recipientFilter = 'confirmed', testMode = false } = actualData;
     
     if (!subject || !content) {
       throw new functions.https.HttpsError('invalid-argument', 'Betreff und Inhalt sind erforderlich');
@@ -320,7 +338,7 @@ exports.sendNewsletter = functions.https.onCall(async (data, context) => {
     
     if (testMode) {
       // Test-Modus: Nur an Admin senden
-      const adminUser = await admin.auth().getUser(context.auth.uid);
+      const adminUser = await admin.auth().getUser(authUID);
       const testRecipients = [{ email: adminUser.email, firstName: 'Test', lastName: 'Admin' }];
       
       await sendBulkNewsletter(subject, content, testRecipients);
@@ -338,7 +356,7 @@ exports.sendNewsletter = functions.https.onCall(async (data, context) => {
         content,
         recipientCount: recipients.length,
         sentAt: admin.firestore.FieldValue.serverTimestamp(),
-        sentBy: context.auth.uid,
+        sentBy: authUID,
         status: 'sending'
       });
       
@@ -374,12 +392,22 @@ exports.sendNewsletter = functions.https.onCall(async (data, context) => {
  */
 exports.sendTestNewsletter = functions.https.onCall(async (data, context) => {
   try {
+    console.log('sendTestNewsletter aufgerufen von User:', context.auth?.uid);
+    console.log('sendTestNewsletter Daten:', data);
+
     // Admin-Berechtigung prüfen
     if (!context.auth || !await isAdmin(context.auth.uid)) {
+      console.log('Admin-Berechtigung fehlgeschlagen für UID:', context.auth?.uid);
       throw new functions.https.HttpsError('permission-denied', 'Admin-Berechtigung erforderlich');
     }
+
+    console.log('Admin-Berechtigung bestätigt für UID:', context.auth.uid);
     
-    const { email } = data;
+    // Firebase Functions v2 Compatibility - Daten können verschachtelt sein
+    const actualData = data.data || data;
+    console.log('Tatsächliche Test-Daten:', actualData);
+
+    const { email } = actualData;
     const adminUser = await admin.auth().getUser(context.auth.uid);
     const testEmail = email || adminUser.email;
     
@@ -513,7 +541,7 @@ exports.getAnalytics = functions.https.onCall(async (data, context) => {
 async function isAdmin(uid) {
   try {
     const userDoc = await db.collection('users').doc(uid).get();
-    return userDoc.exists() && userDoc.data().role === 'admin';
+    return userDoc.exists && userDoc.data().role === 'admin';
   } catch (error) {
     console.error('Admin Check Fehler:', error);
     return false;
@@ -558,13 +586,15 @@ async function logAnalyticsEvent(eventName, data) {
 
 async function sendBulkNewsletter(subject, content, recipients) {
   if (!transporter) {
-    transporter = nodemailer.createTransporter({
+    // E-Mail Transporter konfigurieren mit IONOS SMTP - KORRIGIERTE API
+    const emailPassword = `Buderus1234!`;
+    transporter = nodemailer.createTransport({
       host: 'smtp.ionos.de',
       port: 587,
       secure: false,
       auth: {
         user: 'newsletter@buderus-systeme.de',
-        pass: 'Buderus1234!'
+        pass: emailPassword
       },
       tls: {
         rejectUnauthorized: false
@@ -602,13 +632,15 @@ async function sendBulkNewsletter(subject, content, recipients) {
 
 async function sendTestEmail(email) {
   if (!transporter) {
-    transporter = nodemailer.createTransporter({
+    // E-Mail Transporter konfigurieren mit IONOS SMTP - KORRIGIERTE API
+    const emailPassword = `Buderus1234!`;
+    transporter = nodemailer.createTransport({
       host: 'smtp.ionos.de',
       port: 587,
       secure: false,
       auth: {
         user: 'newsletter@buderus-systeme.de',
-        pass: 'Buderus1234!'
+        pass: emailPassword
       },
       tls: {
         rejectUnauthorized: false
@@ -654,13 +686,15 @@ async function sendTestEmail(email) {
 
 async function sendAdminSetupEmail(email, tempPassword) {
   if (!transporter) {
-    transporter = nodemailer.createTransporter({
+    // E-Mail Transporter konfigurieren mit IONOS SMTP - KORRIGIERTE API
+    const emailPassword = `Buderus1234!`;
+    transporter = nodemailer.createTransport({
       host: 'smtp.ionos.de',
       port: 587,
       secure: false,
       auth: {
         user: 'newsletter@buderus-systeme.de',
-        pass: 'Buderus1234!'
+        pass: emailPassword
       },
       tls: {
         rejectUnauthorized: false
