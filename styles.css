@@ -1,0 +1,525 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    height: 100vh;
+    overflow: hidden;
+    /* Keine Scrollbar für body */
+}
+
+.container {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    padding-top: env(safe-area-inset-top, 24px);
+    padding-bottom: env(safe-area-inset-bottom, 24px);
+}
+
+/* Hintergrund Bild */
+.background {
+    position: absolute;
+    top: -24%;
+    left: 0;
+    width: 100%;
+    height: 148%;
+    /* 100% + 24% oben + 24% unten */
+    background-image: url('assets/background.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: 1;
+}
+
+/* Verlauf Overlay */
+.background::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom,
+            rgba(0, 29, 93, 1) 0%,
+            /* #001D5D mit 100% Deckkraft oben */
+            rgba(0, 23, 74, 0.44) 100%
+            /* #00174A mit 44% Deckkraft unten */
+        );
+    z-index: 1;
+}
+
+/* Schwarzer Container oben */
+.header-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 119px;
+    /* Genau 119px hoch */
+    background-color: rgba(0, 0, 0, 0.7);
+    /* Schwarz mit 70% Deckkraft (dunkler) */
+    border-bottom: 2px solid white;
+    /* Weiße Unterkante */
+    z-index: 3;
+    /* Über dem Verlauf */
+    padding-top: env(safe-area-inset-top, 24px);
+}
+
+/* Logo auf der Border rechts */
+.logo {
+    position: absolute;
+    top: 119px;
+    /* Auf der Border-Linie (119px) */
+    right: 20px;
+    /* Rechts mit Abstand zum Rand */
+    transform: translateY(-50%);
+    /* Mittig auf der Border-Linie */
+    z-index: 4;
+}
+
+.logo img {
+    height: 110px;
+    /* 120x120px */
+    width: 110px;
+}
+
+/* Think Text oben links */
+.think-text {
+    position: absolute;
+    top: 40px;
+    /* Abstand von oben */
+    left: 40px;
+    /* Abstand von links */
+    color: white;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 300;
+    font-size: 16px;
+    line-height: 1.2;
+    z-index: 4;
+}
+
+/* Hauptinhalt */
+.content {
+    position: absolute;
+    top: 119px; /* Beginnt nach dem schwarzen Container */
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2; /* Unter dem Header */
+    overflow-y: auto; /* Scrollbar für den Inhalt */
+    padding: calc(env(safe-area-inset-top, 24px) + 0px) 20px calc(env(safe-area-inset-bottom, 24px) + 20px) 20px;
+    /* oben kein Padding, Abstand über .profile-avatar */
+    text-align: center;
+}
+
+/* Profilbild */
+.profile-avatar {
+    margin-top: 80px;
+    margin-bottom: 20px;
+}
+
+.profile-avatar img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 3px solid white;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    object-fit: cover;
+    object-position: center;
+}
+
+/* Name */
+.name {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    /* Medium */
+    font-size: 20px;
+    /* 20px (2px kleiner) */
+    color: white;
+    text-align: center;
+    margin-top: 20px; /* Abstand nach Avatar */
+}
+
+/* Jobbeschreibung */
+.job-description {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 200;
+    /* Extra Light */
+    font-size: 18px;
+    /* 18px */
+    color: white;
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 30px;
+    /* Abstand nach Name und vor Buttons */
+}
+
+/* Button-Reihe */
+.button-row {
+    display: flex;
+    width: 80%;
+    gap: 10px;
+    /* Lücke zwischen den Buttons */
+    margin: 30px auto 0 auto; /* Mehr Abstand nach unten */
+}
+
+/* Hauptbutton */
+.main-button {
+    width: 80%;
+    padding: 15px 25px;
+    /* Gleiche Höhe wie andere Buttons */
+    background-color: white;
+    color: black;
+    /* Schwarzer Text */
+    border: none;
+    border-radius: 50px;
+    /* Runde Ecken */
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    /* Medium */
+    font-size: 15px;
+    /* 15px */
+    margin: 15px auto 20px auto; /* Zentriert und weniger Abstand nach unten */
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: block; /* Block-Element für Zentrierung */
+}
+
+.main-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+}
+
+.main-button:active {
+    transform: translateY(0);
+}
+
+/* Sekundäre Buttons */
+.secondary-button {
+    flex: 1;
+    /* Gleiche Breite für beide Buttons */
+    padding: 15px 15px;
+    /* Gleiche Höhe wie Hauptbutton */
+    color: white;
+    /* Weißer Text */
+    border: none;
+    border-radius: 50px;
+    /* Runde Ecken */
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    /* Medium */
+    font-size: 15px;
+    /* 15px */
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+/* Phone Button */
+.phone-button {
+    background-color: #284E78;
+    /* Telefon Button Farbe */
+}
+
+/* Email Button */
+.email-button {
+    background-color: rgba(88, 90, 93, 0.79);
+    /* #585A5D mit 79% Deckkraft */
+}
+
+/* Button Icons */
+.button-icon {
+    width: 20px;
+    height: 20px;
+}
+
+.secondary-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+}
+
+.secondary-button:active {
+    transform: translateY(0);
+}
+
+/* QR Code unten mittig */
+.qr-code {
+    position: absolute;
+    bottom: calc(env(safe-area-inset-bottom, 24px) + 30px);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3;
+}
+
+.qr-code img {
+    width: 80px;
+    height: 80px;
+}
+
+/* Mobile Optimierung */
+
+/* iPhone SE und sehr kleine Bildschirme (320px - 375px) */
+@media (max-width: 375px) {
+    .header-container {
+        height: 80px; /* Kleinerer Header */
+    }
+    
+    .logo {
+        top: 80px; /* Anpassung an kleineren Header */
+    }
+    
+    .logo img {
+        height: 70px;
+        width: 70px;
+    }
+    
+    .think-text {
+        top: 25px;
+        left: 25px;
+        font-size: 12px;
+    }
+    
+    .profile-avatar img {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .name {
+        font-size: 16px;
+        margin-bottom: 8px;
+    }
+    
+    .job-description {
+        font-size: 14px;
+        margin-bottom: 20px;
+        padding: 0 10px;
+    }
+    
+    .button-row {
+        margin-top: 15px;
+        gap: 8px;
+    }
+    
+    .main-button {
+        font-size: 13px;
+        padding: 12px 20px;
+        margin-top: 12px;
+    }
+    
+    .secondary-button {
+        font-size: 12px;
+        padding: 12px 10px;
+    }
+    
+    .button-icon {
+        width: 16px;
+        height: 16px;
+    }
+    
+    .qr-code img {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .qr-code {
+        bottom: 20px;
+    }
+}
+
+/* iPhone 12/13/14 Standard und ähnliche (376px - 428px) */
+@media (min-width: 376px) and (max-width: 428px) {
+    .header-container {
+        height: 100px;
+    }
+    
+    .logo {
+        top: 100px;
+    }
+    
+    .logo img {
+        height: 90px;
+        width: 90px;
+    }
+    
+    .think-text {
+        top: 30px;
+        left: 30px;
+        font-size: 14px;
+    }
+    
+    .profile-avatar img {
+        width: 120px;
+        height: 120px;
+    }
+    
+    .name {
+        font-size: 18px;
+    }
+    
+    .job-description {
+        font-size: 16px;
+        margin-bottom: 25px;
+    }
+    
+    .main-button {
+        font-size: 14px;
+        padding: 14px 22px;
+    }
+    
+    .secondary-button {
+        font-size: 13px;
+        padding: 14px 12px;
+    }
+    
+    .button-icon {
+        width: 18px;
+        height: 18px;
+    }
+    
+    .qr-code img {
+        width: 70px;
+        height: 70px;
+    }
+}
+
+/* Tablets im Portrait-Modus (429px - 768px) */
+@media (min-width: 429px) and (max-width: 768px) {
+    .header-container {
+        height: 140px;
+    }
+    
+    .logo {
+        top: 140px;
+    }
+    
+    .logo img {
+        height: 130px;
+        width: 130px;
+    }
+    
+    .think-text {
+        top: 50px;
+        left: 50px;
+        font-size: 18px;
+    }
+    
+    .profile-avatar img {
+        width: 180px;
+        height: 180px;
+    }
+    
+    .name {
+        font-size: 24px;
+        margin-bottom: 12px;
+    }
+    
+    .job-description {
+        font-size: 20px;
+        margin-bottom: 35px;
+    }
+    
+    .button-row {
+        margin-top: 25px;
+        gap: 15px;
+    }
+    
+    .main-button {
+        font-size: 17px;
+        padding: 18px 30px;
+        margin-top: 18px;
+    }
+    
+    .secondary-button {
+        font-size: 16px;
+        padding: 18px 18px;
+    }
+    
+    .button-icon {
+        width: 24px;
+        height: 24px;
+    }
+    
+    .qr-code img {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .qr-code {
+        bottom: 40px;
+    }
+}
+
+/* Tablets im Landscape und Desktop (769px+) */
+@media (min-width: 769px) {
+    .header-container {
+        height: 160px;
+    }
+    
+    .logo {
+        top: 160px;
+    }
+    
+    .logo img {
+        height: 150px;
+        width: 150px;
+    }
+    
+    .think-text {
+        top: 60px;
+        left: 60px;
+        font-size: 20px;
+    }
+    
+    .profile-avatar img {
+        width: 200px;
+        height: 200px;
+    }
+    
+    .name {
+        font-size: 26px;
+        margin-bottom: 15px;
+    }
+    
+    .job-description {
+        font-size: 22px;
+        margin-bottom: 40px;
+    }
+    
+    .button-row {
+        margin-top: 30px;
+        gap: 20px;
+    }
+    
+    .main-button {
+        font-size: 18px;
+        padding: 20px 35px;
+        margin-top: 20px;
+    }
+    
+    .secondary-button {
+        font-size: 17px;
+        padding: 20px 20px;
+    }
+    
+    .button-icon {
+        width: 26px;
+        height: 26px;
+    }
+    
+    .qr-code img {
+        width: 120px;
+        height: 120px;
+    }
+    
+    .qr-code {
+        bottom: 50px;
+    }
+}
