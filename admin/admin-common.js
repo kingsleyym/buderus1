@@ -1,14 +1,37 @@
-// Admin Common Functions
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
-import { getFirestore, collection, getDocs, addDoc, doc, updateDoc, deleteDoc, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
-import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js';
+// Admin Common Functions - NO IMPORTS, damit es als normales Script funktioniert
 
 class AdminBase {
     constructor() {
-        this.initFirebase();
-        this.setupAuth();
-        this.setupMobileNavigation();
+        // Warte auf Firebase Scripts
+        this.waitForFirebase().then(() => {
+            this.initFirebase();
+            this.setupAuth();
+            this.setupMobileNavigation();
+        });
+    }
+    
+    async waitForFirebase() {
+        // Warte bis Firebase verfügbar ist
+        return new Promise((resolve) => {
+            if (typeof firebase !== 'undefined') {
+                resolve();
+                return;
+            }
+            
+            const checkFirebase = setInterval(() => {
+                if (typeof firebase !== 'undefined') {
+                    clearInterval(checkFirebase);
+                    resolve();
+                }
+            }, 100);
+            
+            // Timeout nach 10 Sekunden
+            setTimeout(() => {
+                clearInterval(checkFirebase);
+                console.error('Firebase timeout');
+                resolve();
+            }, 10000);
+        });
     }
     
     initFirebase() {
@@ -22,14 +45,20 @@ class AdminBase {
             appId: "1:384964671486:web:648152b8b7effb95df72af"
         };
         
-        this.app = initializeApp(firebaseConfig);
-        this.auth = getAuth(this.app);
-        this.db = getFirestore(this.app);
-        this.functions = getFunctions(this.app);
+        // Verwende Firebase v8 SDK statt v9
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        this.app = firebase.app();
+        this.auth = firebase.auth();
+        this.db = firebase.firestore();
+        this.functions = firebase.functions();
+        
+        console.log('🔧 DEBUG: Firebase in AdminBase initialisiert');
     }
     
     setupAuth() {
-        onAuthStateChanged(this.auth, (user) => {
+        this.auth.onAuthStateChanged((user) => {
             if (!user) {
                 window.location.href = '/admin/index.html';
             }
@@ -47,7 +76,7 @@ class AdminBase {
         const logoutBtn = document.getElementById('logoutBtn');
         if (logoutBtn) {
             logoutBtn.addEventListener('click', async () => {
-                await signOut(this.auth);
+                await this.auth.signOut();
                 window.location.href = '/admin/index.html';
             });
         }

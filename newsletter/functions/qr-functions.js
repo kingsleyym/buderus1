@@ -35,8 +35,8 @@ exports.qrRedirect = functions.https.onRequest(async (req, res) => {
     
     console.log('QR-Code Scan:', qrId);
     
-    // QR-Code aus Firestore laden
-    const qrRef = db.collection('qrcodes').doc(qrId);
+    // QR-Code aus Firestore laden (korrekte Collection 'qr-codes')
+    const qrRef = db.collection('qr-codes').doc(qrId);
     const qrDoc = await qrRef.get();
     
     if (!qrDoc.exists) {
@@ -224,7 +224,7 @@ exports.exportQRCodes = functions.https.onCall(async (data, context) => {
     const { format = 'csv', qrIds = [] } = data.data || data;
     
     // Alle oder spezifische QR-Codes abrufen
-    let qrQuery = db.collection('qrcodes');
+    let qrQuery = db.collection('qr-codes');
     
     if (qrIds.length > 0) {
       qrQuery = qrQuery.where(admin.firestore.FieldPath.documentId(), 'in', qrIds);

@@ -8,7 +8,12 @@
     <meta name="robots" content="noindex, nofollow">
     
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="/assets/favicon-ico-data.ico">
+    <link rel="icon" type="image/x-icon" href="/assets/f        
+        // Warte auf alle Libraries vor Initialisierung
+        waitForLibraries().then(() => {
+            console.log('🔧 DEBUG: Starte QRCodeManager nach Library Load');
+            
+            class QRCodeManager extends AdminBase {ata.ico">
     
     <link rel="stylesheet" href="/styles.css">
     <link rel="stylesheet" href="/admin/admin.css">
@@ -16,8 +21,21 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- QR Code Library -->
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.js"></script>
+    <!-- Firebase v8 SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-functions.js"></script>
+    
+    <!-- QR Code Library - Erweiterte Version für besseres Design -->
+    <script src="https://unpkg.com/qr-code-styling@1.6.0/lib/qr-code-styling.js" 
+            onload="console.log('🔧 DEBUG: QR-Code-Styling Library geladen')"
+            onerror="console.log('🔧 DEBUG: QR-Code-Styling failed, Fallback zu Standard QRCode'); this.onerror=null; this.src='https://unpkg.com/qrcode@1.4.4/build/qrcode.min.js'"></script>
+    
+    <!-- Fallback QR Code Library -->
+    <script src="https://unpkg.com/qrcode@1.4.4/build/qrcode.min.js" 
+            onload="console.log('🔧 DEBUG: Fallback QRCode Library geladen')"
+            style="display: none;"></script>
     
     <style>
         .qr-grid {
@@ -154,6 +172,61 @@
                 flex-direction: column;
             }
         }
+        
+        /* Modal Styles - Clean CSS ohne Konflikte */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 10000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .modal.show {
+            display: flex;
+            opacity: 1;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            padding: 2rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+        
+        .modal.show .modal-content {
+            transform: scale(1);
+        }
+        
+        .modal .close {
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: #666;
+            transition: color 0.2s;
+        }
+        
+        .modal .close:hover {
+            color: #000;
+        }
     </style>
 </head>
 <body class="admin-body">
@@ -221,8 +294,8 @@
     </div>
     
     <!-- Modal für QR-Code erstellen/bearbeiten -->
-    <div id="qrCodeModal" class="modal" style="display: none;">
-        <div class="modal-content" style="max-width: 800px;">
+    <div id="qrCodeModal" class="modal">
+        <div class="modal-content">
             <div class="modal-header">
                 <h3 id="modalTitle">QR-Code erstellen</h3>
                 <span class="close" id="closeModal">&times;</span>
@@ -264,6 +337,10 @@
                                 <input type="color" id="qrBackground" name="background" value="#ffffff">
                                 <span>Weiß</span>
                             </div>
+                            <label style="margin-top: 0.5rem;">
+                                <input type="checkbox" id="qrTransparent" name="transparent"> 
+                                Transparenter Hintergrund
+                            </label>
                         </div>
                         
                         <div class="form-group">
@@ -311,25 +388,91 @@
     </div>
 
     <script src="admin-common.js"></script>
-    <script type="module">
+    
+    <!-- QRCode Library Test -->
+    <script>
+        console.log('🔧 DEBUG: Teste QRCode Library...');
+        console.log('🔧 DEBUG: Firebase verfügbar?', typeof firebase !== 'undefined' ? '✅' : '❌');
+        
+        // Warte 1 Sekunde und teste dann
+        setTimeout(() => {
+            console.log('🔧 DEBUG: QRCode nach 1s verfügbar?', typeof QRCode !== 'undefined' ? '✅' : '❌');
+            console.log('🔧 DEBUG: AdminBase nach 1s verfügbar?', typeof AdminBase !== 'undefined' ? '✅' : '❌');
+            if (typeof QRCode !== 'undefined') {
+                console.log('🔧 DEBUG: QRCode Object:', QRCode);
+                console.log('🔧 DEBUG: QRCode.toCanvas verfügbar?', typeof QRCode.toCanvas === 'function' ? '✅' : '❌');
+            }
+        }, 1000);
+    </script>
+    
+    <script>
         // Debug-Ausgaben
         console.log('🔧 DEBUG: Script wird geladen...');
         console.log('🔧 DEBUG: QRCode verfügbar?', typeof QRCode !== 'undefined' ? '✅' : '❌');
         console.log('🔧 DEBUG: AdminBase verfügbar?', typeof AdminBase !== 'undefined' ? '✅' : '❌');
+        console.log('🔧 DEBUG: Firebase verfügbar?', typeof firebase !== 'undefined' ? '✅' : '❌');
         
-        // Firebase Imports
-        import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
-        import { httpsCallable } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js';
+        // Warte auf alle Libraries
+        function waitForLibraries() {
+            return new Promise((resolve) => {
+                const checkLibraries = () => {
+                    // Prüfe erweiterte QR-Code-Styling Library
+                    const hasQRCodeStyling = typeof QRCodeStyling !== 'undefined';
+                    // Fallback zu Standard QRCode Library
+                    const hasQRCode = typeof QRCode !== 'undefined' && QRCode.toCanvas;
+                    const hasAdminBase = typeof AdminBase !== 'undefined';
+                    const hasFirebase = typeof firebase !== 'undefined' && firebase.firestore;
+                    
+                    console.log('🔧 DEBUG: Checking libraries:', { 
+                        hasQRCodeStyling, 
+                        hasQRCode, 
+                        hasAdminBase, 
+                        hasFirebase 
+                    });
+                    
+                    if ((hasQRCodeStyling || hasQRCode) && hasAdminBase && hasFirebase) {
+                        console.log('🔧 DEBUG: Alle Libraries verfügbar!');
+                        // Setze globale Variable für QR-Library-Typ
+                        window.qrLibraryType = hasQRCodeStyling ? 'styling' : 'basic';
+                        console.log('🔧 DEBUG: QR Library Typ:', window.qrLibraryType);
+                        resolve();
+                        return true;
+                    }
+                    return false;
+                };
+                
+                if (checkLibraries()) return;
+                
+                console.log('🔧 DEBUG: Warte auf Libraries...');
+                const checkInterval = setInterval(() => {
+                    if (checkLibraries()) {
+                        clearInterval(checkInterval);
+                    }
+                }, 500);
+                
+                // Timeout nach 15 Sekunden
+                setTimeout(() => {
+                    console.error('🔧 DEBUG: Libraries Timeout!');
+                    clearInterval(checkInterval);
+                    resolve(); // Trotzdem weiter machen
+                }, 15000);
+            });
+        }
         
-        console.log('🔧 DEBUG: Firebase imports geladen');
+        console.log('🔧 DEBUG: Firebase v8 bereit - keine Imports nötig');
         
-        class QRCodeManager extends AdminBase {
+        // Warte auf alle Libraries vor Initialisierung
+        waitForLibraries().then(() => {
+            console.log('🔧 DEBUG: Starte QRCodeManager nach Library Load');
+            
+            class QRCodeManager extends AdminBase {
             constructor() {
                 console.log('🔧 DEBUG: QRCodeManager Constructor gestartet');
-                super(); // Call AdminBase constructor
+                super(); // Call AdminBase constructor first
                 console.log('🔧 DEBUG: AdminBase initialisiert');
                 this.currentQRCode = null;
                 this.currentLogoDataUrl = null;
+                
                 // Event Listeners erst nach DOM ready
                 if (document.readyState === 'loading') {
                     console.log('🔧 DEBUG: Warte auf DOMContentLoaded...');
@@ -391,10 +534,23 @@
                 
                 // Design change listeners
                 ['qrName', 'qrTargetUrl', 'qrForeground', 'qrBackground', 'qrDotType', 'qrCornerType'].forEach(id => {
-                    document.getElementById(id).addEventListener('input', () => {
+                    const element = document.getElementById(id);
+                    if (element) {
+                        element.addEventListener('input', () => {
+                            this.updatePreview();
+                        });
+                    }
+                });
+                
+                // Transparenz-Checkbox
+                const transparentCheckbox = document.getElementById('qrTransparent');
+                if (transparentCheckbox) {
+                    transparentCheckbox.addEventListener('change', () => {
+                        const backgroundInput = document.getElementById('qrBackground');
+                        backgroundInput.disabled = transparentCheckbox.checked;
                         this.updatePreview();
                     });
-                });
+                }
                 
                 // Logo upload
                 document.getElementById('qrLogo').addEventListener('change', (e) => {
@@ -424,9 +580,12 @@
             
             async loadQRCodes() {
                 try {
-                    const qrCodesRef = collection(this.db, 'qr-codes');
-                    const q = query(qrCodesRef, orderBy('createdAt', 'desc'));
-                    const snapshot = await getDocs(q);
+                    console.log('🔧 DEBUG: loadQRCodes gestartet, db:', !!this.db);
+                    
+                    // AdminBase hat bereits Firebase initialisiert
+                    const qrCodesRef = this.db.collection('qr-codes');
+                    const q = qrCodesRef.orderBy('createdAt', 'desc');
+                    const snapshot = await q.get();
                     
                     const qrCodesGrid = document.getElementById('qrCodesGrid');
                     qrCodesGrid.innerHTML = '';
@@ -498,20 +657,98 @@
                 const canvas = document.getElementById(`qr-${qrData.id}`);
                 if (!canvas) return;
                 
-                const options = {
+                // WICHTIG: Verwende immer den Short-Link für QR-Codes!
+                const shortLink = `https://buderus-systeme.web.app/q/${qrData.id}`;
+                
+                try {
+                    if (window.qrLibraryType === 'styling' && typeof QRCodeStyling !== 'undefined') {
+                        // Erweiterte Library für Karten-QR-Codes
+                        await this.generateAdvancedQRCodeForCard(canvas, shortLink, qrData.design || {});
+                    } else if (typeof QRCode !== 'undefined' && QRCode.toCanvas) {
+                        // Fallback zur Basic Library
+                        const options = {
+                            width: 150,
+                            margin: 2,
+                            color: {
+                                dark: qrData.design?.foreground || '#000000',
+                                light: qrData.design?.background || '#ffffff'
+                            }
+                        };
+                        await QRCode.toCanvas(canvas, shortLink, options);
+                    } else {
+                        // Fallback: Zeige Platzhalter
+                        this.showQRCodePlaceholder(canvas, 'QR-Code');
+                    }
+                    
+                    console.log('🔧 DEBUG: QR-Code generiert für Short-Link:', shortLink);
+                } catch (error) {
+                    console.error('QR-Code Generierung fehlgeschlagen:', error);
+                    this.showQRCodePlaceholder(canvas, 'Fehler');
+                }
+            }
+            
+            async generateAdvancedQRCodeForCard(canvas, text, design) {
+                const qrCodeConfig = {
                     width: 150,
-                    margin: 2,
-                    color: {
-                        dark: qrData.design?.foreground || '#000000',
-                        light: qrData.design?.background || '#ffffff'
+                    height: 150,
+                    type: "canvas",
+                    data: text,
+                    margin: 8,
+                    qrOptions: {
+                        typeNumber: 0,
+                        mode: "Byte",
+                        errorCorrectionLevel: "M"
+                    },
+                    imageOptions: {
+                        hideBackgroundDots: true,
+                        imageSize: 0.3,
+                        margin: 3,
+                        crossOrigin: "anonymous"
+                    },
+                    dotsOptions: {
+                        color: design.foreground || '#000000',
+                        type: this.mapDotType(design.dotType || 'square')
+                    },
+                    cornersSquareOptions: {
+                        color: design.foreground || '#000000',
+                        type: this.mapCornerType(design.cornerType || 'square')
+                    },
+                    cornersDotOptions: {
+                        color: design.foreground || '#000000',
+                        type: this.mapCornerType(design.cornerType || 'square')
                     }
                 };
                 
-                try {
-                    await QRCode.toCanvas(canvas, `https://buderus-systeme.web.app/q/${qrData.id}`, options);
-                } catch (error) {
-                    console.error('QR-Code Generierung fehlgeschlagen:', error);
+                // Hintergrund nur setzen wenn nicht transparent
+                if (design.background && design.background !== 'transparent') {
+                    qrCodeConfig.backgroundOptions = {
+                        color: design.background
+                    };
                 }
+                
+                // Logo hinzufügen falls vorhanden
+                if (design.logo) {
+                    qrCodeConfig.image = design.logo;
+                }
+                
+                const qrCode = new QRCodeStyling(qrCodeConfig);
+                
+                // QR-Code auf Canvas rendern
+                await new Promise((resolve, reject) => {
+                    qrCode.getRawData("png").then(blob => {
+                        const img = new Image();
+                        img.onload = () => {
+                            const ctx = canvas.getContext('2d');
+                            canvas.width = 150;
+                            canvas.height = 150;
+                            ctx.clearRect(0, 0, 150, 150);
+                            ctx.drawImage(img, 0, 0, 150, 150);
+                            resolve();
+                        };
+                        img.onerror = reject;
+                        img.src = URL.createObjectURL(blob);
+                    }).catch(reject);
+                });
             }
             
             openQRCodeModal(qrData = null) {
@@ -536,15 +773,31 @@
                     document.getElementById('qrBackground').value = '#ffffff';
                 }
                 
-                modal.style.display = 'block';
-                console.log('🔧 DEBUG: Modal angezeigt');
+                // Modal mit CSS-Klasse anzeigen
+                modal.classList.add('show');
+                document.body.style.overflow = 'hidden'; // Verhindert Scrollen im Hintergrund
+                console.log('🔧 DEBUG: Modal mit show-Klasse angezeigt');
+                
+                // Fokus auf erstes Input setzen
+                setTimeout(() => {
+                    const firstInput = document.getElementById('qrName');
+                    if (firstInput) firstInput.focus();
+                }, 300);
+                
                 this.updatePreview();
             }
             
             closeQRCodeModal() {
-                document.getElementById('qrCodeModal').style.display = 'none';
-                this.currentQRCode = null;
-                this.currentLogoDataUrl = null;
+                const modal = document.getElementById('qrCodeModal');
+                modal.classList.remove('show');
+                document.body.style.overflow = ''; // Scrollen wieder ermöglichen
+                console.log('🔧 DEBUG: Modal mit show-Klasse entfernt');
+                
+                // Nach Animation Modal komplett verstecken
+                setTimeout(() => {
+                    this.currentQRCode = null;
+                    this.currentLogoDataUrl = null;
+                }, 300);
             }
             
             populateForm(qrData) {
@@ -557,12 +810,17 @@
                     document.getElementById('qrBackground').value = qrData.design.background || '#ffffff';
                     document.getElementById('qrDotType').value = qrData.design.dotType || 'square';
                     document.getElementById('qrCornerType').value = qrData.design.cornerType || 'square';
+                    
+                    // Transparenz-Checkbox setzen
+                    const isTransparent = qrData.design.background === 'transparent';
+                    document.getElementById('qrTransparent').checked = isTransparent;
+                    document.getElementById('qrBackground').disabled = isTransparent;
                 }
             }
             
             async updatePreview() {
                 console.log('🔧 DEBUG: updatePreview aufgerufen');
-                console.log('🔧 DEBUG: QRCode verfügbar?', typeof QRCode !== 'undefined');
+                console.log('🔧 DEBUG: QR Library Type:', window.qrLibraryType);
                 
                 const targetUrl = document.getElementById('qrTargetUrl').value;
                 if (!targetUrl) {
@@ -575,28 +833,191 @@
                 
                 const foreground = document.getElementById('qrForeground').value;
                 const background = document.getElementById('qrBackground').value;
+                const isTransparent = document.getElementById('qrTransparent').checked;
+                const dotType = document.getElementById('qrDotType').value;
+                const cornerType = document.getElementById('qrCornerType').value;
                 
-                const options = {
+                // WICHTIG: Verwende Short-Link, nicht die direkte URL!
+                let qrCodeUrl = targetUrl;
+                if (this.currentQRCode && this.currentQRCode.id) {
+                    qrCodeUrl = `https://buderus-systeme.web.app/q/${this.currentQRCode.id}`;
+                    console.log('🔧 DEBUG: Verwende bestehenden Short-Link:', qrCodeUrl);
+                } else {
+                    qrCodeUrl = `https://buderus-systeme.web.app/q/preview`;
+                    console.log('🔧 DEBUG: Verwende Vorschau-Link:', qrCodeUrl);
+                }
+                
+                try {
+                    if (window.qrLibraryType === 'styling' && typeof QRCodeStyling !== 'undefined') {
+                        // Erweiterte QR-Code-Styling Library
+                        await this.generateAdvancedQRCode(canvas, qrCodeUrl, {
+                            foreground,
+                            background: isTransparent ? 'transparent' : background,
+                            dotType,
+                            cornerType,
+                            logoUrl: this.currentLogoDataUrl
+                        });
+                    } else if (typeof QRCode !== 'undefined' && QRCode.toCanvas) {
+                        // Fallback zur Basic Library
+                        await this.generateBasicQRCode(canvas, qrCodeUrl, {
+                            foreground,
+                            background: isTransparent ? '#ffffff' : background // Basic library kann nicht transparent
+                        });
+                    } else {
+                        console.error('🔧 DEBUG: Keine QR-Code Library verfügbar');
+                        this.showQRCodePlaceholder(canvas, 'QR-Code wird geladen...');
+                    }
+                    
+                    // Zeige den Short-Link in der Vorschau an
+                    this.updatePreviewInfo(qrCodeUrl, targetUrl);
+                    
+                } catch (error) {
+                    console.error('🔧 DEBUG: QR-Code Vorschau Fehler:', error);
+                    this.showQRCodePlaceholder(canvas, 'QR-Code Fehler');
+                }
+            }
+            
+            async generateAdvancedQRCode(canvas, text, options) {
+                console.log('🔧 DEBUG: Generiere erweiterten QR-Code', options);
+                
+                // QRCodeStyling Konfiguration
+                const qrCodeConfig = {
                     width: 200,
-                    margin: 2,
-                    color: {
-                        dark: foreground,
-                        light: background
+                    height: 200,
+                    type: "canvas",
+                    data: text,
+                    margin: 10,
+                    qrOptions: {
+                        typeNumber: 0,
+                        mode: "Byte",
+                        errorCorrectionLevel: "M"
+                    },
+                    imageOptions: {
+                        hideBackgroundDots: true,
+                        imageSize: 0.4,
+                        margin: 0,
+                        crossOrigin: "anonymous"
+                    },
+                    dotsOptions: {
+                        color: options.foreground,
+                        type: this.mapDotType(options.dotType)
+                    },
+                    cornersSquareOptions: {
+                        color: options.foreground,
+                        type: this.mapCornerType(options.cornerType)
+                    },
+                    cornersDotOptions: {
+                        color: options.foreground,
+                        type: this.mapCornerType(options.cornerType)
                     }
                 };
                 
-                console.log('🔧 DEBUG: QR Options:', options);
-                
-                try {
-                    if (typeof QRCode !== 'undefined') {
-                        await QRCode.toCanvas(canvas, targetUrl, options);
-                        console.log('🔧 DEBUG: QR-Code erfolgreich generiert');
-                    } else {
-                        console.error('🔧 DEBUG: QRCode Library nicht verfügbar');
-                    }
-                } catch (error) {
-                    console.error('🔧 DEBUG: QR-Code Vorschau Fehler:', error);
+                // Hintergrund nur setzen wenn nicht transparent
+                if (options.background !== 'transparent') {
+                    qrCodeConfig.backgroundOptions = {
+                        color: options.background
+                    };
                 }
+                
+                // Logo hinzufügen falls vorhanden
+                if (options.logoUrl) {
+                    qrCodeConfig.image = options.logoUrl;
+                    qrCodeConfig.imageOptions.imageSize = 0.3;
+                    qrCodeConfig.imageOptions.margin = 5;
+                }
+                
+                const qrCode = new QRCodeStyling(qrCodeConfig);
+                
+                // QR-Code auf Canvas rendern
+                await new Promise((resolve, reject) => {
+                    qrCode.getRawData("png").then(blob => {
+                        const img = new Image();
+                        img.onload = () => {
+                            const ctx = canvas.getContext('2d');
+                            canvas.width = 200;
+                            canvas.height = 200;
+                            
+                            // Canvas leeren (für Transparenz)
+                            ctx.clearRect(0, 0, 200, 200);
+                            
+                            // QR-Code zeichnen
+                            ctx.drawImage(img, 0, 0, 200, 200);
+                            resolve();
+                        };
+                        img.onerror = reject;
+                        img.src = URL.createObjectURL(blob);
+                    }).catch(reject);
+                });
+                
+                console.log('🔧 DEBUG: Erweiteter QR-Code erfolgreich generiert');
+            }
+            
+            async generateBasicQRCode(canvas, text, options) {
+                console.log('🔧 DEBUG: Generiere Basic QR-Code (Fallback)', options);
+                
+                const qrOptions = {
+                    width: 200,
+                    margin: 2,
+                    color: {
+                        dark: options.foreground,
+                        light: options.background
+                    }
+                };
+                
+                await QRCode.toCanvas(canvas, text, qrOptions);
+                console.log('🔧 DEBUG: Basic QR-Code erfolgreich generiert');
+            }
+            
+            showQRCodePlaceholder(canvas, message) {
+                const ctx = canvas.getContext('2d');
+                canvas.width = 200;
+                canvas.height = 200;
+                ctx.fillStyle = '#f0f0f0';
+                ctx.fillRect(0, 0, 200, 200);
+                ctx.fillStyle = '#333';
+                ctx.font = '14px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(message, 100, 100);
+            }
+            
+            mapDotType(dotType) {
+                const dotMapping = {
+                    'square': 'square',
+                    'rounded': 'rounded',
+                    'dots': 'dots',
+                    'classy': 'classy',
+                    'classy-rounded': 'classy-rounded',
+                    'extra-rounded': 'extra-rounded'
+                };
+                return dotMapping[dotType] || 'square';
+            }
+            
+            mapCornerType(cornerType) {
+                const cornerMapping = {
+                    'square': 'square',
+                    'rounded': 'extra-rounded',
+                    'dot': 'dot'
+                };
+                return cornerMapping[cornerType] || 'square';
+            }
+            
+            updatePreviewInfo(shortLink, targetUrl) {
+                // Zeige Info über Short-Link und Weiterleitung
+                let previewInfo = document.getElementById('previewInfo');
+                if (!previewInfo) {
+                    previewInfo = document.createElement('div');
+                    previewInfo.id = 'previewInfo';
+                    previewInfo.style.cssText = 'margin-top: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 6px; font-size: 0.9rem;';
+                    document.querySelector('.qr-preview').appendChild(previewInfo);
+                }
+                
+                previewInfo.innerHTML = `
+                    <strong>QR-Code zeigt:</strong><br>
+                    <code style="color: #007bff;">${shortLink}</code><br><br>
+                    <strong>Leitet weiter zu:</strong><br>
+                    <code style="color: #28a745;">${targetUrl}</code><br><br>
+                    <small style="color: #666;">Der QR-Code enthält einen kurzen Link, der zur Ziel-URL weiterleitet und Scans zählt.</small>
+                `;
             }
             
             async handleLogoUpload(event) {
@@ -614,18 +1035,21 @@
             async saveQRCode() {
                 try {
                     const formData = new FormData(document.getElementById('qrCodeForm'));
+                    const isTransparent = document.getElementById('qrTransparent').checked;
+                    
                     const qrData = {
                         name: formData.get('name'),
                         targetUrl: formData.get('targetUrl'),
                         status: formData.get('status'),
                         design: {
                             foreground: formData.get('foreground'),
-                            background: formData.get('background'),
+                            background: isTransparent ? 'transparent' : formData.get('background'),
                             dotType: formData.get('dotType'),
-                            cornerType: formData.get('cornerType')
+                            cornerType: formData.get('cornerType'),
+                            transparent: isTransparent
                         },
                         scanCount: 0,
-                        updatedAt: serverTimestamp()
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                     };
                     
                     if (this.currentLogoDataUrl) {
@@ -634,13 +1058,13 @@
                     
                     if (this.currentQRCode) {
                         // Update existing QR code
-                        const qrRef = doc(this.db, 'qr-codes', this.currentQRCode.id);
-                        await updateDoc(qrRef, qrData);
+                        const qrRef = this.db.collection('qr-codes').doc(this.currentQRCode.id);
+                        await qrRef.update(qrData);
                         alert('QR-Code erfolgreich aktualisiert!');
                     } else {
                         // Create new QR code
-                        qrData.createdAt = serverTimestamp();
-                        await addDoc(collection(this.db, 'qr-codes'), qrData);
+                        qrData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+                        await this.db.collection('qr-codes').add(qrData);
                         alert('QR-Code erfolgreich erstellt!');
                     }
                     
@@ -655,11 +1079,10 @@
             
             async editQRCode(qrId) {
                 try {
-                    const qrDoc = await getDocs(query(collection(this.db, 'qr-codes')));
-                    const qrData = qrDoc.docs.find(doc => doc.id === qrId);
+                    const qrDoc = await this.db.collection('qr-codes').doc(qrId).get();
                     
-                    if (qrData) {
-                        this.openQRCodeModal({ id: qrId, ...qrData.data() });
+                    if (qrDoc.exists) {
+                        this.openQRCodeModal({ id: qrId, ...qrDoc.data() });
                     }
                 } catch (error) {
                     console.error('Fehler beim Laden des QR-Codes:', error);
@@ -669,10 +1092,10 @@
             async toggleQRStatus(qrId, currentStatus) {
                 try {
                     const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
-                    const qrRef = doc(this.db, 'qr-codes', qrId);
-                    await updateDoc(qrRef, { 
+                    const qrRef = this.db.collection('qr-codes').doc(qrId);
+                    await qrRef.update({ 
                         status: newStatus,
-                        updatedAt: serverTimestamp()
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
                     
                     this.loadQRCodes();
@@ -687,7 +1110,7 @@
                 }
                 
                 try {
-                    await deleteDoc(doc(this.db, 'qr-codes', qrId));
+                    await this.db.collection('qr-codes').doc(qrId).delete();
                     this.loadQRCodes();
                     alert('QR-Code gelöscht');
                 } catch (error) {
@@ -707,6 +1130,8 @@
                     link.download = `${name}.${format}`;
                     link.href = canvas.toDataURL(`image/${format}`);
                     link.click();
+                    
+                    console.log('🔧 DEBUG: QR-Code Vorschau heruntergeladen als:', format);
                 } else if (format === 'svg') {
                     // For SVG, we'd need to use a different QR library that supports SVG
                     alert('SVG Export wird in einer zukünftigen Version verfügbar sein');
@@ -714,32 +1139,136 @@
             }
             
             async downloadQRCodeById(qrId, format) {
-                // Generate QR code for specific ID and download
-                const qrDoc = await getDocs(query(collection(this.db, 'qr-codes')));
-                const qrData = qrDoc.docs.find(doc => doc.id === qrId);
+                try {
+                    // Generate QR code for specific ID and download
+                    const qrDoc = await this.db.collection('qr-codes').doc(qrId).get();
+                    
+                    if (!qrDoc.exists) return;
+                    const qrData = qrDoc.data();
+                    
+                    // WICHTIG: Verwende Short-Link für Download!
+                    const shortLink = `https://buderus-systeme.web.app/q/${qrId}`;
+                    
+                    if (window.qrLibraryType === 'styling' && typeof QRCodeStyling !== 'undefined') {
+                        // Erweiterte Library - unterstützt PNG, JPEG, WEBP, SVG
+                        await this.downloadAdvancedQRCode(shortLink, qrData, format);
+                    } else {
+                        // Fallback zur Basic Library
+                        await this.downloadBasicQRCode(shortLink, qrData, format);
+                    }
+                    
+                    console.log('🔧 DEBUG: QR-Code heruntergeladen für Short-Link:', shortLink);
+                } catch (error) {
+                    console.error('Download Fehler:', error);
+                    alert('Fehler beim Download des QR-Codes');
+                }
+            }
+            
+            async downloadAdvancedQRCode(text, qrData, format) {
+                const design = qrData.design || {};
                 
-                if (!qrData) return;
-                
-                const tempCanvas = document.createElement('canvas');
-                const options = {
-                    width: 400,
-                    margin: 2,
-                    color: {
-                        dark: qrData.data().design?.foreground || '#000000',
-                        light: qrData.data().design?.background || '#ffffff'
+                const qrCodeConfig = {
+                    width: 1000, // Hohe Auflösung für Download
+                    height: 1000,
+                    type: "canvas",
+                    data: text,
+                    margin: 50,
+                    qrOptions: {
+                        typeNumber: 0,
+                        mode: "Byte",
+                        errorCorrectionLevel: "M"
+                    },
+                    imageOptions: {
+                        hideBackgroundDots: true,
+                        imageSize: 0.3,
+                        margin: 10,
+                        crossOrigin: "anonymous"
+                    },
+                    dotsOptions: {
+                        color: design.foreground || '#000000',
+                        type: this.mapDotType(design.dotType || 'square')
+                    },
+                    cornersSquareOptions: {
+                        color: design.foreground || '#000000',
+                        type: this.mapCornerType(design.cornerType || 'square')
+                    },
+                    cornersDotOptions: {
+                        color: design.foreground || '#000000',
+                        type: this.mapCornerType(design.cornerType || 'square')
                     }
                 };
                 
-                try {
-                    await QRCode.toCanvas(tempCanvas, `https://buderus-systeme.web.app/q/${qrId}`, options);
-                    
-                    const link = document.createElement('a');
-                    link.download = `${qrData.data().name}.${format}`;
-                    link.href = tempCanvas.toDataURL(`image/${format}`);
-                    link.click();
-                } catch (error) {
-                    console.error('Download Fehler:', error);
+                // Hintergrund nur setzen wenn nicht transparent
+                if (design.background && design.background !== 'transparent') {
+                    qrCodeConfig.backgroundOptions = {
+                        color: design.background
+                    };
                 }
+                
+                // Logo hinzufügen falls vorhanden
+                if (design.logo) {
+                    qrCodeConfig.image = design.logo;
+                }
+                
+                const qrCode = new QRCodeStyling(qrCodeConfig);
+                
+                // Download in gewünschtem Format
+                const mimeMapping = {
+                    'png': 'image/png',
+                    'webp': 'image/webp', 
+                    'jpeg': 'image/jpeg',
+                    'svg': 'image/svg+xml'
+                };
+                
+                const fileExtension = format === 'jpeg' ? 'jpg' : format;
+                const fileName = `${qrData.name || 'qr-code'}.${fileExtension}`;
+                
+                if (format === 'svg') {
+                    // SVG Download
+                    const svgData = await qrCode.getRawData('svg');
+                    const blob = new Blob([svgData], { type: 'image/svg+xml' });
+                    this.downloadBlob(blob, fileName);
+                } else {
+                    // Raster-Format Download (PNG, WEBP, JPEG)
+                    const blob = await qrCode.getRawData(format);
+                    this.downloadBlob(blob, fileName);
+                }
+            }
+            
+            async downloadBasicQRCode(text, qrData, format) {
+                const tempCanvas = document.createElement('canvas');
+                const options = {
+                    width: 1000, // Hohe Auflösung
+                    margin: 2,
+                    color: {
+                        dark: qrData.design?.foreground || '#000000',
+                        light: qrData.design?.background === 'transparent' ? '#ffffff' : (qrData.design?.background || '#ffffff')
+                    }
+                };
+                
+                await QRCode.toCanvas(tempCanvas, text, options);
+                
+                // Nur PNG und WebP für Basic Library
+                if (format === 'svg') {
+                    alert('SVG Export benötigt die erweiterte QR-Code Library');
+                    return;
+                }
+                
+                const link = document.createElement('a');
+                link.download = `${qrData.name || 'qr-code'}.${format}`;
+                link.href = tempCanvas.toDataURL(`image/${format}`);
+                link.click();
+            }
+            
+            downloadBlob(blob, fileName) {
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = fileName;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
             }
         }
         
@@ -757,6 +1286,8 @@
                 console.log('🔧 DEBUG: Button Event Listeners:', btn.onclick);
             }
         }, 2000);
+        
+        }); // Ende waitForQRCode().then()
     </script>
 </body>
 </html>
