@@ -1,0 +1,42 @@
+# Jekyll Konfiguration für GitHub Pages
+# Verarbeitet nur Mitarbeiter-Seiten, ignoriert Firebase-Dateien
+
+# Basis-Pfad für GitHub Pages
+baseurl: "/buderus1/mitarbeiter"
+url: "https://kingsleyym.github.io"
+
+# Quell- und Zielordner
+source: mitarbeiter
+destination: _site
+
+# Ausgeschlossene Dateien (relativ zum source-Ordner)
+exclude:
+  - "*.js"
+  - "*.sh" 
+  - "*.json"
+  - "*.md"
+  - "_config.yml"
+
+# Eingeschlossene Dateien
+include:
+  - "*.html"
+  - "*.css"
+
+# Plugins deaktivieren um Konflikte zu vermeiden
+plugins: []
+
+# Markdown deaktivieren
+markdown: kramdown
+highlighter: rouge
+
+# Layout-Verarbeitung deaktivieren
+layouts_dir: _layouts
+includes_dir: _includes
+
+# Kein Front Matter Processing für HTML-Dateien
+defaults:
+  - scope:
+      path: ""
+      type: "pages"
+    values:
+      layout: null
