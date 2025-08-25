@@ -105,10 +105,12 @@
             const app = initializeApp(firebaseConfig);
             const functions = getFunctions(app);
             
+            // Global verfügbar machen (v10 API)
             window.firebase = { functions };
+            window.httpsCallable = httpsCallable;
             window.firebaseReady = true;
             
-            console.log('Firebase erfolgreich initialisiert');
+            console.log('Firebase v10 erfolgreich initialisiert (confirm.html)');
         } catch (error) {
             console.error('Firebase Initialisierung fehlgeschlagen:', error);
             window.firebaseReady = false;
@@ -165,7 +167,17 @@
             }
             
             async confirmWithFirebase(token, email) {
-                const confirmFunction = window.firebase.functions().httpsCallable('confirmNewsletter');
+                // Firebase v10 API verwenden
+                if (!window.firebase || !window.firebase.functions) {
+                    throw new Error('Firebase nicht verfügbar');
+                }
+                
+                if (!window.httpsCallable) {
+                    const { httpsCallable } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js');
+                    window.httpsCallable = httpsCallable;
+                }
+                
+                const confirmFunction = window.httpsCallable(window.firebase.functions, 'confirmNewsletter');
                 const result = await confirmFunction({ token, email });
                 
                 if (!result.data.success) {

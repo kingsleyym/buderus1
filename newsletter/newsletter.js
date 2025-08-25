@@ -84,8 +84,18 @@ class NewsletterManager {
     
     async submitToFirebase(data) {
         try {
-            // Firebase Cloud Function aufrufen
-            const subscribeFunction = window.firebase.functions().httpsCallable('subscribeNewsletter');
+            // Firebase v10 httpsCallable verwenden
+            if (!window.firebase || !window.firebase.functions) {
+                throw new Error('Firebase nicht verfügbar');
+            }
+            
+            // Importiere httpsCallable dynamisch wenn nicht verfügbar
+            if (!window.httpsCallable) {
+                const { httpsCallable } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js');
+                window.httpsCallable = httpsCallable;
+            }
+            
+            const subscribeFunction = window.httpsCallable(window.firebase.functions, 'subscribeNewsletter');
             const result = await subscribeFunction(data);
             
             if (!result.data.success) {

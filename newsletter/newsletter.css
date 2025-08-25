@@ -8,14 +8,16 @@
 .newsletter-title {
     font-size: 2.5rem;
     font-weight: 600;
-    color: #333;
+    color: #fff !important;
+    /* Immer weiß, da Hintergrund immer dunkel */
     text-align: center;
     margin-bottom: 1rem;
 }
 
 .newsletter-description {
     font-size: 1.1rem;
-    color: #666;
+    color: #ccc !important;
+    /* Immer hell grau, da Hintergrund immer dunkel */
     text-align: center;
     margin-bottom: 2rem;
     line-height: 1.6;
@@ -35,7 +37,8 @@
 
 .form-group label {
     font-weight: 500;
-    color: #333;
+    color: #fff !important;
+    /* Immer weiß, da Hintergrund immer dunkel */
     margin-bottom: 0.5rem;
     font-size: 0.95rem;
 }
@@ -43,18 +46,26 @@
 .form-group input[type="email"],
 .form-group input[type="text"] {
     padding: 0.75rem;
-    border: 2px solid #ddd;
+    border: 2px solid #555;
+    /* Dunklerer Rand für dunklen Hintergrund */
     border-radius: 8px;
     font-size: 1rem;
     font-family: 'Poppins', sans-serif;
     transition: border-color 0.3s ease;
+    background-color: #2a2a2a;
+    /* Dunkler Hintergrund */
+    color: #fff;
+    /* Weiße Schrift */
 }
+
 
 .form-group input[type="email"]:focus,
 .form-group input[type="text"]:focus {
     outline: none;
     border-color: #007bff;
     box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    background-color: #333;
+    /* Etwas hellerer Hintergrund bei Focus */
 }
 
 .form-group input[type="email"]:invalid {
@@ -73,6 +84,8 @@
     font-size: 0.9rem;
     line-height: 1.4;
     margin: 0;
+    color: #ccc !important;
+    /* Immer hell grau, da Hintergrund immer dunkel */
 }
 
 .checkbox-label input[type="checkbox"] {
@@ -84,8 +97,10 @@
 .checkmark {
     min-width: 20px;
     height: 20px;
-    background-color: #fff;
-    border: 2px solid #ddd;
+    background-color: #2a2a2a;
+    /* Dunkel für dunklen Hintergrund */
+    border: 2px solid #555;
+    /* Heller Rand für Sichtbarkeit */
     border-radius: 4px;
     margin-right: 0.75rem;
     margin-top: 0.1rem;
@@ -97,12 +112,12 @@
     border-color: #007bff;
 }
 
-.checkbox-label input[type="checkbox"]:checked ~ .checkmark {
+.checkbox-label input[type="checkbox"]:checked~.checkmark {
     background-color: #007bff;
     border-color: #007bff;
 }
 
-.checkbox-label input[type="checkbox"]:checked ~ .checkmark::after {
+.checkbox-label input[type="checkbox"]:checked~.checkmark::after {
     content: "";
     position: absolute;
     left: 6px;
@@ -142,8 +157,13 @@
 }
 
 @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* Messages */
@@ -198,54 +218,21 @@
         padding: 1rem;
         max-width: 100%;
     }
-    
+
     .newsletter-title {
         font-size: 2rem;
     }
-    
+
     .newsletter-description {
         font-size: 1rem;
     }
-    
+
     .form-group input[type="email"],
     .form-group input[type="text"] {
-        font-size: 16px; /* Verhindert Zoom auf iOS */
+        font-size: 16px;
+        /* Verhindert Zoom auf iOS */
     }
 }
 
-/* Dark Mode Support */
-@media (prefers-color-scheme: dark) {
-    .newsletter-title {
-        color: #fff;
-    }
-    
-    .newsletter-description {
-        color: #ccc;
-    }
-    
-    .form-group label {
-        color: #fff;
-    }
-    
-    .form-group input[type="email"],
-    .form-group input[type="text"] {
-        background-color: #2a2a2a;
-        border-color: #555;
-        color: #fff;
-    }
-    
-    .form-group input[type="email"]:focus,
-    .form-group input[type="text"]:focus {
-        border-color: #007bff;
-        background-color: #333;
-    }
-    
-    .checkmark {
-        background-color: #2a2a2a;
-        border-color: #555;
-    }
-    
-    .checkbox-label {
-        color: #ccc;
-    }
-}
+/* Alle Styles sind bereits für dunklen Hintergrund optimiert */
+/* Dark Mode Media Query entfernt, da Newsletter immer dunklen Hintergrund hat */
