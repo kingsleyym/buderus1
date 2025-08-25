@@ -133,4 +133,15 @@
         "company": "Buderus Systeme",
         "avatarExt": "webp"
     }
+    ,
+    {
+        "id": "sebastian-baier",
+        "name": "Sebastian Baier",
+        "title": "Technischer Fachberater",
+        "phone": "+4917623893089",
+        "email": "s.baier@buderus-systeme.de",
+        "website": "https://buderus-systeme.de",
+        "company": "Buderus Systeme",
+        "avatarExt": "webp"
+    }
 ]
