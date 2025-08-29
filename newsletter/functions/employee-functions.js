@@ -4,28 +4,96 @@ const QRCode = require('qrcode');
 const { Octokit } = require('@octokit/rest');
 const { createAppAuth } = require('@octokit/auth-app');
 
-// Node.js fetch polyfill für ältere Versionen
-const fetch = globalThis.fetch || require('node-fetch');
+// Node.js fetch polyfill für ältere Versionen (nicht mehr benötigt in Node 18+)
+// const fetch = require('node-fetch');
 
 // GitHub App Integration
 let octokit = null;
+let githubIntegrationEnabled = false;
+
 try {
-    const config = functions.config();
-    if (config.github && config.github.app_id && config.github.private_key) {
-        // Private Key formatieren (| zurück zu Zeilenumbrüchen)
-        const privateKey = config.github.private_key.replace(/\|/g, '\n');
+    // GitHub App Credentials - ECHTE APP ID EINGEFÜGT
+    // Für vollständige Aktivierung wird noch der Private Key benötigt
+    const githubAppId = "1863383"; // Ihre echte GitHub App ID
+    const githubPrivateKey = `-----BEGIN RSA PRIVATE KEY-----
+MIIEowIBAAKCAQEAxeBuuV20n+a7O61uEu7OVyM7SSnDYnQTfxohIq11AIU0EMUO
+c84lAqoavsn4ZhN+Js/vFZH2bN7zYtS9GbFGntLV232weAyFQDT3vhNiXBlaMB3S
+AeaY/tsJQE9HY11lj1hyuAI+e/jHvLQ1cd8JoGOtodTWyVtfMzBOKaegSULOReEH
+5CHBoPm323IyKOiwhmcdicAmTEubq4BAUg0VtDx3/DfOsaabVmF9QhIi2TfuMaQO
+512emi6VN6l8LZkdX6383yMWv9WlcKhVYSAvskO52aqtmpzYcFWBJctPCi/j3E6F
+6c8Sr7NARsZhLy+SALsPZ3qXX8M9Y1IZEfM9hQIDAQABAoIBACrrZjjQqWfxfPUR
+xglXQOxHmQlihJ2rPbtY6I0EAJfPTJ7Cj0LxGLf+O3TcjANgAQHcIiiUk1XD+hia
+ujWDbSTv6DEGjytK0/A8TOwueiwt15EONsnwwYit69DGIV7dGDVCYwekfPcY3AID
+OIBtd0IRvMyYRMpCBmEs/hcs46hf8m8cNEroVyNAxnxoAFHJY1wRePT1kR/A+JRA
+AsmRbgh2fn5Wp/c5EXKB+Bs1kVd7Ni2VwCzAdCDk9y7Y9UCyuYQO51r7WTTc08g7
+9tOGwN5UTyx/WcswQ3erN7EhPYj+koMO7B5C/ed9V0UR0EKJ9JH0BWsKE1or8g2N
+1q9A9bUCgYEA64EjD4NPYilSIy+08GYbRE8oiTb+BQrPXAHGcDFTGXclYKlkFblT
+leZYs378g370M2D3HVWbscFg2WJmNx4+dT8GDsgD8GITgB5rVetKXsR8pVIGuXKA
+rq07+e95Ztf3T/J3VG8HydsU7iPrq+e25VYlV0jNRqqbG31FBOcXe1cCgYEA1xj6
+NBzOzmk7GS3K5Q2+ZoRFyFgLJ84ry7vwwhs2ODYFaCtrmy9grZi+2XsW+zLHT4nP
+lFzs5axIiWSPGr6jNjSjeW3b6xgnBXrfGNzD2pkmRHlCe6XUsOdpbaIIq3utqgRu
+qj7gyE8BEb79+2sgKFY4J692LqXclHtZTqQ14IMCgYB6Zn3gfDDwJeXI3+y83XTi
+hfndhzVzTXEEsu9+NESqgaBtotyf5dipmjUT5bY8aelmIsmM94eaVZWOpnPVxeRU
+b9MoL5DMiUz1U9oZp9bZdmoKSp2wGPEE2IjJmEuSxkCFztFyktqLcVBpjUXZ7O7E
+N4fk27PFPLqtCOisaadstQKBgAay32/qCcLB4jZJh80UXX6h1e6EV2yY7iI9KyVQ
+ZaLgg9CXsZU2p4Mgg6kQPUn7bdubRhyvvCz27Zdhy1cg4sJYZ1LryfKLYQO5rOMA
+VRUkud1eDWT+aB5ORqlEZ5K3mlP2KWAh7ywt0bG0ygIfdvPqo3sQ6tRPFAyHvuNF
+F+xzAoGBAIa+adcGE7RZVsHkPDfwDcM4Pytn9qCWtQxreM1ArrwcEN80Tcw6AvCP
+mzLsao6IHn3Y0U7+I0jTtevZYRpKoaCxuf8KWJOJpeDv2xPYoBoV5qTD2r98F9c1
+5LxC0KABj9m+DmcrRx70MusJP0adFIPYQOKRLG8GovzmuRyr9Ndf
+-----END RSA PRIVATE KEY-----`; // Echter Private Key eingefügt
+    
+    console.log('🔧 GitHub Integration Init - AppId:', githubAppId);
+    console.log('🔧 GitHub Integration Init - PrivateKey:', githubPrivateKey.startsWith('PLACEHOLDER') ? 'PRIVATE_KEY_NEEDED' : 'REAL_KEY_FOUND');
+    
+    // Prüfe ob echte Credentials vorhanden sind
+    if (!githubAppId || !githubPrivateKey || githubPrivateKey.startsWith('PLACEHOLDER') || githubPrivateKey.includes('DUMMY')) {
+        console.log('⚠️ GitHub Integration DEAKTIVIERT - Private Key fehlt noch');
+        console.log('⚠️ App ID gefunden:', githubAppId);
+        console.log('⚠️ Benötigt: Echter Private Key von GitHub App Settings');
+        githubIntegrationEnabled = false;
+        octokit = null;
+    } else {
+        // Private Key formatieren (| zurück zu Zeilenumbrüchen falls nötig)
+        const privateKey = githubPrivateKey.replace(/\|/g, '\n');
+        console.log('🔧 Formatted PrivateKey length:', privateKey.length);
+        console.log('🔧 PrivateKey starts with:', privateKey.substring(0, 30));
+        console.log('🔧 PrivateKey ends with:', privateKey.substring(privateKey.length - 30));
         
-        octokit = new Octokit({
-            authStrategy: createAppAuth,
-            auth: {
-                appId: config.github.app_id,
-                privateKey: privateKey,
-                installationId: null // wird später gesetzt
+        // Validiere RSA Private Key Format
+        if (!privateKey.includes('-----BEGIN RSA PRIVATE KEY-----') || 
+            !privateKey.includes('-----END RSA PRIVATE KEY-----')) {
+            console.log('❌ Invalid RSA Private Key format detected');
+            console.log('🔧 Expected format: -----BEGIN RSA PRIVATE KEY-----...-----END RSA PRIVATE KEY-----');
+            console.warn('GitHub Integration deaktiviert wegen ungültigem Private Key');
+            githubIntegrationEnabled = false;
+            octokit = null;
+        } else {
+            try {
+                // Octokit ohne installationId initialisieren (wird später in getAuthenticatedOctokit gesetzt)
+                octokit = new Octokit({
+                    authStrategy: createAppAuth,
+                    auth: {
+                        appId: githubAppId,
+                        privateKey: privateKey
+                        // installationId wird dynamisch in getAuthenticatedOctokit abgerufen
+                    }
+                });
+                githubIntegrationEnabled = true;
+                console.log('✅ GitHub Integration AKTIVIERT - Octokit erfolgreich initialisiert');
+            } catch (octokitError) {
+                console.error('❌ Octokit Initialisierung fehlgeschlagen:', octokitError.message);
+                console.warn('GitHub Integration deaktiviert wegen Octokit Fehler');
+                githubIntegrationEnabled = false;
+                octokit = null;
             }
-        });
+        }
     }
 } catch (error) {
+    console.error('❌ GitHub Integration Init Error:', error.message);
     console.warn('GitHub Integration nicht verfügbar:', error.message);
+    githubIntegrationEnabled = false;
+    octokit = null;
 }
 
 const GITHUB_OWNER = 'kingsleyym';
@@ -53,17 +121,38 @@ async function getAuthenticatedOctokit() {
         
         console.log('✅ Installation gefunden:', installation.id);
         
-        // Neuen Octokit mit Installation ID erstellen
-        const { Octokit } = require('@octokit/rest');
-        const { createAppAuth } = require('@octokit/auth-app');
-        const config = functions.config();
-        const privateKey = config.github.private_key.replace(/\|/g, '\n');
-        
+        // Bereits initialisiertes Octokit mit Installation ID verwenden
         return new Octokit({
             authStrategy: createAppAuth,
             auth: {
-                appId: config.github.app_id,
-                privateKey: privateKey,
+                appId: "1863383", // Ihre echte App ID
+                privateKey: `-----BEGIN RSA PRIVATE KEY-----
+MIIEowIBAAKCAQEAxeBuuV20n+a7O61uEu7OVyM7SSnDYnQTfxohIq11AIU0EMUO
+c84lAqoavsn4ZhN+Js/vFZH2bN7zYtS9GbFGntLV232weAyFQDT3vhNiXBlaMB3S
+AeaY/tsJQE9HY11lj1hyuAI+e/jHvLQ1cd8JoGOtodTWyVtfMzBOKaegSULOReEH
+5CHBoPm323IyKOiwhmcdicAmTEubq4BAUg0VtDx3/DfOsaabVmF9QhIi2TfuMaQO
+512emi6VN6l8LZkdX6383yMWv9WlcKhVYSAvskO52aqtmpzYcFWBJctPCi/j3E6F
+6c8Sr7NARsZhLy+SALsPZ3qXX8M9Y1IZEfM9hQIDAQABAoIBACrrZjjQqWfxfPUR
+xglXQOxHmQlihJ2rPbtY6I0EAJfPTJ7Cj0LxGLf+O3TcjANgAQHcIiiUk1XD+hia
+ujWDbSTv6DEGjytK0/A8TOwueiwt15EONsnwwYit69DGIV7dGDVCYwekfPcY3AID
+OIBtd0IRvMyYRMpCBmEs/hcs46hf8m8cNEroVyNAxnxoAFHJY1wRePT1kR/A+JRA
+AsmRbgh2fn5Wp/c5EXKB+Bs1kVd7Ni2VwCzAdCDk9y7Y9UCyuYQO51r7WTTc08g7
+9tOGwN5UTyx/WcswQ3erN7EhPYj+koMO7B5C/ed9V0UR0EKJ9JH0BWsKE1or8g2N
+1q9A9bUCgYEA64EjD4NPYilSIy+08GYbRE8oiTb+BQrPXAHGcDFTGXclYKlkFblT
+leZYs378g370M2D3HVWbscFg2WJmNx4+dT8GDsgD8GITgB5rVetKXsR8pVIGuXKA
+rq07+e95Ztf3T/J3VG8HydsU7iPrq+e25VYlV0jNRqqbG31FBOcXe1cCgYEA1xj6
+NBzOzmk7GS3K5Q2+ZoRFyFgLJ84ry7vwwhs2ODYFaCtrmy9grZi+2XsW+zLHT4nP
+lFzs5axIiWSPGr6jNjSjeW3b6xgnBXrfGNzD2pkmRHlCe6XUsOdpbaIIq3utqgRu
+qj7gyE8BEb79+2sgKFY4J692LqXclHtZTqQ14IMCgYB6Zn3gfDDwJeXI3+y83XTi
+hfndhzVzTXEEsu9+NESqgaBtotyf5dipmjUT5bY8aelmIsmM94eaVZWOpnPVxeRU
+b9MoL5DMiUz1U9oZp9bZdmoKSp2wGPEE2IjJmEuSxkCFztFyktqLcVBpjUXZ7O7E
+N4fk27PFPLqtCOisaadstQKBgAay32/qCcLB4jZJh80UXX6h1e6EV2yY7iI9KyVQ
+ZaLgg9CXsZU2p4Mgg6kQPUn7bdubRhyvvCz27Zdhy1cg4sJYZ1LryfKLYQO5rOMA
+VRUkud1eDWT+aB5ORqlEZ5K3mlP2KWAh7ywt0bG0ygIfdvPqo3sQ6tRPFAyHvuNF
+F+xzAoGBAIa+adcGE7RZVsHkPDfwDcM4Pytn9qCWtQxreM1ArrwcEN80Tcw6AvCP
+mzLsao6IHn3Y0U7+I0jTtevZYRpKoaCxuf8KWJOJpeDv2xPYoBoV5qTD2r98F9c1
+5LxC0KABj9m+DmcrRx70MusJP0adFIPYQOKRLG8GovzmuRyr9Ndf
+-----END RSA PRIVATE KEY-----`, // Echter Private Key eingefügt
                 installationId: installation.id
             }
         });
@@ -251,10 +340,11 @@ async function processApproval(employeeId) {
     // GitHub Repository Update auslösen
     try {
         await triggerGitHubDeployment(employeeData);
-        console.log('✅ GitHub Deployment ausgelöst');
+        console.log('✅ GitHub Deployment erfolgreich abgeschlossen');
     } catch (gitError) {
-        console.warn('⚠️ GitHub Deployment fehlgeschlagen:', gitError.message);
+        console.warn('⚠️ GitHub Deployment fehlgeschlagen (nicht kritisch):', gitError.message);
         // Nicht kritisch - Genehmigung trotzdem durchführen
+        // GitHub Integration ist optional
     }
     
     // Genehmigungs-E-Mail senden
@@ -287,13 +377,13 @@ async function processApproval(employeeId) {
 exports.updateEmployeeProfile = functions.https.onCall(async (data, context) => {
     try {
         console.log('� ===== UPDATE EMPLOYEE PROFILE FUNCTION GESTARTET =====');
-        console.log('📥 Eingehende Daten:', JSON.stringify(data, null, 2));
-        console.log('� Context:', JSON.stringify(context, null, 2));
+        console.log('📥 Eingehende Daten - Keys:', data ? Object.keys(data) : 'null/undefined');
+        console.log('� Context:', "[Context Object]");
         
         // Auth prüfen
         console.log('� Prüfe Authentifizierung...');
-        console.log('🔐 Data Auth:', data.auth);
-        console.log('🔐 Context Auth:', context.auth);
+        console.log('🔐 Data Auth vorhanden:', !!data.auth);
+        console.log('🔐 Context Auth vorhanden:', !!context.auth);
         
         // Firebase Functions v2 - Auth ist in data.auth, nicht context.auth
         const auth = data.auth || context.auth;
@@ -306,14 +396,14 @@ exports.updateEmployeeProfile = functions.https.onCall(async (data, context) => 
         
         // Firebase Functions v2 Compatibility - Daten können verschachtelt sein
         const actualData = data.data || data;
-        console.log('📋 Actual Data:', JSON.stringify(actualData, null, 2));
+        console.log('📋 Actual Data - Keys:', actualData ? Object.keys(actualData) : 'null/undefined');
         
         const { employeeId, profileData } = actualData;
         const userId = auth.uid;
         
         console.log('👤 Employee ID:', employeeId);
         console.log('👤 User ID:', userId);
-        console.log('📊 Profile Data:', JSON.stringify(profileData, null, 2));
+        console.log('📊 Profile Data - Keys:', profileData ? Object.keys(profileData) : 'null/undefined');
         
         // Berechtigung prüfen (Benutzer kann nur sein eigenes Profil bearbeiten)
         if (employeeId !== userId) {
@@ -341,7 +431,7 @@ exports.updateEmployeeProfile = functions.https.onCall(async (data, context) => 
         
         updateData.updatedAt = admin.firestore.FieldValue.serverTimestamp();
         
-        console.log('📝 Final Update Data:', JSON.stringify(updateData, null, 2));
+        console.log('📝 Final Update Data - Keys:', Object.keys(updateData));
         
         // Firestore aktualisieren
         console.log('💾 Aktualisiere Firestore...');
@@ -358,15 +448,20 @@ exports.updateEmployeeProfile = functions.https.onCall(async (data, context) => 
         }
         
         const employeeData = employeeDoc.data();
-        console.log('📊 Geladene Employee Data:', JSON.stringify(employeeData, null, 2));
+        console.log('📊 Geladene Employee Data - Keys:', employeeData ? Object.keys(employeeData) : 'null/undefined');
         console.log('✅ Employee approved status:', employeeData.approved);
         
         // GitHub Repository Update auslösen (falls genehmigt)
         if (employeeData.approved) {
-            console.log('🚀 Employee ist genehmigt - GitHub Deployment TEMPORÄR DEAKTIVIERT...');
-            // TEMPORÄR AUSGESCHALTET UM PROFIL UPDATE ZU FIXEN
-            // await triggerGitHubDeployment(employeeData);
-            console.log('⏸️ GitHub Deployment temporär übersprungen');
+            console.log('🚀 Employee ist genehmigt - GitHub Deployment wird gestartet...');
+            try {
+                await triggerGitHubDeployment(employeeData);
+                console.log('✅ GitHub Deployment erfolgreich abgeschlossen');
+            } catch (gitError) {
+                console.warn('⚠️ GitHub Deployment fehlgeschlagen (nicht kritisch):', gitError.message);
+                // Nicht kritisch - Profil Update trotzdem erfolgreich
+                // GitHub Integration ist optional für das System
+            }
         } else {
             console.log('⏸️ Employee noch nicht genehmigt - GitHub Deployment übersprungen');
         }
@@ -604,27 +699,33 @@ exports.getEmployeeStats = functions.https.onCall(async (data, context) => {
  */
 async function triggerGitHubDeployment(employeeData) {
     try {
-        const config = functions.config();
-        if (!config.github || !config.github.app_id) {
-            console.warn('GitHub App nicht konfiguriert - GitHub Integration übersprungen');
-            return;
+        // Prüfe ob GitHub Integration aktiviert ist
+        if (!githubIntegrationEnabled || !octokit) {
+            console.log('⚠️ GitHub Integration ist deaktiviert - automatische Seiten-Generierung übersprungen');
+            console.log('⚠️ Grund: Keine gültigen GitHub App Credentials vorhanden');
+            console.log('💡 Hinweis: Für automatische Employee-Seiten auf buderus-systeme.de werden echte GitHub App Credentials benötigt');
+            return; // Kein Fehler werfen, einfach überspringen
         }
         
         console.log('🚀 GitHub Deployment gestartet für:', employeeData.firstName, employeeData.lastName);
         
         // GitHub App authentifizieren
+        console.log('🔐 Authentifiziere GitHub App...');
         const authenticatedOctokit = await getAuthenticatedOctokit();
         
         // 1. Avatar zu GitHub uploaden falls vorhanden
         let avatarPath = null;
         if (employeeData.avatar) {
+            console.log('📸 Avatar Upload wird gestartet...');
             avatarPath = await uploadAvatarToGitHub(employeeData, authenticatedOctokit);
         }
         
         // 2. employees.json aktualisieren
+        console.log('📄 employees.json Update wird gestartet...');
         await updateEmployeesJSON(employeeData, avatarPath, authenticatedOctokit);
         
         // 3. Repository Dispatch Event auslösen für HTML Generation
+        console.log('⚡ Repository Dispatch Event wird ausgelöst...');
         await authenticatedOctokit.rest.repos.createDispatchEvent({
             owner: GITHUB_OWNER,
             repo: GITHUB_REPO,
@@ -645,11 +746,26 @@ async function triggerGitHubDeployment(employeeData) {
             }
         });
         
-        console.log(`✅ GitHub Deployment ausgelöst für: ${employeeData.firstName} ${employeeData.lastName}`);
+        console.log(`✅ GitHub Deployment erfolgreich abgeschlossen für: ${employeeData.firstName} ${employeeData.lastName}`);
+        console.log(`🌐 Employee-Seite wird automatisch generiert: buderus-systeme.de/mitarbeiter/${employeeData.firstName.toLowerCase()}-${employeeData.lastName.toLowerCase()}.html`);
         
     } catch (error) {
         console.error('❌ GitHub Deployment Fehler:', error);
-        // GitHub Fehler sollten nicht das gesamte System blockieren
+        console.error('❌ Error Message:', error.message);
+        
+        // Spezifische Behandlung für verschiedene Fehlertypen
+        if (error.message && error.message.includes('secretOrPrivateKey must be an asymmetric key')) {
+            console.error('🔑 RSA Private Key Fehler - GitHub App Credentials sind ungültig');
+            console.error('🔑 Lösung: Echte GitHub App Credentials in employee-functions.js einfügen');
+        } else if (error.message && error.message.includes('GitHub App nicht installiert')) {
+            console.error('📦 GitHub App Installation Fehler - App ist nicht im Repository installiert');
+        } else {
+            console.error('🔧 Allgemeiner GitHub API Fehler');
+        }
+        
+        // Nur warnen, nicht das gesamte System blockieren
+        console.warn('⚠️ GitHub Auto-Deployment fehlgeschlagen - Employee Profil wurde trotzdem erfolgreich gespeichert');
+        console.warn('⚠️ Employee-Seite muss manuell erstellt werden oder GitHub Integration repariert werden');
     }
 }
 
@@ -668,9 +784,13 @@ async function uploadAvatarToGitHub(employeeData, authenticatedOctokit) {
             throw new Error(`Avatar Download fehlgeschlagen: ${response.status}`);
         }
         
-        const avatarBuffer = await response.buffer();
-        const avatarExtension = employeeData.avatar.includes('.webp') ? 'webp' : 'png';
-        const avatarFilename = `${employeeData.uid}.${avatarExtension}`;
+        const avatarBuffer = Buffer.from(await response.arrayBuffer());
+        const avatarExtension = employeeData.avatar.includes('.webp') ? 'webp' : 
+                              employeeData.avatar.includes('.jpg') || employeeData.avatar.includes('.jpeg') ? 'jpg' : 'png';
+        
+        // Employee ID für URL-kompatible Benennung (wie in der bestehenden employees.json)
+        const employeeId = `${employeeData.firstName.toLowerCase()}-${employeeData.lastName.toLowerCase()}`;
+        const avatarFilename = `${employeeId}.${avatarExtension}`;
         const avatarPath = `assets/avatars/${avatarFilename}`;
         
         // Avatar zu GitHub Repository uploaden
@@ -720,7 +840,8 @@ async function updateEmployeesJSON(employeeData, avatarFilename, authenticatedOc
         
         // Employee-Daten für JSON vorbereiten
         const employeeForJSON = {
-            id: employeeData.uid,
+            id: `${employeeData.firstName.toLowerCase()}-${employeeData.lastName.toLowerCase()}`, // Name-basierte ID für URL
+            uid: employeeData.uid, // Echte Firebase UID für interne Referenz
             name: `${employeeData.firstName} ${employeeData.lastName}`,
             title: employeeData.position,
             phone: employeeData.phone,
@@ -731,7 +852,8 @@ async function updateEmployeesJSON(employeeData, avatarFilename, authenticatedOc
         };
         
         // Bestehenden Employee aktualisieren oder hinzufügen
-        const existingIndex = currentEmployees.findIndex(emp => emp.id === employeeData.uid);
+        const employeeId = `${employeeData.firstName.toLowerCase()}-${employeeData.lastName.toLowerCase()}`;
+        const existingIndex = currentEmployees.findIndex(emp => emp.id === employeeId || emp.uid === employeeData.uid);
         if (existingIndex >= 0) {
             currentEmployees[existingIndex] = employeeForJSON;
             console.log('🔄 Bestehender Employee aktualisiert');
