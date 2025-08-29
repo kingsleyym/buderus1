@@ -1,0 +1,74 @@
+name: Generate Employee Pages
+
+on:
+  repository_dispatch:
+    types: [employee_update]
+  workflow_dispatch:  # Manuelle Ausführung ermöglichen
+
+jobs:
+  generate-pages:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        
+    - name: Generate Employee HTML Pages
+      working-directory: ./mitarbeiter
+      run: |
+        echo "🚀 Starting Employee Page Generation..."
+        echo "📋 Employee Update Event Details:"
+        echo "Action: ${{ github.event.client_payload.action }}"
+        echo "Employee: ${{ github.event.client_payload.employee.firstName }} ${{ github.event.client_payload.employee.lastName }}"
+        
+        # Check if employees.json exists
+        if [ ! -f "employees.json" ]; then
+          echo "⚠️ employees.json nicht gefunden, erstelle Fallback..."
+          echo "[]" > employees.json
+        fi
+        
+        # Generate HTML pages from employees.json
+        echo "🔄 Generiere Employee HTML-Seiten..."
+        node generate-employee-pages.js
+        
+    - name: Commit and Push Changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        
+        # Add generated files
+        git add mitarbeiter/*.html
+        git add assets/avatars/* || echo "No new avatars to add"
+        
+        # Check if there are changes to commit
+        if git diff --staged --quiet; then
+          echo "✅ Keine Änderungen zu committen"
+        else
+          git commit -m "🤖 Auto-generate employee pages
+
+          - Generated HTML pages for employee profiles
+          - Updated employee: ${{ github.event.client_payload.employee.firstName || 'Unknown' }} ${{ github.event.client_payload.employee.lastName || 'Employee' }}
+          - Triggered by: ${{ github.event.client_payload.action || 'manual' }}
+          
+          Files updated:
+          - mitarbeiter/*.html
+          - employees.json (if updated)"
+          
+          git push
+          
+          echo "✅ Employee-Seiten erfolgreich generiert und deployed!"
+        fi
+        
+    - name: Summary
+      run: |
+        echo "🎉 Employee Page Generation Complete!"
+        echo "🌐 Updated pages available at: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/mitarbeiter/"
+        echo "📱 Individual employee pages:"
+        ls mitarbeiter/*.html | grep -v index.html | head -5 || echo "No individual pages found"
