@@ -5,6 +5,10 @@ on:
     types: [employee_update]
   workflow_dispatch:  # Manuelle Ausführung ermöglichen
 
+permissions:
+  contents: write  # Berechtigung zum Schreiben in das Repository
+  actions: read    # Berechtigung zum Lesen von Actions
+
 jobs:
   generate-pages:
     runs-on: ubuntu-latest
