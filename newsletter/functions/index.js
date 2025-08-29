@@ -3,8 +3,10 @@ const admin = require('firebase-admin');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 
-// Firebase Admin initialisieren
-admin.initializeApp();
+// Firebase Admin initialisieren (nur einmal für alle Functions)
+if (!admin.apps.length) {
+    admin.initializeApp();
+}
 const db = admin.firestore();
 
 // E-Mail Transporter (wird später konfiguriert)
@@ -560,3 +562,14 @@ const qrFunctions = require('./qr-functions');
 exports.qrRedirect = qrFunctions.qrRedirect;
 exports.getQRAnalytics = qrFunctions.getQRAnalytics;
 exports.exportQRCodes = qrFunctions.exportQRCodes;
+
+// Employee Functions importieren und exportieren
+const employeeFunctions = require('./employee-functions');
+
+// Employee Functions exportieren
+exports.registerEmployee = employeeFunctions.registerEmployee;
+exports.approveEmployee = employeeFunctions.approveEmployee;
+exports.updateEmployeeProfile = employeeFunctions.updateEmployeeProfile;
+exports.generateEmployeeQR = employeeFunctions.generateEmployeeQR;
+exports.getEmployeeStats = employeeFunctions.getEmployeeStats;
+exports.getAllEmployees = employeeFunctions.getAllEmployees;

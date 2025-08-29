@@ -48,6 +48,9 @@
                 <a href="/admin/qr-codes.html" class="nav-item">
                     <i>📱</i> QR-Codes
                 </a>
+                <a href="/admin/employees.html" class="nav-item">
+                    <i>👷</i> Mitarbeiter
+                </a>
                 <a href="/admin/rewards.html" class="nav-item">
                     <i>🎁</i> Belohnungen
                 </a>
@@ -252,15 +255,27 @@
         
         class AdminDashboard {
             constructor() {
+                this.authChecked = false;
                 this.checkAuth();
-                this.initializeEventListeners();
-                this.loadDashboardData();
+                // Initialisierung erst nach Auth-Check
             }
             
             checkAuth() {
                 onAuthStateChanged(auth, (user) => {
-                    if (!user) {
-                        window.location.href = '/admin/index.html';
+                    console.log('🔧 DEBUG: Auth State Changed:', user?.email || 'No user');
+                    
+                    if (!this.authChecked) {
+                        this.authChecked = true;
+                        
+                        if (!user) {
+                            console.log('🔧 DEBUG: No user found, redirecting to login');
+                            window.location.href = '/admin/index.html';
+                            return;
+                        }
+                        
+                        console.log('🔧 DEBUG: User authenticated, initializing dashboard');
+                        this.initializeEventListeners();
+                        this.loadDashboardData();
                     }
                 });
             }

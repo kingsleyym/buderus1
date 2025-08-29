@@ -32,6 +32,9 @@
     "rules": "newsletter/firestore.rules",
     "indexes": "newsletter/firestore.indexes.json"
   },
+  "storage": {
+    "rules": "storage.rules"
+  },
   "emulators": {
     "functions": {
       "port": 5001

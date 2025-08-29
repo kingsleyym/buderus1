@@ -99,10 +99,21 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         
-        // Auth Check
+        // Auth Check mit besserer Logik
+        let subscribersAuthInitialized = false;
         onAuthStateChanged(auth, (user) => {
-            if (!user) {
-                window.location.href = '/admin/index.html';
+            console.log('🔧 DEBUG: Subscribers Auth State Changed:', user?.email || 'No user');
+            
+            if (!subscribersAuthInitialized) {
+                subscribersAuthInitialized = true;
+                
+                if (!user) {
+                    console.log('🔧 DEBUG: No user found, redirecting to login');
+                    window.location.href = '/admin/index.html';
+                    return;
+                }
+                
+                console.log('🔧 DEBUG: User authenticated for subscribers page');
             }
         });
         

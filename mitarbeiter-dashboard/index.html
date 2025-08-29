@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Werke Mitarbeiter Dashboard</title>
+    <link rel="icon" type="image/x-icon" href="../assets/logo.png">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-spinner"></div>
+        <p>Dashboard wird geladen...</p>
+    </div>
+
+    <!-- Login Screen -->
+    <div id="loginScreen" class="auth-screen">
+        <div class="auth-container">
+            <div class="logo-section">
+                <img src="../assets/logo.png" alt="E-Werke Logo" class="logo">
+                <h1>E-Werke Mitarbeiter</h1>
+                <p>Dashboard Portal</p>
+            </div>
+
+            <div class="auth-tabs">
+                <button class="tab-btn active" data-tab="login">Anmelden</button>
+                <button class="tab-btn" data-tab="register">Registrieren</button>
+            </div>
+
+            <!-- Login Form -->
+            <div id="loginForm" class="auth-form active">
+                <h2>Anmelden</h2>
+                <form id="loginFormElement">
+                    <div class="input-group">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="loginEmail" placeholder="E-Mail Adresse" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="loginPassword" placeholder="Passwort" required>
+                        <button type="button" class="password-toggle" onclick="togglePassword('loginPassword')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <button type="submit" class="auth-btn">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Anmelden
+                    </button>
+                </form>
+                <p class="forgot-password">
+                    <a href="#" onclick="resetPassword()">Passwort vergessen?</a>
+                </p>
+            </div>
+
+            <!-- Registration Form -->
+            <div id="registerForm" class="auth-form">
+                <h2>Mitarbeiter Registrierung</h2>
+                <form id="registerFormElement">
+                    <div class="input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="registerFirstName" placeholder="Vorname" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="registerLastName" placeholder="Nachname" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="registerEmail" placeholder="E-Mail Adresse" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-phone"></i>
+                        <input type="tel" id="registerPhone" placeholder="Telefonnummer" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-briefcase"></i>
+                        <input type="text" id="registerPosition" placeholder="Position/Abteilung" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="registerPassword" placeholder="Passwort" required>
+                        <button type="button" class="password-toggle" onclick="togglePassword('registerPassword')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="registerConfirmPassword" placeholder="Passwort bestätigen" required>
+                        <button type="button" class="password-toggle" onclick="togglePassword('registerConfirmPassword')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="agreeTerms" required>
+                        <label for="agreeTerms">Ich stimme den Nutzungsbedingungen zu</label>
+                    </div>
+                    <button type="submit" class="auth-btn register-btn">
+                        <i class="fas fa-user-plus"></i>
+                        Registrierung beantragen
+                    </button>
+                    <div class="registration-note">
+                        <i class="fas fa-info-circle"></i>
+                        <p>Ihre Registrierung muss von einem Administrator genehmigt werden. Sie erhalten eine E-Mail-Benachrichtigung.</p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Screen -->
+    <div id="dashboardScreen" class="dashboard-screen hidden">
+        <!-- Navigation -->
+        <nav class="dashboard-nav">
+            <div class="nav-brand">
+                <img src="../assets/logo.png" alt="E-Werke Logo" class="nav-logo">
+                <span>E-Werke Dashboard</span>
+            </div>
+            <div class="nav-user">
+                <span id="userDisplayName">Max Mustermann</span>
+                <div class="user-dropdown">
+                    <button class="user-btn" onclick="toggleUserMenu()">
+                        <img id="userAvatar" src="../assets/avatar.png" alt="User Avatar" class="user-avatar">
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div id="userMenu" class="user-menu hidden">
+                        <a href="#" onclick="showProfile()"><i class="fas fa-user"></i> Profil</a>
+                        <a href="#" onclick="showSettings()"><i class="fas fa-cog"></i> Einstellungen</a>
+                        <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Abmelden</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            <!-- Welcome Section -->
+            <section id="welcomeSection" class="dashboard-section active">
+                <div class="welcome-header">
+                    <h1>Willkommen zurück!</h1>
+                    <p id="welcomeMessage">Schön, dass Sie da sind.</p>
+                </div>
+
+                <!-- Status Cards -->
+                <div class="status-cards">
+                    <div class="status-card">
+                        <div class="card-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>Profil Status</h3>
+                            <p id="profileStatus">Vollständig</p>
+                        </div>
+                    </div>
+                    <div class="status-card">
+                        <div class="card-icon">
+                            <i class="fas fa-qrcode"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>Visitenkarte</h3>
+                            <p>Verfügbar</p>
+                        </div>
+                    </div>
+                    <div class="status-card">
+                        <div class="card-icon">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>Öffentliche Seite</h3>
+                            <p id="publicPageStatus">Aktiv</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="quick-actions">
+                    <h2>Schnellzugriff</h2>
+                    <div class="action-grid">
+                        <button class="action-btn" onclick="showProfile()">
+                            <i class="fas fa-user-edit"></i>
+                            <span>Profil bearbeiten</span>
+                        </button>
+                        <button class="action-btn" onclick="showBusinessCard()">
+                            <i class="fas fa-id-card"></i>
+                            <span>Visitenkarte</span>
+                        </button>
+                        <button class="action-btn" onclick="showQRCode()">
+                            <i class="fas fa-qrcode"></i>
+                            <span>QR-Code</span>
+                        </button>
+                        <button class="action-btn" onclick="previewPublicPage()">
+                            <i class="fas fa-external-link-alt"></i>
+                            <span>Öffentliche Seite</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Profile Section -->
+            <section id="profileSection" class="dashboard-section">
+                <div class="section-header">
+                    <h2>Profil bearbeiten</h2>
+                    <button class="back-btn" onclick="showWelcome()">
+                        <i class="fas fa-arrow-left"></i> Zurück
+                    </button>
+                </div>
+
+                <form id="profileForm" class="profile-form">
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="profileFirstName">Vorname</label>
+                            <input type="text" id="profileFirstName" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="profileLastName">Nachname</label>
+                            <input type="text" id="profileLastName" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="profileEmail">E-Mail</label>
+                            <input type="email" id="profileEmail" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="profilePhone">Telefon</label>
+                            <input type="tel" id="profilePhone" required>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="profilePosition">Position</label>
+                        <input type="text" id="profilePosition" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="profileBio">Kurzbeschreibung (optional)</label>
+                        <textarea id="profileBio" rows="3" placeholder="Kurze Beschreibung Ihrer Tätigkeit..."></textarea>
+                    </div>
+
+                    <div class="avatar-section">
+                        <label>Profilbild</label>
+                        <div class="avatar-upload">
+                            <img id="profileAvatarPreview" src="../assets/avatar.png" alt="Profil Vorschau" class="avatar-preview">
+                            <input type="file" id="profileAvatarInput" accept="image/*" onchange="previewAvatar(this)">
+                            <label for="profileAvatarInput" class="upload-btn">
+                                <i class="fas fa-camera"></i>
+                                Bild ändern
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="save-btn">
+                            <i class="fas fa-save"></i>
+                            Änderungen speichern
+                        </button>
+                        <button type="button" class="preview-btn" onclick="previewChanges()">
+                            <i class="fas fa-eye"></i>
+                            Vorschau
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Business Card Section -->
+            <section id="businessCardSection" class="dashboard-section">
+                <div class="section-header">
+                    <h2>Digitale Visitenkarte</h2>
+                    <button class="back-btn" onclick="showWelcome()">
+                        <i class="fas fa-arrow-left"></i> Zurück
+                    </button>
+                </div>
+
+                <div class="business-card-container">
+                    <div class="business-card" id="businessCardPreview">
+                        <div class="card-header">
+                            <img id="cardAvatar" src="../assets/avatar.png" alt="Profil" class="card-avatar">
+                            <img src="../assets/logo.png" alt="E-Werke Logo" class="card-logo">
+                        </div>
+                        <div class="card-content">
+                            <h3 id="cardName">Max Mustermann</h3>
+                            <p id="cardPosition">Position</p>
+                            <div class="card-contact">
+                                <div class="contact-item">
+                                    <i class="fas fa-envelope"></i>
+                                    <span id="cardEmail">email@example.com</span>
+                                </div>
+                                <div class="contact-item">
+                                    <i class="fas fa-phone"></i>
+                                    <span id="cardPhone">+49 123 456789</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-actions">
+                        <button class="action-btn" onclick="downloadBusinessCard()">
+                            <i class="fas fa-download"></i>
+                            Als Bild speichern
+                        </button>
+                        <button class="action-btn" onclick="shareBusinessCard()">
+                            <i class="fas fa-share"></i>
+                            Teilen
+                        </button>
+                        <button class="action-btn" onclick="showQRCode()">
+                            <i class="fas fa-qrcode"></i>
+                            QR-Code anzeigen
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- QR Code Section -->
+            <section id="qrCodeSection" class="dashboard-section">
+                <div class="section-header">
+                    <h2>Ihr QR-Code</h2>
+                    <button class="back-btn" onclick="showWelcome()">
+                        <i class="fas fa-arrow-left"></i> Zurück
+                    </button>
+                </div>
+
+                <div class="qr-container">
+                    <div class="qr-display">
+                        <div id="qrCodeDisplay" class="qr-code">
+                            <!-- QR Code wird hier generiert -->
+                        </div>
+                        <p class="qr-info">Scannen Sie diesen Code, um direkt zu Ihrer Profilseite zu gelangen</p>
+                    </div>
+
+                    <div class="qr-actions">
+                        <button class="action-btn" onclick="downloadQRCode()">
+                            <i class="fas fa-download"></i>
+                            QR-Code speichern
+                        </button>
+                        <button class="action-btn" onclick="printQRCode()">
+                            <i class="fas fa-print"></i>
+                            Drucken
+                        </button>
+                        <button class="action-btn" onclick="regenerateQRCode()">
+                            <i class="fas fa-sync"></i>
+                            Neu generieren
+                        </button>
+                    </div>
+
+                    <div class="qr-stats">
+                        <h3>Scan-Statistiken</h3>
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <span class="stat-number" id="totalScans">0</span>
+                                <span class="stat-label">Gesamt-Scans</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number" id="todayScans">0</span>
+                                <span class="stat-label">Heute</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number" id="weekScans">0</span>
+                                <span class="stat-label">Diese Woche</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Pending Approval Screen -->
+    <div id="pendingScreen" class="pending-screen hidden">
+        <div class="pending-container">
+            <div class="pending-icon">
+                <i class="fas fa-clock"></i>
+            </div>
+            <h2>Registrierung eingereicht</h2>
+            <p>Ihre Registrierung wurde erfolgreich eingereicht und wartet auf die Genehmigung durch einen Administrator.</p>
+            <p>Sie erhalten eine E-Mail-Benachrichtigung, sobald Ihr Konto aktiviert wurde.</p>
+            <button class="back-to-login-btn" onclick="backToLogin()">
+                <i class="fas fa-arrow-left"></i>
+                Zurück zur Anmeldung
+            </button>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+        import { getAuth } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+        import { getFunctions } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js';
+        import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+        import { getStorage } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDW_tTYVrU-8pZPqmFcx5BKhgZVs0pTzSQ",
+            authDomain: "buderus-systeme.firebaseapp.com",
+            projectId: "buderus-systeme",
+            storageBucket: "buderus-systeme.firebasestorage.app",
+            messagingSenderId: "384964671486",
+            appId: "1:384964671486:web:648152b8b7effb95df72af"
+        };
+
+        window.app = initializeApp(firebaseConfig);
+        window.auth = getAuth(window.app);
+        window.functions = getFunctions(window.app);
+        window.db = getFirestore(window.app);
+        window.storage = getStorage(window.app);
+    </script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

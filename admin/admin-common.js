@@ -1,4 +1,4 @@
-// Admin Common Functions - NO IMPORTS, damit es als normales Script funktioniert
+// Admin Common Functions - Nutzt Firebase v10 aus window objects
 
 class AdminBase {
     constructor() {
@@ -11,15 +11,15 @@ class AdminBase {
     }
     
     async waitForFirebase() {
-        // Warte bis Firebase verfügbar ist
+        // Warte bis Firebase v10 window objects verfügbar sind
         return new Promise((resolve) => {
-            if (typeof firebase !== 'undefined') {
+            if (window.app && window.auth && window.db) {
                 resolve();
                 return;
             }
             
             const checkFirebase = setInterval(() => {
-                if (typeof firebase !== 'undefined') {
+                if (window.app && window.auth && window.db) {
                     clearInterval(checkFirebase);
                     resolve();
                 }
@@ -35,33 +35,33 @@ class AdminBase {
     }
     
     initFirebase() {
-        // Firebase Config
-        const firebaseConfig = {
-            apiKey: "AIzaSyDW_tTYVrU-8pZPqmFcx5BKhgZVs0pTzSQ",
-            authDomain: "buderus-systeme.firebaseapp.com",
-            projectId: "buderus-systeme",
-            storageBucket: "buderus-systeme.firebasestorage.app",
-            messagingSenderId: "384964671486",
-            appId: "1:384964671486:web:648152b8b7effb95df72af"
-        };
-        
-        // Verwende Firebase v8 SDK statt v9
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-        this.app = firebase.app();
-        this.auth = firebase.auth();
-        this.db = firebase.firestore();
-        this.functions = firebase.functions();
+        // Nutze die bereits initialisierten Firebase v10 Instanzen
+        this.app = window.app;
+        this.auth = window.auth;
+        this.db = window.db;
+        this.functions = window.functions;
         
         console.log('🔧 DEBUG: Firebase in AdminBase initialisiert');
     }
     
-    setupAuth() {
-        this.auth.onAuthStateChanged((user) => {
+    async setupAuth() {
+        // Import Firebase Auth functions dynamically
+        const { onAuthStateChanged, signOut } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+        
+        onAuthStateChanged(this.auth, async (user) => {
             if (!user) {
-                window.location.href = '/admin/index.html';
+                // Nur umleiten wenn wir nicht schon auf der Login-Seite sind
+                if (!window.location.pathname.includes('/admin/index.html')) {
+                    window.location.href = '/admin/index.html';
+                }
+                return;
             }
+            
+            // User ist eingeloggt - prüfe Admin-Berechtigung
+            console.log('🔧 DEBUG: User eingeloggt:', user.email);
+            
+            // Hier könntest du später Admin-Berechtigung prüfen
+            // Für jetzt nehmen wir an, dass alle eingeloggten User Admins sind
         });
         
         // Wait for DOM to be ready before setting up logout
@@ -72,11 +72,13 @@ class AdminBase {
         }
     }
     
-    setupLogout() {
+    async setupLogout() {
+        const { signOut } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+        
         const logoutBtn = document.getElementById('logoutBtn');
         if (logoutBtn) {
             logoutBtn.addEventListener('click', async () => {
-                await this.auth.signOut();
+                await signOut(this.auth);
                 window.location.href = '/admin/index.html';
             });
         }

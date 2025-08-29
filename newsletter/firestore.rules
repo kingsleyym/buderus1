@@ -44,6 +44,11 @@ service cloud.firestore {
       allow read, write: if request.auth != null;
     }
     
+    // Employees Collection - nur für authentifizierte User
+    match /employees/{document} {
+      allow read, write: if request.auth != null;
+    }
+    
     // Alle anderen Dokumente - blockiert
     match /{document=**} {
       allow read, write: if false;

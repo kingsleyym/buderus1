@@ -1,0 +1,47 @@
+name: Generate Employee Pages
+
+on:
+  repository_dispatch:
+    types: [employee_update]
+  workflow_dispatch: # Manueller Trigger
+
+jobs:
+  generate-pages:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        
+    - name: Generate employee pages
+      run: |
+        cd mitarbeiter
+        node generate-employee-pages.js
+        
+    - name: Commit and push changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        
+        # Check if there are changes to commit
+        if [ -n "$(git status --porcelain)" ]; then
+          git add .
+          
+          # Create commit message based on trigger
+          if [ "${{ github.event.action }}" = "employee_update" ]; then
+            EMPLOYEE_NAME="${{ github.event.client_payload.employee.firstName }} ${{ github.event.client_payload.employee.lastName }}"
+            git commit -m "🔄 Update employee page for ${EMPLOYEE_NAME}"
+          else
+            git commit -m "🔄 Regenerate all employee pages"
+          fi
+          
+          git push
+          echo "✅ Employee pages updated and pushed"
+        else
+          echo "ℹ️ No changes to commit"
+        fi

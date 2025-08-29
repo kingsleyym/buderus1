@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mitarbeiter Verwaltung | Buderus Systeme</title>
+    <meta name="theme-color" content="#181A23">
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/assets/favicon-ico-data.ico">
+    
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/admin/admin.css">
+    <link rel="stylesheet" href="admin-employees.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="admin-body">
+    <!-- Mobile Navigation Toggle -->
+    <button class="mobile-nav-toggle" id="mobileNavToggle">☰</button>
+    
+    <!-- Mobile Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    
+    <div class="admin-dashboard">
+        <!-- Sidebar -->
+        <nav class="admin-sidebar">
+            <div class="sidebar-header">
+                <img src="/assets/logo.png" alt="Buderus Systeme" class="sidebar-logo">
+                <h2 class="sidebar-title">Admin Dashboard</h2>
+                <p class="sidebar-subtitle">E-Werke Management</p>
+            </div>
+            
+            <div class="sidebar-nav">
+                <a href="/admin/dashboard.html" class="nav-item">
+                    <i>📊</i> Dashboard
+                </a>
+                <a href="/admin/newsletter-editor.html" class="nav-item">
+                    <i>✏️</i> Newsletter erstellen
+                </a>
+                <a href="/admin/subscribers.html" class="nav-item">
+                    <i>👥</i> Abonnenten
+                </a>
+                <a href="/admin/campaigns.html" class="nav-item">
+                    <i>📧</i> Kampagnen
+                </a>
+                <a href="/admin/qr-codes.html" class="nav-item">
+                    <i>📱</i> QR-Codes
+                </a>
+                <a href="/admin/employees.html" class="nav-item active">
+                    <i>👷</i> Mitarbeiter
+                </a>
+                <a href="/admin/analytics.html" class="nav-item">
+                    <i>📈</i> Analytics
+                </a>
+                <a href="/admin/rewards.html" class="nav-item">
+                    <i>🎁</i> Rewards
+                </a>
+            </div>
+            
+            <div class="sidebar-footer">
+                <button class="logout-btn" id="logoutBtn">
+                    <i>🚪</i> Abmelden
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <div class="page-header">
+                <h1>Mitarbeiter Verwaltung</h1>
+                <div class="header-actions">
+                    <button class="refresh-btn" onclick="loadEmployees()">
+                        <i>🔄</i>
+                        Aktualisieren
+                    </button>
+                    <button class="add-btn" onclick="showAddEmployeeModal()">
+                        <i>➕</i>
+                        Mitarbeiter hinzufügen
+                    </button>
+                </div>
+            </div>
+
+        <!-- Filter und Suche -->
+        <div class="filters">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Nach Namen, E-Mail oder Position suchen..." onkeyup="filterEmployees()">
+            </div>
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-status="all" onclick="filterByStatus('all')">
+                    Alle <span id="countAll">0</span>
+                </button>
+                <button class="filter-btn" data-status="pending" onclick="filterByStatus('pending')">
+                    Wartend <span id="countPending">0</span>
+                </button>
+                <button class="filter-btn" data-status="active" onclick="filterByStatus('active')">
+                    Aktiv <span id="countActive">0</span>
+                </button>
+                <button class="filter-btn" data-status="disabled" onclick="filterByStatus('disabled')">
+                    Deaktiviert <span id="countDisabled">0</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mitarbeiter Liste -->
+        <div class="employees-container">
+            <div id="loadingEmployees" class="loading">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Mitarbeiter werden geladen...</p>
+            </div>
+
+            <div id="employeesGrid" class="employees-grid hidden">
+                <!-- Mitarbeiter-Karten werden hier dynamisch geladen -->
+            </div>
+
+            <div id="noEmployees" class="no-data hidden">
+                <i class="fas fa-users"></i>
+                <h3>Keine Mitarbeiter gefunden</h3>
+                <p>Es wurden keine Mitarbeiter gefunden, die den Suchkriterien entsprechen.</p>
+            </div>
+        </div>
+        </main>
+    </div>
+
+    <!-- Employee Detail Modal -->
+    <div id="employeeModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Mitarbeiter Details</h2>
+                <button class="modal-close" onclick="closeEmployeeModal()">
+                    <i>✖</i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="employee-details">
+                    <div class="employee-avatar">
+                        <img id="modalAvatar" src="../assets/avatar.png" alt="Profil">
+                    </div>
+                    <div class="employee-info">
+                        <h3 id="modalName">Name</h3>
+                        <p id="modalPosition" class="position">Position</p>
+                        <div class="contact-info">
+                            <div class="contact-item">
+                                <i>📧</i>
+                                <span id="modalEmail">email@example.com</span>
+                            </div>
+                            <div class="contact-item">
+                                <i>📞</i>
+                                <span id="modalPhone">+49 123 456789</span>
+                            </div>
+                        </div>
+                        <div class="employee-status">
+                            <span id="modalStatus" class="status-badge">Status</span>
+                            <span id="modalCreated" class="created-date">Erstellt am</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="employee-bio">
+                    <h4>Beschreibung</h4>
+                    <p id="modalBio">Keine Beschreibung verfügbar</p>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button id="approveBtn" class="action-btn primary-btn" onclick="approveEmployee()">
+                    <i>✅</i>
+                    Genehmigen
+                </button>
+                <button id="deactivateBtn" class="action-btn secondary-btn" onclick="deactivateEmployee()">
+                    <i>🚫</i>
+                    Deaktivieren
+                </button>
+                <button id="editBtn" class="action-btn secondary-btn" onclick="editEmployee()">
+                    <i>✏️</i>
+                    Bearbeiten
+                </button>
+                <button id="deleteBtn" class="action-btn danger-btn" onclick="deleteEmployee()">
+                    <i>🗑️</i>
+                    Löschen
+                </button>
+                <button class="action-btn secondary-btn" onclick="viewPublicProfile()">
+                    <i>🔗</i>
+                    Öffentliches Profil
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Employee Modal -->
+    <div id="addEmployeeModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Neuen Mitarbeiter hinzufügen</h2>
+                <button class="modal-close" onclick="closeAddEmployeeModal()">
+                    <i>✖</i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="addEmployeeForm">
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="addFirstName">Vorname</label>
+                            <input type="text" id="addFirstName" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="addLastName">Nachname</label>
+                            <input type="text" id="addLastName" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="addEmail">E-Mail</label>
+                            <input type="email" id="addEmail" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="addPhone">Telefon</label>
+                            <input type="tel" id="addPhone" required>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="addPosition">Position</label>
+                        <input type="text" id="addPosition" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="addBio">Beschreibung (optional)</label>
+                        <textarea id="addBio" rows="3" placeholder="Kurze Beschreibung der Tätigkeit..."></textarea>
+                    </div>
+                    <div class="input-group">
+                        <label for="addPassword">Temporäres Passwort</label>
+                        <input type="password" id="addPassword" required>
+                        <small>Der Mitarbeiter sollte das Passwort beim ersten Login ändern</small>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="autoApprove" checked>
+                        <label for="autoApprove">Automatisch genehmigen</label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-actions">
+                <button type="submit" form="addEmployeeForm" class="action-btn primary-btn">
+                    <i>➕</i>
+                    Mitarbeiter erstellen
+                </button>
+                <button class="action-btn secondary-btn" onclick="closeAddEmployeeModal()">
+                    Abbrechen
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+        import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js';
+        import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDW_tTYVrU-8pZPqmFcx5BKhgZVs0pTzSQ",
+            authDomain: "buderus-systeme.firebaseapp.com",
+            projectId: "buderus-systeme",
+            storageBucket: "buderus-systeme.firebasestorage.app",
+            messagingSenderId: "384964671486",
+            appId: "1:384964671486:web:648152b8b7effb95df72af"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const functions = getFunctions(app);
+        const db = getFirestore(app);
+        
+        // Auth Check mit besserer Logik
+        let authInitialized = false;
+        onAuthStateChanged(auth, (user) => {
+            console.log('🔧 DEBUG: Employees Auth State Changed:', user?.email || 'No user');
+            
+            if (!authInitialized) {
+                authInitialized = true;
+                
+                if (!user) {
+                    console.log('🔧 DEBUG: No user found, redirecting to login');
+                    window.location.href = '/admin/index.html';
+                    return;
+                }
+                
+                console.log('🔧 DEBUG: User authenticated, initializing employee management');
+                // Initialize Employee Management
+                initEmployeeManagement();
+            }
+        });
+        
+        // Logout functionality
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            await signOut(auth);
+            window.location.href = '/admin/index.html';
+        });
+        
+        // Employee Management
+        let employees = [];
+        
+        async function initEmployeeManagement() {
+            await loadEmployees();
+            setupEventListeners();
+        }
+        
+        async function loadEmployees() {
+            try {
+                showLoading();
+                
+                console.log('🔧 DEBUG: Lade Mitarbeiter...');
+                console.log('🔧 DEBUG: Auth User:', auth.currentUser?.email);
+                
+                const employeesRef = collection(db, 'employees');
+                const snapshot = await getDocs(employeesRef);
+                
+                console.log('🔧 DEBUG: Mitarbeiter geladen:', snapshot.size);
+                
+                employees = [];
+                snapshot.forEach(doc => {
+                    const empData = {
+                        id: doc.id,
+                        ...doc.data()
+                    };
+                    employees.push(empData);
+                    console.log('🔧 DEBUG: Employee loaded:', empData);
+                });
+                
+                console.log('🔧 DEBUG: Total employees loaded:', employees.length);
+                console.log('🔧 DEBUG: All employees:', employees);
+                
+                hideLoading();
+                renderEmployees();
+                updateCounts();
+                
+            } catch (error) {
+                console.error('🔥 FEHLER beim Laden der Mitarbeiter:', error);
+                console.error('🔥 Error Code:', error.code);
+                console.error('🔥 Error Message:', error.message);
+                console.error('🔥 Auth User:', auth.currentUser);
+                
+                hideLoading();
+                showNotification(`Fehler beim Laden der Mitarbeiter: ${error.message}`, 'error');
+                
+                // Fallback: Zeige leere Liste
+                employees = [];
+                renderEmployees();
+            }
+        }
+        
+        function showLoading() {
+            document.getElementById('loadingEmployees').style.display = 'flex';
+            document.getElementById('employeesGrid').classList.add('hidden');
+            document.getElementById('noEmployees').classList.add('hidden');
+        }
+        
+        function hideLoading() {
+            document.getElementById('loadingEmployees').style.display = 'none';
+        }
+        
+        function renderEmployees() {
+            const grid = document.getElementById('employeesGrid');
+            const noDataDiv = document.getElementById('noEmployees');
+            
+            if (employees.length === 0) {
+                grid.classList.add('hidden');
+                noDataDiv.classList.remove('hidden');
+                return;
+            }
+            
+            grid.classList.remove('hidden');
+            noDataDiv.classList.add('hidden');
+            
+            const filteredEmployees = getFilteredEmployees();
+            
+            if (filteredEmployees.length === 0) {
+                grid.innerHTML = '<p style="text-align: center; grid-column: 1 / -1; color: #666;">Keine Mitarbeiter gefunden.</p>';
+                return;
+            }
+            
+            grid.innerHTML = filteredEmployees.map(emp => createEmployeeCard(emp)).join('');
+        }
+        
+        function getFilteredEmployees() {
+            const searchInput = document.getElementById('searchInput');
+            const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+            const currentFilter = document.querySelector('.filter-btn.active')?.dataset.status || 'all';
+            
+            console.log('🔧 DEBUG: Filter applied - Status:', currentFilter, 'Search:', searchTerm);
+            
+            return employees.filter(emp => {
+                const matchesSearch = !searchTerm || 
+                    emp.name?.toLowerCase().includes(searchTerm) ||
+                    emp.email?.toLowerCase().includes(searchTerm) ||
+                    emp.phone?.toLowerCase().includes(searchTerm);
+                
+                const matchesFilter = currentFilter === 'all' || 
+                                    emp.status === currentFilter ||
+                                    (currentFilter === 'active' && (emp.status === 'approved' || emp.status === 'active'));
+                
+                return matchesSearch && matchesFilter;
+            });
+        }
+        
+        function createEmployeeCard(employee) {
+            const statusClass = employee.status === 'approved' ? 'approved' : 
+                              employee.status === 'rejected' ? 'rejected' : 'pending';
+            
+            const statusText = employee.status === 'approved' ? 'Bestätigt' :
+                             employee.status === 'rejected' ? 'Abgelehnt' : 'Wartend';
+            
+            return `
+                <div class="employee-card ${statusClass}">
+                    <div class="employee-header">
+                        <div class="employee-avatar">
+                            ${employee.name ? employee.name.charAt(0).toUpperCase() : '?'}
+                        </div>
+                        <div class="employee-info">
+                            <h3 class="employee-name">${employee.name || 'Unbekannt'}</h3>
+                            <p class="employee-email">${employee.email || 'Keine E-Mail'}</p>
+                        </div>
+                        <div class="employee-status ${statusClass}">
+                            ${statusText}
+                        </div>
+                    </div>
+                    
+                    <div class="employee-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Telefon:</span>
+                            <span class="detail-value">${employee.phone || 'Nicht angegeben'}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Position:</span>
+                            <span class="detail-value">${employee.position || 'Nicht angegeben'}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Registriert:</span>
+                            <span class="detail-value">${formatDate(employee.createdAt)}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="employee-actions">
+                        ${(employee.status === 'pending' || (employee.status === 'approved' && employee.approved === false)) ? `
+                            <button class="btn btn-success" onclick="approveEmployee('${employee.id}')">
+                                ${employee.status === 'pending' ? '✓ Bestätigen' : '🔄 Aktivieren'}
+                            </button>
+                            <button class="btn btn-danger" onclick="rejectEmployee('${employee.id}')">
+                                ✗ Ablehnen
+                            </button>
+                        ` : ''}
+                        <button class="btn btn-secondary" onclick="viewEmployee('${employee.id}')">
+                            👁 Anzeigen
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function formatDate(timestamp) {
+            if (!timestamp) return 'Unbekannt';
+            const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+            return date.toLocaleDateString('de-DE', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric' 
+            });
+        }
+        
+        function updateCounts() {
+            const approved = employees.filter(e => e.status === 'approved').length;
+            const pending = employees.filter(e => e.status === 'pending').length;
+            const active = employees.filter(e => e.status === 'active').length;
+            
+            // Update count spans in the HTML
+            const countAll = document.getElementById('countAll');
+            const countPending = document.getElementById('countPending');
+            const countActive = document.getElementById('countActive');
+            
+            if (countAll) countAll.textContent = employees.length;
+            if (countPending) countPending.textContent = pending;
+            if (countActive) countActive.textContent = approved + active;
+            
+            console.log('🔧 DEBUG: Counts updated - All:', employees.length, 'Pending:', pending, 'Active:', approved + active);
+        }
+        
+        function setupEventListeners() {
+            // Filter buttons - mit Null-Check
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            if (filterButtons.length > 0) {
+                filterButtons.forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        renderEmployees();
+                    });
+                });
+            }
+            
+            // Search input
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.addEventListener('input', () => {
+                    renderEmployees();
+                });
+            }
+            
+            // Refresh button (optional)
+            const refreshBtn = document.getElementById('refreshBtn');
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', loadEmployees);
+            }
+        }
+        
+        // Global functions for HTML onclick events
+        window.loadEmployees = loadEmployees;
+        window.showAddEmployeeModal = function() {
+            alert('Add Employee Modal - Coming Soon');
+        };
+        window.filterEmployees = function() {
+            renderEmployees();
+        };
+        window.filterByStatus = function(status) {
+            // Update active button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.status === status) {
+                    btn.classList.add('active');
+                }
+            });
+            renderEmployees();
+        };
+        
+        // Global functions for button actions
+        window.approveEmployee = async function(employeeId) {
+            try {
+                console.log('🔧 DEBUG: Function aufgerufen mit employeeId:', employeeId);
+                console.log('🔧 DEBUG: Type of employeeId:', typeof employeeId);
+                console.log('🔧 DEBUG: employeeId length:', employeeId ? employeeId.length : 'null/undefined');
+                
+                if (!employeeId) {
+                    console.error('❌ FEHLER: Keine Employee ID bereitgestellt!');
+                    showNotification('Fehler: Keine Employee ID', 'error');
+                    return;
+                }
+                
+                console.log('Genehmigung von Mitarbeiter:', employeeId);
+                
+                // Cloud Function aufrufen, um sowohl Firestore als auch Firebase Auth zu aktualisieren
+                const approveEmployeeFunction = httpsCallable(functions, 'approveEmployee');
+                
+                console.log('🔧 DEBUG: Calling Cloud Function with data:', { employeeId });
+                const result = await approveEmployeeFunction({ employeeId });
+                console.log('Cloud Function Ergebnis:', result);
+                
+                showNotification('Mitarbeiter erfolgreich bestätigt und aktiviert', 'success');
+                await loadEmployees();
+            } catch (error) {
+                console.error('Fehler beim Bestätigen:', error);
+                showNotification('Fehler beim Bestätigen: ' + error.message, 'error');
+            }
+        };
+        
+        window.rejectEmployee = async function(employeeId) {
+            try {
+                await updateDoc(doc(db, 'employees', employeeId), {
+                    status: 'rejected',
+                    rejectedAt: new Date()
+                });
+                
+                showNotification('Mitarbeiter abgelehnt', 'success');
+                await loadEmployees();
+            } catch (error) {
+                console.error('Fehler beim Ablehnen:', error);
+                showNotification('Fehler beim Ablehnen', 'error');
+            }
+        };
+        
+        window.viewEmployee = function(employeeId) {
+            const employee = employees.find(e => e.id === employeeId);
+            if (employee) {
+                alert(`Mitarbeiter Details:\n\nName: ${employee.name}\nE-Mail: ${employee.email}\nTelefon: ${employee.phone}\nPosition: ${employee.position}\nStatus: ${employee.status}`);
+            }
+        };
+        
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `toast toast-${type}`;
+            notification.textContent = message;
+            
+            const container = document.getElementById('toastContainer');
+            container.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    container.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
