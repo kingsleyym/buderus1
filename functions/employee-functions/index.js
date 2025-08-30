@@ -460,3 +460,175 @@ async function sendApprovalEmail(email, firstName) {
         console.error('Genehmigungs-E-Mail Fehler:', error);
     }
 }
+
+/**
+ * Bestellung verarbeiten
+ * Speichert Bestellungen in Firestore für Admin-Verwaltung
+ */
+exports.submitOrder = functions.https.onCall(async (data, context) => {
+    try {
+        // Authentifizierung prüfen
+        if (!context.auth) {
+            throw new functions.https.HttpsError('unauthenticated', 'Benutzer muss angemeldet sein');
+        }
+        
+        const { orderId, items, employee, summary } = data;
+        
+        // Validierung
+        if (!orderId || !items || !employee || !summary) {
+            throw new functions.https.HttpsError('invalid-argument', 'Bestelldaten unvollständig');
+        }
+        
+        if (!Array.isArray(items) || items.length === 0) {
+            throw new functions.https.HttpsError('invalid-argument', 'Bestellung muss mindestens einen Artikel enthalten');
+        }
+        
+        // Sicherstellen, dass der Benutzer seine eigene Bestellung abgibt
+        if (context.auth.uid !== employee.uid) {
+            throw new functions.https.HttpsError('permission-denied', 'Berechtigung verweigert');
+        }
+        
+        // Bestelldaten für Admin-Dashboard strukturieren
+        const orderData = {
+            orderId: orderId,
+            status: 'pending',
+            priority: 'normal',
+            createdAt: admin.firestore.FieldValue.serverTimestamp(),
+            createdDate: new Date().toLocaleDateString('de-DE'),
+            orderMonth: new Date().toLocaleDateString('de-DE', { year: 'numeric', month: '2-digit' }),
+            orderYear: new Date().getFullYear(),
+            
+            // Mitarbeiterdaten für Sortierung und Zuordnung
+            employee: {
+                uid: employee.uid,
+                firstName: employee.firstName,
+                lastName: employee.lastName,
+                fullName: `${employee.firstName} ${employee.lastName}`,
+                email: employee.email,
+                position: employee.position,
+                department: employee.department || 'Unbekannt'
+            },
+            
+            // Bestellte Artikel mit Details
+            items: items.map(item => ({
+                id: item.id,
+                type: item.type,
+                name: item.name,
+                quantity: item.quantity,
+                details: item.details,
+                unitType: item.type === 'cards' ? 'Stück' : 'Anzahl',
+                ...(item.size && { size: item.size }),
+                ...(item.format && { format: item.format })
+            })),
+            
+            // Zusammenfassung für Admin-Übersicht
+            summary: {
+                totalItems: summary.totalItems,
+                itemTypes: summary.itemTypes,
+                itemCount: summary.itemCount,
+                hasShirts: summary.hasShirts || false,
+                hasCards: summary.hasCards || false,
+                categories: summary.itemTypes.join(', ')
+            },
+            
+            // Admin-Felder
+            adminNotes: '',
+            processedBy: null,
+            processedAt: null,
+            estimatedCompletion: null,
+            notificationsSent: {
+                orderReceived: false,
+                processing: false,
+                completed: false
+            }
+        };
+        
+        // In Firestore speichern
+        const db = admin.firestore();
+        await db.collection('orders').doc(orderId).set(orderData);
+        
+        // Optional: Benachrichtigung an Admin senden
+        await sendOrderNotificationToAdmin(orderData);
+        
+        console.log(`✅ Bestellung ${orderId} erfolgreich gespeichert für ${employee.fullName}`);
+        
+        return {
+            success: true,
+            orderId: orderId,
+            message: 'Bestellung erfolgreich übermittelt'
+        };
+        
+    } catch (error) {
+        console.error('❌ Fehler beim Verarbeiten der Bestellung:', error);
+        
+        // Spezifische Fehlerbehandlung
+        if (error instanceof functions.https.HttpsError) {
+            throw error;
+        }
+        
+        throw new functions.https.HttpsError('internal', 'Fehler beim Verarbeiten der Bestellung');
+    }
+});
+
+/**
+ * Bestellstatus aktualisieren (nur für Admins)
+ */
+exports.updateOrderStatus = functions.https.onCall(async (data, context) => {
+    try {
+        // Authentifizierung prüfen
+        if (!context.auth) {
+            throw new functions.https.HttpsError('unauthenticated', 'Admin-Berechtigung erforderlich');
+        }
+        
+        // Admin-Berechtigung prüfen
+        const userDoc = await admin.firestore().collection('employees').doc(context.auth.uid).get();
+        if (!userDoc.exists || userDoc.data().role !== 'admin') {
+            throw new functions.https.HttpsError('permission-denied', 'Admin-Berechtigung erforderlich');
+        }
+        
+        const { orderId, status, adminNotes } = data;
+        
+        if (!orderId || !status) {
+            throw new functions.https.HttpsError('invalid-argument', 'Bestell-ID und Status erforderlich');
+        }
+        
+        const updateData = {
+            status: status,
+            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+            processedBy: context.auth.uid,
+            processedAt: admin.firestore.FieldValue.serverTimestamp()
+        };
+        
+        if (adminNotes) {
+            updateData.adminNotes = adminNotes;
+        }
+        
+        await admin.firestore().collection('orders').doc(orderId).update(updateData);
+        
+        console.log(`✅ Bestellstatus aktualisiert: ${orderId} -> ${status}`);
+        
+        return {
+            success: true,
+            message: 'Bestellstatus erfolgreich aktualisiert'
+        };
+        
+    } catch (error) {
+        console.error('❌ Fehler beim Aktualisieren des Bestellstatus:', error);
+        throw new functions.https.HttpsError('internal', 'Fehler beim Aktualisieren des Status');
+    }
+});
+
+/**
+ * Bestellbenachrichtigung an Admin senden
+ */
+async function sendOrderNotificationToAdmin(orderData) {
+    try {
+        // Hier könnte eine E-Mail an den Admin gesendet werden
+        console.log(`📧 Neue Bestellung für Admin: ${orderData.orderId} von ${orderData.employee.fullName}`);
+        
+        // Optional: Push-Benachrichtigung oder E-Mail implementieren
+        
+    } catch (error) {
+        console.error('Fehler beim Senden der Admin-Benachrichtigung:', error);
+    }
+}

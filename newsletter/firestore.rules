@@ -49,6 +49,12 @@ service cloud.firestore {
       allow read, write: if request.auth != null;
     }
     
+    // Orders Collection - erlaube schreiben für alle, lesen nur für authentifizierte User
+    match /orders/{document} {
+      allow write: if true;
+      allow read: if request.auth != null;
+    }
+    
     // Alle anderen Dokumente - blockiert
     match /{document=**} {
       allow read, write: if false;

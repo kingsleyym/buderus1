@@ -300,15 +300,17 @@ function loadProfileForm() {
 }
 
 function loadBusinessCard() {
-    if (!currentEmployeeData) return;
+    if (!currentEmployeeData) {
+        console.log('⚠️ loadBusinessCard: Keine Employee Data verfügbar');
+        return;
+    }
     
-    document.getElementById('cardName').textContent = `${currentEmployeeData.firstName} ${currentEmployeeData.lastName}`;
-    document.getElementById('cardPosition').textContent = currentEmployeeData.position || '';
-    document.getElementById('cardEmail').textContent = currentEmployeeData.email || '';
-    document.getElementById('cardPhone').textContent = currentEmployeeData.phone || '';
+    // Diese Funktion ist für das alte Business Card System - wird durch generateEmployeeCardPreview ersetzt
+    console.log('ℹ️ loadBusinessCard: Übersprungen - verwende generateEmployeeCardPreview');
     
-    if (currentEmployeeData.avatar) {
-        document.getElementById('cardAvatar').src = currentEmployeeData.avatar;
+    // Optional: Employee Card generieren falls auf der richtigen Seite
+    if (document.getElementById('employeeCardContainer')) {
+        generateEmployeeCardPreview();
     }
 }
 
@@ -376,8 +378,25 @@ function showProfile() {
     switchDashboardSection('profileSection');
 }
 
+function showEmployeeCard() {
+    console.log('🎨 Zeige Employee Card Section');
+    switchDashboardSection('employeeCardSection');
+    
+    // Warten bis DOM bereit ist, dann Employee Card generieren
+    setTimeout(() => {
+        generateEmployeeCardPreview();
+    }, 100);
+}
+
+// Legacy-Funktion für Kompatibilität
 function showBusinessCard() {
-    switchDashboardSection('businessCardSection');
+    showEmployeeCard();
+}
+
+function showOrders() {
+    switchDashboardSection('ordersSection');
+    loadProducts();
+    loadCart();
 }
 
 function showQRCode() {
@@ -393,6 +412,170 @@ function switchDashboardSection(sectionId) {
         section.classList.remove('active');
     });
     document.getElementById(sectionId).classList.add('active');
+}
+
+// Neue Funktionen für zusätzliche Buttons
+function openOnlineProfile() {
+    // Öffne die Online-Visitenkarte in neuem Tab
+    try {
+        // Versuche zuerst die aktuellen User-Daten zu bekommen
+        let firstName, lastName;
+        
+        if (window.currentUser && window.currentUser.firstName && window.currentUser.lastName) {
+            firstName = window.currentUser.firstName;
+            lastName = window.currentUser.lastName;
+        } else {
+            // Fallback: Versuche Daten aus den Input-Feldern zu holen
+            const firstNameInput = document.getElementById('profileFirstName');
+            const lastNameInput = document.getElementById('profileLastName');
+            
+            if (firstNameInput && lastNameInput && firstNameInput.value && lastNameInput.value) {
+                firstName = firstNameInput.value;
+                lastName = lastNameInput.value;
+            }
+        }
+        
+        if (firstName && lastName) {
+            const formattedFirstName = firstName.toLowerCase().replace(/\s+/g, '-');
+            const formattedLastName = lastName.toLowerCase().replace(/\s+/g, '-');
+            const profileUrl = `https://buderus-systeme.de/mitarbeiter/${formattedFirstName}-${formattedLastName}.html`;
+            
+            console.log('🔗 Öffne Online-Visitenkarte:', profileUrl);
+            window.open(profileUrl, '_blank');
+        } else {
+            console.warn('⚠️ Keine Vor-/Nachname Daten gefunden');
+            showToast('info', 'Online Visitenkarte', 'Die Online-Visitenkarte wird nach dem nächsten Profil-Update verfügbar sein');
+        }
+    } catch (error) {
+        console.error('❌ Fehler beim Öffnen der Online-Visitenkarte:', error);
+        showToast('error', 'Fehler', 'Visitenkarte konnte nicht geöffnet werden');
+    }
+}
+
+function showMyOrders() {
+    switchDashboardSection('myOrdersSection');
+    loadMyOrders();
+}
+
+async function loadMyOrders() {
+    const ordersLoading = document.getElementById('ordersLoading');
+    const ordersList = document.getElementById('ordersList');
+    const noOrders = document.getElementById('noOrders');
+    
+    try {
+        ordersLoading.style.display = 'block';
+        ordersList.style.display = 'none';
+        noOrders.style.display = 'none';
+        
+        // Firebase Firestore Abfrage
+        const { collection, query, where, orderBy, getDocs } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+        
+        // Mehrere Wege versuchen, die User-E-Mail zu bekommen
+        let userEmail = null;
+        
+        if (window.currentUser && window.currentUser.email) {
+            userEmail = window.currentUser.email;
+        } else if (window.auth && window.auth.currentUser) {
+            userEmail = window.auth.currentUser.email;
+        } else {
+            // Fallback: Versuche die E-Mail aus dem Profil-Input zu holen
+            const emailInput = document.getElementById('profileEmail');
+            if (emailInput && emailInput.value) {
+                userEmail = emailInput.value;
+            }
+        }
+        
+        if (!userEmail) {
+            throw new Error('Benutzer-E-Mail nicht gefunden. Bitte loggen Sie sich neu ein.');
+        }
+        
+        console.log('🔍 Lade Bestellungen für E-Mail:', userEmail);
+        
+        const ordersQuery = query(
+            collection(window.db, 'orders'),
+            where('employee.email', '==', userEmail),
+            orderBy('createdAt', 'desc')
+        );
+        
+        const querySnapshot = await getDocs(ordersQuery);
+        
+        ordersLoading.style.display = 'none';
+        
+        if (querySnapshot.empty) {
+            noOrders.style.display = 'block';
+            return;
+        }
+        
+        // Bestellungen anzeigen
+        let ordersHtml = '';
+        querySnapshot.forEach((doc) => {
+            const order = doc.data();
+            ordersHtml += generateOrderHTML(order);
+        });
+        
+        ordersList.innerHTML = ordersHtml;
+        ordersList.style.display = 'block';
+        
+    } catch (error) {
+        console.error('Fehler beim Laden der Bestellungen:', error);
+        ordersLoading.style.display = 'none';
+        ordersList.innerHTML = `
+            <div class="error-message">
+                <i class="fas fa-exclamation-triangle"></i>
+                <p>Fehler beim Laden der Bestellungen: ${error.message}</p>
+            </div>
+        `;
+        ordersList.style.display = 'block';
+    }
+}
+
+function generateOrderHTML(order) {
+    const orderDate = order.timestamp?.toDate?.() || new Date(order.timestamp);
+    const formattedDate = orderDate.toLocaleDateString('de-DE');
+    const orderNumber = order.orderId.split('_')[1] || order.orderId;
+    
+    // Status Badge
+    const status = order.status || 'pending';
+    const statusConfig = {
+        pending: { label: 'In Bearbeitung', class: 'status-pending', icon: 'clock' },
+        processing: { label: 'Wird bearbeitet', class: 'status-processing', icon: 'cog' },
+        shipped: { label: 'Versendet', class: 'status-shipped', icon: 'truck' },
+        delivered: { label: 'Zugestellt', class: 'status-delivered', icon: 'check-circle' },
+        cancelled: { label: 'Storniert', class: 'status-cancelled', icon: 'times-circle' }
+    };
+    
+    const statusInfo = statusConfig[status] || statusConfig.pending;
+    
+    // Items aufbereiten
+    let itemsHtml = '';
+    if (order.items && order.items.length > 0) {
+        order.items.forEach(item => {
+            itemsHtml += `
+                <div class="order-item">
+                    <span class="item-name">${item.name}</span>
+                    <span class="item-details">${item.details}</span>
+                </div>
+            `;
+        });
+    }
+    
+    return `
+        <div class="order-card">
+            <div class="order-header">
+                <div class="order-info">
+                    <h4>Bestellung #${orderNumber}</h4>
+                    <p class="order-date">${formattedDate}</p>
+                </div>
+                <div class="order-status ${statusInfo.class}">
+                    <i class="fas fa-${statusInfo.icon}"></i>
+                    <span>${statusInfo.label}</span>
+                </div>
+            </div>
+            <div class="order-items">
+                ${itemsHtml}
+            </div>
+        </div>
+    `;
 }
 
 // Profile Functions
@@ -862,10 +1045,540 @@ function getErrorMessage(errorCode) {
     return errorMessages[errorCode] || 'Ein unbekannter Fehler ist aufgetreten';
 }
 
+// === EMPLOYEE CARD FUNCTIONS ===
+function generateEmployeeCardPreview() {
+    const container = document.getElementById('employeeCardContainer');
+    if (!container || !currentEmployeeData) {
+        console.error('❌ Container oder Employee Data nicht verfügbar');
+        return;
+    }
+    
+    console.log('🎨 Generiere Employee Card mit Daten:', currentEmployeeData);
+    
+    // HTML-Struktur passend zum employee-card.css (ohne card-actions, da schon im HTML vorhanden)
+    container.innerHTML = `
+        <div class="card-preview-wrapper">
+            <div class="employee-card" id="employeeCard">
+                <div class="card-top-section">
+                    <img src="../assets/logo.png" alt="Logo" class="card-logo">
+                    <img src="${currentEmployeeData.avatar || '../assets/avatar.png'}" alt="Avatar" class="card-avatar">
+                </div>
+                <div class="card-bottom-section">
+                    <div class="card-text-content">
+                        <h3 class="card-name">${currentEmployeeData.firstName || ''} ${currentEmployeeData.lastName || ''}</h3>
+                        <p class="card-job-title">${currentEmployeeData.position || ''}</p>
+                        <div class="card-contact-info">
+                            <p class="card-contact-item">TEL: ${currentEmployeeData.phone || ''}</p>
+                            <p class="card-contact-item">${currentEmployeeData.email || ''}</p>
+                            <p class="card-contact-item">buderus-systeme.de</p>
+                        </div>
+                    </div>
+                    <div class="card-qr-code" id="cardQRCode"></div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // QR-Code generieren
+    setTimeout(() => {
+        if (window.QRCode && currentEmployeeData.firstName && currentEmployeeData.lastName) {
+            const qrContainer = document.getElementById('cardQRCode');
+            const publicUrl = `https://buderus-systeme.de/mitarbeiter/${currentEmployeeData.firstName.toLowerCase()}-${currentEmployeeData.lastName.toLowerCase()}.html`;
+            
+            console.log('🔗 Generiere QR Code für URL:', publicUrl);
+            
+            // QR-Code Container leeren
+            qrContainer.innerHTML = '';
+            
+            new QRCode(qrContainer, {
+                text: publicUrl,
+                width: 52, // Passt zur CSS-Größe von 60px minus padding
+                height: 52,
+                colorDark: "#1B3155", // Blaue QR-Code auf weißem Hintergrund
+                colorLight: "#FFFFFF",
+                correctLevel: QRCode.CorrectLevel.M
+            });
+        }
+    }, 100);
+}
+
+function orderEmployeeCard() {
+    showOrders();
+    addToCart('employee-card');
+}
+
+function downloadCard() {
+    const cardElement = document.getElementById('employeeCard');
+    if (!cardElement) return;
+    
+    if (window.html2canvas) {
+        html2canvas(cardElement, {
+            scale: 2,
+            backgroundColor: '#ffffff'
+        }).then(canvas => {
+            const link = document.createElement('a');
+            link.download = `mitarbeiterausweis-${currentUser.firstName}-${currentUser.lastName}.png`;
+            link.href = canvas.toDataURL();
+            link.click();
+        });
+    }
+}
+
+// === SHOP FUNCTIONS ===
+let cart = [];
+let products = [];
+
+async function loadProducts() {
+    const productGrid = document.getElementById('productGrid');
+    if (!productGrid) return;
+    
+    try {
+        products = [
+            {
+                id: 'employee-card',
+                name: 'Mitarbeiterausweis',
+                description: 'Professioneller Mitarbeiterausweis mit Ihren Daten',
+                price: 'Kostenlos',
+                icon: 'fas fa-id-card',
+                category: 'cards'
+            },
+            {
+                id: 'business-card',
+                name: 'Visitenkarten',
+                description: '100 Stück, hochwertiger Druck',
+                price: '15,00 €',
+                icon: 'fas fa-address-card',
+                category: 'cards'
+            },
+            {
+                id: 'tshirt',
+                name: 'T-Shirt',
+                description: 'Firmen T-Shirt in verschiedenen Größen',
+                price: '25,00 €',
+                icon: 'fas fa-tshirt',
+                category: 'clothing'
+            }
+        ];
+        
+        renderProducts();
+    } catch (error) {
+        console.error('Fehler beim Laden der Produkte:', error);
+        productGrid.innerHTML = '<p class="error">Fehler beim Laden der Produkte</p>';
+    }
+}
+
+function renderProducts() {
+    const productGrid = document.getElementById('productGrid');
+    if (!productGrid) return;
+    
+    productGrid.innerHTML = products.map(product => `
+        <div class="product-card">
+            <div class="product-image">
+                <i class="${product.icon}"></i>
+            </div>
+            <h4 class="product-title">${product.name}</h4>
+            <p class="product-description">${product.description}</p>
+            <div class="product-price">${product.price}</div>
+            <button class="add-to-cart-btn" onclick="addToCart('${product.id}')">
+                <i class="fas fa-cart-plus"></i>
+                In den Warenkorb
+            </button>
+        </div>
+    `).join('');
+}
+
+// VERALTETE FUNKTION ENTFERNT - Verwende die neue addToCart-Funktion weiter unten
+
+function removeFromCart(productId) {
+    cart = cart.filter(item => item.productId !== productId);
+    updateCartDisplay();
+}
+
+function updateQuantity(productId, change) {
+    const item = cart.find(item => item.productId === productId);
+    if (!item) return;
+    
+    item.quantity += change;
+    if (item.quantity <= 0) {
+        removeFromCart(productId);
+    } else {
+        updateCartDisplay();
+    }
+}
+
+function updateCartDisplay() {
+    const cartItems = document.getElementById('cartItems');
+    const checkoutBtn = document.querySelector('.checkout-btn');
+    
+    if (!cartItems) return;
+    
+    if (cart.length === 0) {
+        cartItems.innerHTML = '<p class="empty-cart">Warenkorb ist leer</p>';
+        if (checkoutBtn) checkoutBtn.disabled = true;
+    } else {
+        cartItems.innerHTML = cart.map(item => `
+            <div class="cart-item">
+                <div class="cart-item-info">
+                    <div class="cart-item-name">${item.name}</div>
+                    <div class="cart-item-price">${item.price}</div>
+                </div>
+                <div class="quantity-controls">
+                    <button class="quantity-btn" onclick="updateQuantity('${item.productId}', -1)">-</button>
+                    <span>${item.quantity}</span>
+                    <button class="quantity-btn" onclick="updateQuantity('${item.productId}', 1)">+</button>
+                </div>
+            </div>
+        `).join('');
+        if (checkoutBtn) checkoutBtn.disabled = false;
+    }
+}
+
+// === VOLLSTÄNDIGES BESTELLSYSTEM ===
+// cart ist bereits oben deklariert - verwende bestehende Variable
+let productStates = {
+    'employee-card': { format: '', quantity: 0 },
+    tshirt: { size: '', quantity: 0 },
+    cards: { format: '', quantity: 0 }
+};
+
+// Kategorie anzeigen
+function showCategory(category) {
+    console.log('🏷️ Zeige Kategorie:', category);
+    
+    // Kategorie-Buttons aktualisieren
+    document.querySelectorAll('.category-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+    
+    // Produkte filtern
+    const products = document.querySelectorAll('.product-card');
+    products.forEach(product => {
+        if (category === 'all' || product.dataset.category === category) {
+            product.style.display = 'block';
+        } else {
+            product.style.display = 'none';
+        }
+    });
+}
+
+// Produkt aktualisieren (Größe/Format ändern)
+function updateProduct(productType, selectElement) {
+    const value = selectElement.value;
+    console.log('🔄 Update Produkt:', productType, 'Wert:', value);
+    
+    if (productType === 'tshirt') {
+        productStates.tshirt.size = value;
+    } else if (productType === 'cards') {
+        productStates.cards.format = value;
+    } else if (productType === 'employee-card') {
+        productStates['employee-card'].format = value;
+    }
+    
+    updateAddToCartButton(productType);
+}
+
+// Menge ändern
+function changeQuantity(productType, change) {
+    const currentQuantity = productStates[productType].quantity;
+    let newQuantity = currentQuantity + change;
+    
+    // Mindestmenge 0
+    if (newQuantity < 0) newQuantity = 0;
+    
+    // Maximalmenge für verschiedene Produkte
+    if (productType === 'tshirt' && newQuantity > 10) newQuantity = 10;
+    if (productType === 'cards' && newQuantity > 1000) newQuantity = 1000;
+    
+    productStates[productType].quantity = newQuantity;
+    
+    // Anzeige aktualisieren
+    document.getElementById(`${productType}-quantity`).textContent = newQuantity;
+    
+    console.log('📊 Menge geändert:', productType, 'Neue Menge:', newQuantity);
+    updateAddToCartButton(productType);
+}
+
+// "In Warenkorb"-Button aktivieren/deaktivieren
+function updateAddToCartButton(productType) {
+    const button = document.querySelector(`[onclick="addToCart('${productType}')"]`);
+    if (!button) return;
+    
+    const state = productStates[productType];
+    
+    let canAdd = false;
+    
+    if (productType === 'tshirt') {
+        canAdd = state.size && state.quantity > 0;
+    } else if (productType === 'cards') {
+        canAdd = state.format && state.quantity > 0;
+    } else if (productType === 'employee-card') {
+        canAdd = state.format && state.quantity > 0;
+    }
+    
+    button.disabled = !canAdd;
+    console.log('🛒 Button Status:', productType, 'Aktiviert:', canAdd);
+}
+
+// Zum Warenkorb hinzufügen
+function addToCart(productType) {
+    const state = productStates[productType];
+    
+    if (productType === 'tshirt' && state.size && state.quantity > 0) {
+        const item = {
+            id: `tshirt-${state.size}-${Date.now()}`,
+            type: 'tshirt',
+            name: 'Firmen T-Shirt',
+            size: state.size,
+            quantity: state.quantity,
+            details: `Größe: ${state.size}, Anzahl: ${state.quantity}`
+        };
+        
+        cart.push(item);
+        console.log('✅ T-Shirt zum Warenkorb hinzugefügt:', item);
+        
+        // Reset
+        productStates.tshirt = { size: '', quantity: 0 };
+        const sizeSelect = document.querySelector('.size-select');
+        if (sizeSelect) sizeSelect.value = '';
+        const quantityDisplay = document.getElementById('tshirt-quantity');
+        if (quantityDisplay) quantityDisplay.textContent = '0';
+        
+    } else if (productType === 'cards' && state.format && state.quantity > 0) {
+        const item = {
+            id: `cards-${state.format}-${Date.now()}`,
+            type: 'cards',
+            name: 'Visitenkarten',
+            format: state.format,
+            quantity: state.quantity,
+            details: `Format: ${state.format}, Stückzahl: ${state.quantity}`
+        };
+        
+        cart.push(item);
+        console.log('✅ Visitenkarten zum Warenkorb hinzugefügt:', item);
+        
+        // Reset
+        productStates.cards = { format: '', quantity: 0 };
+        const formatSelect = document.querySelector('.format-select');
+        if (formatSelect) formatSelect.value = '';
+        const quantityDisplay = document.getElementById('cards-quantity');
+        if (quantityDisplay) quantityDisplay.textContent = '0';
+        
+    } else if (productType === 'employee-card' && state.format && state.quantity > 0) {
+        const item = {
+            id: `employee-card-${state.format}-${Date.now()}`,
+            type: 'employee-card',
+            name: 'Mitarbeiterausweis',
+            format: state.format,
+            quantity: state.quantity,
+            details: `Format: ${state.format}, Anzahl: ${state.quantity}`
+        };
+        
+        cart.push(item);
+        console.log('✅ Mitarbeiterausweis zum Warenkorb hinzugefügt:', item);
+        
+        // Reset
+        productStates['employee-card'] = { format: '', quantity: 0 };
+        const formatSelect = document.querySelector('div[data-category="cards"] .format-select');
+        if (formatSelect) formatSelect.value = '';
+        const quantityDisplay = document.getElementById('employee-card-quantity');
+        if (quantityDisplay) quantityDisplay.textContent = '0';
+    }
+    
+    updateCartDisplay();
+    updateAddToCartButton(productType);
+}
+
+// Warenkorb-Anzeige aktualisieren (Neues System)
+function updateCartDisplay() {
+    const cartBadge = document.getElementById('cartBadge');
+    const footerCartCount = document.getElementById('footerCartCount');
+    const cartDialogBody = document.getElementById('cartDialogBody');
+    const cartTotalItems = document.getElementById('cartTotalItems');
+    const cartCheckoutBtn = document.getElementById('cartCheckoutBtn');
+    
+    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+    
+    // Badge aktualisieren
+    if (cartBadge) {
+        if (totalItems > 0) {
+            cartBadge.textContent = totalItems;
+            cartBadge.classList.remove('hidden');
+        } else {
+            cartBadge.classList.add('hidden');
+        }
+    }
+    
+    // Footer Count aktualisieren
+    if (footerCartCount) {
+        footerCartCount.textContent = totalItems;
+    }
+    
+    // Dialog Content aktualisieren
+    if (cartDialogBody) {
+        if (cart.length === 0) {
+            cartDialogBody.innerHTML = `
+                <div class="empty-cart-message">
+                    <i class="fas fa-shopping-cart"></i>
+                    <h3>Warenkorb ist leer</h3>
+                    <p>Fügen Sie Artikel aus dem Shop hinzu</p>
+                </div>
+            `;
+        } else {
+            cartDialogBody.innerHTML = cart.map(item => `
+                <div class="cart-dialog-item">
+                    <div class="cart-dialog-item-info">
+                        <h4>${item.name}</h4>
+                        <p>${item.details}</p>
+                    </div>
+                    <div class="cart-dialog-item-actions">
+                        <span class="cart-item-quantity">${item.quantity}x</span>
+                        <button class="remove-cart-item" onclick="removeFromCart('${item.id}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+    }
+    
+    // Total und Checkout Button
+    if (cartTotalItems) {
+        cartTotalItems.textContent = `${totalItems} Artikel`;
+    }
+    
+    if (cartCheckoutBtn) {
+        cartCheckoutBtn.disabled = cart.length === 0;
+    }
+    
+    console.log('🛒 Cart Display aktualisiert:', totalItems, 'Artikel');
+}
+
+// Cart Dialog öffnen
+function openCartDialog() {
+    const cartDialog = document.getElementById('cartDialog');
+    if (cartDialog) {
+        cartDialog.classList.remove('hidden');
+        updateCartDisplay(); // Aktuelle Daten laden
+        console.log('🛒 Cart Dialog geöffnet');
+    }
+}
+
+// Cart Dialog schließen
+function closeCartDialog() {
+    const cartDialog = document.getElementById('cartDialog');
+    if (cartDialog) {
+        cartDialog.classList.add('hidden');
+        console.log('🛒 Cart Dialog geschlossen');
+    }
+}
+
+// Artikel aus Warenkorb entfernen
+function removeFromCart(itemId) {
+    cart = cart.filter(item => item.id !== itemId);
+    console.log('🗑️ Artikel entfernt:', itemId);
+    updateCartDisplay();
+}
+
+// Bestellung abschicken (Firebase-Integration)
+async function submitOrder() {
+    if (cart.length === 0) {
+        showToast('warning', 'Warenkorb leer', 'Fügen Sie erst Artikel zum Warenkorb hinzu');
+        return;
+    }
+    
+    if (!currentEmployeeData) {
+        showToast('error', 'Fehler', 'Benutzerdaten nicht verfügbar');
+        return;
+    }
+    
+    console.log('📦 Sende Bestellung...');
+    
+    try {
+        const orderData = {
+            // Bestellungs-Metadaten
+            orderId: `ORDER_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            status: 'pending', // pending, processing, completed, cancelled
+            createdAt: new Date().toISOString(),
+            createdDate: new Date().toLocaleDateString('de-DE'),
+            orderMonth: new Date().toLocaleDateString('de-DE', { year: 'numeric', month: '2-digit' }),
+            
+            // Mitarbeiterdaten für Admin-Sortierung
+            employee: {
+                uid: currentEmployeeData.uid,
+                firstName: currentEmployeeData.firstName,
+                lastName: currentEmployeeData.lastName,
+                fullName: `${currentEmployeeData.firstName} ${currentEmployeeData.lastName}`,
+                email: currentEmployeeData.email,
+                position: currentEmployeeData.position,
+                department: currentEmployeeData.department || 'Unbekannt'
+            },
+            
+            // Bestellte Artikel
+            items: cart.map(item => ({
+                id: item.id,
+                type: item.type,
+                name: item.name,
+                quantity: item.quantity,
+                details: item.details,
+                // Zusätzliche Produktdetails
+                ...(item.size && { size: item.size }),
+                ...(item.format && { format: item.format })
+            })),
+            
+            // Zusammenfassung für Admin-Dashboard
+            summary: {
+                totalItems: cart.reduce((sum, item) => sum + item.quantity, 0),
+                itemTypes: [...new Set(cart.map(item => item.type))],
+                itemCount: cart.length,
+                hasShirts: cart.some(item => item.type === 'tshirt'),
+                hasCards: cart.some(item => item.type === 'cards')
+            }
+        };
+        
+        console.log('📄 Bestelldaten:', orderData);
+        
+        // In Firestore speichern (Firebase v9+ SDK)
+        const { doc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+        await setDoc(doc(window.db, 'orders', orderData.orderId), orderData);
+        
+        console.log('✅ Bestellung erfolgreich in Firebase gespeichert');
+        
+        // Erfolgs-Feedback
+        showToast('success', 'Bestellung erfolgreich', `Bestellnummer: ${orderData.orderId.split('_')[1]}`);
+        
+        // Warenkorb leeren
+        cart = [];
+        updateCartDisplay();
+        
+        // Produkt-States zurücksetzen
+        productStates = {
+            tshirt: { size: '', quantity: 0 },
+            cards: { format: '', quantity: 0 }
+        };
+        
+    } catch (error) {
+        console.error('❌ Fehler beim Senden der Bestellung:', error);
+        showToast('error', 'Fehler', 'Bestellung konnte nicht gesendet werden');
+    }
+}
+
+function loadCart() {
+    cart = [];
+    updateCartDisplay();
+}
+
+// Legacy-Funktion für Kompatibilität
+async function checkout() {
+    await submitOrder();
+}
+
 // Export für globale Verfügbarkeit
 window.dashboardApp = {
     showProfile,
     showBusinessCard,
+    showEmployeeCard,
+    showOrders,
     showQRCode,
     showWelcome,
     togglePassword,
@@ -876,9 +1589,39 @@ window.dashboardApp = {
     previewAvatar,
     previewChanges,
     previewPublicPage,
+    generateEmployeeCardPreview,
+    orderEmployeeCard,
+    downloadCard,
+    loadProducts,
+    addToCart,
+    updateQuantity,
+    removeFromCart,
+    checkout,
     downloadBusinessCard,
     shareBusinessCard,
     downloadQRCode,
     printQRCode,
     regenerateQRCode
 };
+
+// Globale Funktionen für onclick Handler
+window.showProfile = showProfile;
+window.showEmployeeCard = showEmployeeCard;
+window.showOrders = showOrders;
+window.showQRCode = showQRCode;
+window.previewPublicPage = previewPublicPage;
+window.addToCart = addToCart;
+window.updateQuantity = updateQuantity;
+window.removeFromCart = removeFromCart;
+window.checkout = checkout;
+window.orderEmployeeCard = orderEmployeeCard;
+window.downloadCard = downloadCard;
+
+// Neue Shop-Funktionen
+window.showCategory = showCategory;
+window.updateProduct = updateProduct;
+window.changeQuantity = changeQuantity;
+window.updateAddToCartButton = updateAddToCartButton;
+window.submitOrder = submitOrder;
+window.openCartDialog = openCartDialog;
+window.closeCartDialog = closeCartDialog;

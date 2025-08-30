@@ -6,8 +6,11 @@
     <title>E-Werke Mitarbeiter Dashboard</title>
     <link rel="icon" type="image/x-icon" href="../assets/logo.png">
     <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/employee-card.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 </head>
 <body>
     <div id="loadingScreen" class="loading-screen">
@@ -119,6 +122,15 @@
             </div>
             <div class="nav-user">
                 <span id="userDisplayName">Max Mustermann</span>
+                
+                <!-- Shopping Cart Icon -->
+                <div class="cart-icon-container">
+                    <button class="cart-icon-btn" onclick="openCartDialog()" title="Warenkorb">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span id="cartBadge" class="cart-badge hidden">0</span>
+                    </button>
+                </div>
+                
                 <div class="user-dropdown">
                     <button class="user-btn" onclick="toggleUserMenu()">
                         <img id="userAvatar" src="../assets/avatar.png" alt="User Avatar" class="user-avatar">
@@ -150,49 +162,22 @@
                             <i class="fas fa-user-edit"></i>
                             <span>Profil bearbeiten</span>
                         </button>
-                        <button class="action-btn" onclick="showBusinessCard()">
+                        <button class="action-btn" onclick="showEmployeeCard()">
                             <i class="fas fa-id-card"></i>
-                            <span>Visitenkarte</span>
+                            <span>Mitarbeiterausweis</span>
                         </button>
-                        <button class="action-btn" onclick="showQRCode()">
-                            <i class="fas fa-qrcode"></i>
-                            <span>QR-Code</span>
+                        <button class="action-btn" onclick="showOrders()">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span>Bestellen</span>
                         </button>
-                        <button class="action-btn" onclick="previewPublicPage()">
-                            <i class="fas fa-external-link-alt"></i>
-                            <span>Seite öffnen</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Status Cards -->
-                <div class="status-cards">
-                    <div class="status-card">
-                        <div class="card-icon">
-                            <i class="fas fa-check-circle"></i>
-                        </div>
-                        <div class="card-content">
-                            <h3>Profil Status</h3>
-                            <p id="profileStatus">Vollständig</p>
-                        </div>
-                    </div>
-                    <div class="status-card">
-                        <div class="card-icon">
-                            <i class="fas fa-qrcode"></i>
-                        </div>
-                        <div class="card-content">
-                            <h3>Visitenkarte</h3>
-                            <p>Verfügbar</p>
-                        </div>
-                    </div>
-                    <div class="status-card">
-                        <div class="card-icon">
+                        <button class="action-btn" onclick="openOnlineProfile()">
                             <i class="fas fa-globe"></i>
-                        </div>
-                        <div class="card-content">
-                            <h3>Öffentliche Seite</h3>
-                            <p id="publicPageStatus">Aktiv</p>
-                        </div>
+                            <span>Online Visitenkarte</span>
+                        </button>
+                        <button class="action-btn" onclick="showMyOrders()">
+                            <i class="fas fa-history"></i>
+                            <span>Meine Bestellungen</span>
+                        </button>
                     </div>
                 </div>
             </section>
@@ -264,51 +249,171 @@
                 </form>
             </section>
 
-            <!-- Business Card Section -->
-            <section id="businessCardSection" class="dashboard-section">
+            <!-- My Orders Section -->
+            <section id="myOrdersSection" class="dashboard-section">
                 <div class="section-header">
-                    <h2>Digitale Visitenkarte</h2>
+                    <h2>Meine Bestellungen</h2>
                     <button class="back-btn" onclick="showWelcome()">
                         <i class="fas fa-arrow-left"></i> Zurück
                     </button>
                 </div>
 
-                <div class="business-card-container">
-                    <div class="business-card" id="businessCardPreview">
-                        <div class="card-header">
-                            <img id="cardAvatar" src="../assets/avatar.png" alt="Profil" class="card-avatar">
-                            <img src="../assets/logo.png" alt="E-Werke Logo" class="card-logo">
-                        </div>
-                        <div class="card-content">
-                            <h3 id="cardName">Max Mustermann</h3>
-                            <p id="cardPosition">Position</p>
-                            <div class="card-contact">
-                                <div class="contact-item">
-                                    <i class="fas fa-envelope"></i>
-                                    <span id="cardEmail">email@example.com</span>
-                                </div>
-                                <div class="contact-item">
-                                    <i class="fas fa-phone"></i>
-                                    <span id="cardPhone">+49 123 456789</span>
-                                </div>
-                            </div>
+                <div class="orders-container">
+                    <div id="ordersLoading" class="loading-message">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Bestellungen werden geladen...</p>
+                    </div>
+                    
+                    <div id="ordersList" class="orders-list">
+                        <!-- Bestellungen werden hier dynamisch eingefügt -->
+                    </div>
+                    
+                    <div id="noOrders" class="empty-message" style="display: none;">
+                        <i class="fas fa-shopping-cart"></i>
+                        <h3>Noch keine Bestellungen</h3>
+                        <p>Sie haben bisher noch nichts bestellt.</p>
+                        <button class="action-btn" onclick="showOrders()">
+                            <i class="fas fa-plus"></i>
+                            Jetzt bestellen
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Employee Card Section -->
+            <section id="employeeCardSection" class="dashboard-section">
+                <div class="section-header">
+                    <h2>Mitarbeiterausweis</h2>
+                    <button class="back-btn" onclick="showWelcome()">
+                        <i class="fas fa-arrow-left"></i> Zurück
+                    </button>
+                </div>
+
+                <div class="employee-card-preview">
+                    <div id="employeeCardContainer">
+                        <!-- Employee Card wird hier automatisch generiert -->
+                        <div class="loading-card">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <p>Ausweis wird geladen...</p>
                         </div>
                     </div>
-
+                    
                     <div class="card-actions">
-                        <button class="action-btn" onclick="downloadBusinessCard()">
+                        <button class="order-btn" onclick="orderEmployeeCard()">
+                            <i class="fas fa-shopping-cart"></i>
+                            Ausweis bestellen
+                        </button>
+                        <button class="download-btn" onclick="downloadCard()">
                             <i class="fas fa-download"></i>
                             Als Bild speichern
                         </button>
-                        <button class="action-btn" onclick="shareBusinessCard()">
-                            <i class="fas fa-share"></i>
-                            Teilen
-                        </button>
-                        <button class="action-btn" onclick="showQRCode()">
-                            <i class="fas fa-qrcode"></i>
-                            QR-Code anzeigen
+                    </div>
+                </div>
+            </section>
+
+            <!-- Orders Section -->
+            <section id="ordersSection" class="dashboard-section">
+                <div class="section-header">
+                    <h2>Bestellungen</h2>
+                    <button class="back-btn" onclick="showWelcome()">
+                        <i class="fas fa-arrow-left"></i> Zurück
+                    </button>
+                </div>
+
+                <div class="shop-container">
+                    <!-- Kompakte Produktliste -->
+                    <div class="product-list">
+                        <!-- Mitarbeiterausweis -->
+                        <div class="product-item" data-category="cards">
+                            <div class="product-info">
+                                <i class="fas fa-id-badge product-icon"></i>
+                                <div class="product-details">
+                                    <h3>Mitarbeiterausweis</h3>
+                                    <p>Professioneller Ausweis mit Ihren Daten und QR-Code</p>
+                                </div>
+                            </div>
+                            <div class="product-controls">
+                                <select class="format-select" onchange="updateProduct('employee-card', this)">
+                                    <option value="">Format wählen</option>
+                                    <option value="standard">Standard (85x54mm)</option>
+                                    <option value="premium">Premium (86x54mm)</option>
+                                </select>
+                                <div class="quantity-controls">
+                                    <button onclick="changeQuantity('employee-card', -1)">-</button>
+                                    <span id="employee-card-quantity">0</span>
+                                    <button onclick="changeQuantity('employee-card', 1)">+</button>
+                                </div>
+                                <button class="add-to-cart-btn compact" onclick="addToCart('employee-card')" disabled>
+                                    <i class="fas fa-cart-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- T-Shirts -->
+                        <div class="product-item" data-category="tshirts">
+                            <div class="product-info">
+                                <i class="fas fa-tshirt product-icon"></i>
+                                <div class="product-details">
+                                    <h3>Firmen T-Shirt</h3>
+                                    <p>Hochwertiges T-Shirt mit Firmenlogo</p>
+                                </div>
+                            </div>
+                            <div class="product-controls">
+                                <select class="size-select" onchange="updateProduct('tshirt', this)">
+                                    <option value="">Größe wählen</option>
+                                    <option value="S">S</option>
+                                    <option value="M">M</option>
+                                    <option value="L">L</option>
+                                    <option value="XL">XL</option>
+                                    <option value="XXL">XXL</option>
+                                </select>
+                                <div class="quantity-controls">
+                                    <button onclick="changeQuantity('tshirt', -1)">-</button>
+                                    <span id="tshirt-quantity">0</span>
+                                    <button onclick="changeQuantity('tshirt', 1)">+</button>
+                                </div>
+                                <button class="add-to-cart-btn compact" onclick="addToCart('tshirt')" disabled>
+                                    <i class="fas fa-cart-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Visitenkarten -->
+                        <div class="product-item" data-category="cards">
+                            <div class="product-info">
+                                <i class="fas fa-id-card product-icon"></i>
+                                <div class="product-details">
+                                    <h3>Visitenkarten</h3>
+                                    <p>Professionelle Visitenkarten mit Ihren Daten</p>
+                                </div>
+                            </div>
+                            <div class="product-controls">
+                                <select class="format-select" onchange="updateProduct('cards', this)">
+                                    <option value="">Format wählen</option>
+                                    <option value="standard">Standard (85x55mm)</option>
+                                    <option value="premium">Premium (90x55mm)</option>
+                                </select>
+                                <div class="quantity-controls">
+                                    <button onclick="changeQuantity('cards', -50)">-50</button>
+                                    <span id="cards-quantity">0</span>
+                                    <button onclick="changeQuantity('cards', 50)">+50</button>
+                                </div>
+                                <button class="add-to-cart-btn compact" onclick="addToCart('cards')" disabled>
+                                    <i class="fas fa-cart-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Bottom Action -->
+                    <div class="shop-footer">
+                        <button class="view-cart-btn" onclick="openCartDialog()">
+                            <i class="fas fa-shopping-cart"></i>
+                            Zum Warenkorb (<span id="footerCartCount">0</span>)
                         </button>
                     </div>
+                </div>
+            </section>
                 </div>
             </section>
 
@@ -360,7 +465,6 @@
                                 <span class="stat-label">Diese Woche</span>
                             </div>
                         </div>
-                    </div>
                 </div>
             </section>
         </main>
@@ -379,6 +483,41 @@
                 <i class="fas fa-arrow-left"></i>
                 Zurück zur Anmeldung
             </button>
+        </div>
+    </div>
+
+    <!-- Shopping Cart Fullscreen Dialog -->
+    <div id="cartDialog" class="cart-dialog hidden">
+        <div class="cart-dialog-backdrop" onclick="closeCartDialog()"></div>
+        <div class="cart-dialog-content">
+            <div class="cart-dialog-header">
+                <h2><i class="fas fa-shopping-cart"></i> Warenkorb</h2>
+                <button class="cart-close-btn" onclick="closeCartDialog()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="cart-dialog-body" id="cartDialogBody">
+                <div class="empty-cart-message">
+                    <i class="fas fa-shopping-cart"></i>
+                    <h3>Warenkorb ist leer</h3>
+                    <p>Fügen Sie Artikel aus dem Shop hinzu</p>
+                </div>
+            </div>
+            
+            <div class="cart-dialog-footer" id="cartDialogFooter">
+                <div class="cart-total-info">
+                    <span>Gesamt: <strong id="cartTotalItems">0 Artikel</strong></span>
+                </div>
+                <div class="cart-actions">
+                    <button class="btn-secondary" onclick="closeCartDialog()">
+                        <i class="fas fa-arrow-left"></i> Weiter shoppen
+                    </button>
+                    <button class="btn-primary" id="cartCheckoutBtn" onclick="submitOrder()" disabled>
+                        <i class="fas fa-paper-plane"></i> Bestellung abschicken
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -409,5 +548,6 @@
         window.storage = getStorage(window.app);
     </script>
     <script src="js/dashboard.js"></script>
+    <script src="js/employee-card.js"></script>
 </body>
 </html>

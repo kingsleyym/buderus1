@@ -573,3 +573,4 @@ exports.updateEmployeeProfile = employeeFunctions.updateEmployeeProfile;
 exports.generateEmployeeQR = employeeFunctions.generateEmployeeQR;
 exports.getEmployeeStats = employeeFunctions.getEmployeeStats;
 exports.getAllEmployees = employeeFunctions.getAllEmployees;
+exports.sendOrderConfirmationEmail = employeeFunctions.sendOrderConfirmationEmail;

@@ -3,6 +3,10 @@ const functions = require('firebase-functions');
 const QRCode = require('qrcode');
 const { Octokit } = require('@octokit/rest');
 const { createAppAuth } = require('@octokit/auth-app');
+const nodemailer = require('nodemailer');
+
+// E-Mail Transporter für Mitarbeiter-E-Mails
+let employeeEmailTransporter = null;
 
 // Node.js fetch polyfill für ältere Versionen (nicht mehr benötigt in Node 18+)
 // const fetch = require('node-fetch');
@@ -984,12 +988,165 @@ async function sendWelcomeEmail(email, firstName) {
  */
 async function sendApprovalEmail(email, firstName) {
     try {
-        // Hier würde normalerweise ein E-Mail-Service verwendet
-        console.log(`Genehmigungs-E-Mail gesendet an: ${email} (${firstName})`);
+        console.log(`🔧 Sende Genehmigungs-E-Mail an: ${email} (${firstName})`);
         
-        // TODO: Implementierung mit einem E-Mail-Service
+        // E-Mail Transporter konfigurieren falls noch nicht geschehen
+        if (!employeeEmailTransporter) {
+            console.log('🔧 Erstelle Employee E-Mail Transporter...');
+            // Nutze anderen E-Mail Account für Mitarbeiter-E-Mails
+            const emailPassword = `Buderus1234!`;
+            employeeEmailTransporter = nodemailer.createTransporter({
+                host: 'smtp.ionos.de',
+                port: 587,
+                secure: false,
+                auth: {
+                    user: 'employees@buderus-systeme.de', // Separater E-Mail Account für Mitarbeiter
+                    pass: emailPassword
+                }
+            });
+            console.log('✅ Employee E-Mail Transporter erstellt');
+        }
+
+        const name = firstName ? ` ${firstName}` : '';
+        const dashboardUrl = 'https://buderus-systeme.web.app/mitarbeiter-dashboard/';
+        
+        const mailOptions = {
+            from: '"Buderus Systeme HR" <employees@buderus-systeme.de>',
+            to: email,
+            subject: '✅ Registrierung genehmigt - Willkommen bei Buderus Systeme!',
+            html: `
+            <div style="font-family: 'Poppins', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #f8f9fa;">
+                <!-- Header -->
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 2rem; text-align: center;">
+                    <h1 style="color: white; margin: 0; font-size: 28px;">Buderus Systeme</h1>
+                    <p style="color: white; margin: 0.5rem 0 0 0; opacity: 0.9;">Think intelligent. Think blue.</p>
+                </div>
+                
+                <!-- Welcome Message -->
+                <div style="background: white; padding: 2rem; text-align: center;">
+                    <div style="background: #e8f5e8; border-radius: 50%; width: 80px; height: 80px; margin: 0 auto 1.5rem; display: flex; align-items: center; justify-content: center;">
+                        <span style="font-size: 40px;">✅</span>
+                    </div>
+                    
+                    <h2 style="color: #2c3e50; margin: 0 0 1rem 0;">Herzlich Willkommen${name}!</h2>
+                    <p style="color: #666; font-size: 18px; line-height: 1.6; margin: 0 0 2rem 0;">
+                        Ihre Registrierung wurde erfolgreich genehmigt. Sie können jetzt das Mitarbeiter-Dashboard nutzen.
+                    </p>
+                </div>
+                
+                <!-- Dashboard Access -->
+                <div style="background: white; padding: 0 2rem 2rem 2rem;">
+                    <div style="background: #f8f9fa; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem;">
+                        <h3 style="color: #2c3e50; margin: 0 0 1rem 0; font-size: 18px;">🚀 Jetzt loslegen</h3>
+                        <p style="color: #666; margin: 0 0 1.5rem 0; line-height: 1.6;">
+                            Besuchen Sie das Mitarbeiter-Dashboard und loggen Sie sich mit Ihren Anmeldedaten ein:
+                        </p>
+                        <div style="text-align: center;">
+                            <a href="${dashboardUrl}" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; padding: 12px 30px; border-radius: 25px; font-weight: 600; display: inline-block; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);">
+                                Zum Dashboard
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Features -->
+                    <div style="background: #f8f9fa; border-radius: 12px; padding: 1.5rem;">
+                        <h3 style="color: #2c3e50; margin: 0 0 1rem 0; font-size: 18px;">📋 Verfügbare Funktionen</h3>
+                        <ul style="color: #666; line-height: 1.8; margin: 0; padding-left: 1.5rem;">
+                            <li><strong>Firmen T-Shirts bestellen</strong> - In verschiedenen Größen verfügbar</li>
+                            <li><strong>Visitenkarten anfragen</strong> - Professionelle Visitenkarten mit Ihren Daten</li>
+                            <li><strong>Mitarbeiterausweis erstellen</strong> - Mit QR-Code und persönlichen Informationen</li>
+                            <li><strong>Profil verwalten</strong> - Ihre Daten jederzeit aktualisieren</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Support -->
+                <div style="background: #2c3e50; padding: 1.5rem; text-align: center;">
+                    <p style="color: white; margin: 0 0 0.5rem 0; font-size: 14px;">
+                        Bei Fragen wenden Sie sich an:
+                    </p>
+                    <p style="color: #3498db; margin: 0; font-weight: 600;">
+                        employees@buderus-systeme.de
+                    </p>
+                </div>
+                
+                <!-- Footer -->
+                <div style="text-align: center; padding: 1rem; color: #999; font-size: 12px;">
+                    <p style="margin: 0;">© 2025 Buderus Systeme GmbH</p>
+                    <p style="margin: 0.5rem 0 0 0;">Think intelligent. Think blue.</p>
+                </div>
+            </div>
+            `
+        };
+
+        const result = await employeeEmailTransporter.sendMail(mailOptions);
+        console.log('✅ Genehmigungs-E-Mail erfolgreich gesendet:', result.messageId);
         
     } catch (error) {
-        console.error('Genehmigungs-E-Mail Fehler:', error);
+        console.error('❌ Genehmigungs-E-Mail Fehler:', error);
+        throw error;
     }
 }
+
+// Neue E-Mail Funktion für Bestellbestätigungen (für später)
+async function sendOrderConfirmationEmail(email, firstName, orderDetails) {
+    try {
+        console.log(`🔧 Sende Bestellbestätigung an: ${email}`);
+        
+        if (!employeeEmailTransporter) {
+            const emailPassword = `Buderus1234!`;
+            employeeEmailTransporter = nodemailer.createTransporter({
+                host: 'smtp.ionos.de',
+                port: 587,
+                secure: false,
+                auth: {
+                    user: 'employees@buderus-systeme.de',
+                    pass: emailPassword
+                }
+            });
+        }
+
+        const name = firstName ? ` ${firstName}` : '';
+        
+        const mailOptions = {
+            from: '"Buderus Systeme Shop" <employees@buderus-systeme.de>',
+            to: email,
+            subject: '📦 Bestellbestätigung - Buderus Systeme',
+            html: `
+            <div style="font-family: 'Poppins', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #f8f9fa;">
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 2rem; text-align: center;">
+                    <h1 style="color: white; margin: 0; font-size: 28px;">Buderus Systeme</h1>
+                    <p style="color: white; margin: 0.5rem 0 0 0;">Bestellbestätigung</p>
+                </div>
+                
+                <div style="background: white; padding: 2rem;">
+                    <h2 style="color: #2c3e50; margin: 0 0 1rem 0;">Vielen Dank für Ihre Bestellung${name}!</h2>
+                    <p style="color: #666; line-height: 1.6;">
+                        Ihre Bestellung wurde erfolgreich eingegangen und wird bearbeitet.
+                    </p>
+                    
+                    <div style="background: #f8f9fa; border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;">
+                        <h3 style="color: #2c3e50; margin: 0 0 1rem 0;">Bestelldetails</h3>
+                        <p style="color: #666; margin: 0;"><strong>Bestellnummer:</strong> ${orderDetails.orderId}</p>
+                        <p style="color: #666; margin: 0.5rem 0 0 0;"><strong>Bestelldatum:</strong> ${orderDetails.date}</p>
+                    </div>
+                    
+                    <p style="color: #666; font-size: 14px;">
+                        Sie erhalten eine weitere E-Mail, sobald Ihre Bestellung versandbereit ist.
+                    </p>
+                </div>
+            </div>
+            `
+        };
+
+        const result = await employeeEmailTransporter.sendMail(mailOptions);
+        console.log('✅ Bestellbestätigung erfolgreich gesendet:', result.messageId);
+        
+    } catch (error) {
+        console.error('❌ Bestellbestätigung Fehler:', error);
+        throw error;
+    }
+}
+
+// Export der neuen E-Mail Funktion für zukünftige Nutzung
+exports.sendOrderConfirmationEmail = sendOrderConfirmationEmail;
