@@ -793,8 +793,23 @@ async function uploadAvatarToGitHub(employeeData, authenticatedOctokit) {
         const avatarFilename = `${employeeId}.${avatarExtension}`;
         const avatarPath = `assets/avatars/${avatarFilename}`;
         
+        // Prüfen ob Avatar bereits existiert für SHA
+        let existingSha = null;
+        try {
+            const existingFile = await authenticatedOctokit.rest.repos.getContent({
+                owner: GITHUB_OWNER,
+                repo: GITHUB_REPO,
+                path: avatarPath
+            });
+            if (existingFile.data && !Array.isArray(existingFile.data)) {
+                existingSha = existingFile.data.sha;
+            }
+        } catch (error) {
+            // Datei existiert nicht - kein Problem, wir erstellen sie neu
+        }
+
         // Avatar zu GitHub Repository uploaden
-        await authenticatedOctokit.rest.repos.createOrUpdateFileContents({
+        const uploadData = {
             owner: GITHUB_OWNER,
             repo: GITHUB_REPO,
             path: avatarPath,
@@ -804,7 +819,14 @@ async function uploadAvatarToGitHub(employeeData, authenticatedOctokit) {
                 name: 'Buderus System Bot',
                 email: 'bot@buderus-systeme.de'
             }
-        });
+        };
+
+        // SHA nur hinzufügen wenn Datei bereits existiert
+        if (existingSha) {
+            uploadData.sha = existingSha;
+        }
+
+        await authenticatedOctokit.rest.repos.createOrUpdateFileContents(uploadData);
         
         console.log('✅ Avatar erfolgreich zu GitHub hochgeladen:', avatarPath);
         return avatarFilename;

@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>E-Werke Mitarbeiter Dashboard</title>
     <link rel="icon" type="image/x-icon" href="../assets/logo.png">
     <link rel="stylesheet" href="css/dashboard.css">
@@ -142,6 +142,29 @@
                     <p id="welcomeMessage">Schön, dass Sie da sind.</p>
                 </div>
 
+                <!-- Quick Actions -->
+                <div class="quick-actions">
+                    <h2>Schnellzugriff</h2>
+                    <div class="action-grid">
+                        <button class="action-btn" onclick="showProfile()">
+                            <i class="fas fa-user-edit"></i>
+                            <span>Profil bearbeiten</span>
+                        </button>
+                        <button class="action-btn" onclick="showBusinessCard()">
+                            <i class="fas fa-id-card"></i>
+                            <span>Visitenkarte</span>
+                        </button>
+                        <button class="action-btn" onclick="showQRCode()">
+                            <i class="fas fa-qrcode"></i>
+                            <span>QR-Code</span>
+                        </button>
+                        <button class="action-btn" onclick="previewPublicPage()">
+                            <i class="fas fa-external-link-alt"></i>
+                            <span>Seite öffnen</span>
+                        </button>
+                    </div>
+                </div>
+
                 <!-- Status Cards -->
                 <div class="status-cards">
                     <div class="status-card">
@@ -170,29 +193,6 @@
                             <h3>Öffentliche Seite</h3>
                             <p id="publicPageStatus">Aktiv</p>
                         </div>
-                    </div>
-                </div>
-
-                <!-- Quick Actions -->
-                <div class="quick-actions">
-                    <h2>Schnellzugriff</h2>
-                    <div class="action-grid">
-                        <button class="action-btn" onclick="showProfile()">
-                            <i class="fas fa-user-edit"></i>
-                            <span>Profil bearbeiten</span>
-                        </button>
-                        <button class="action-btn" onclick="showBusinessCard()">
-                            <i class="fas fa-id-card"></i>
-                            <span>Visitenkarte</span>
-                        </button>
-                        <button class="action-btn" onclick="showQRCode()">
-                            <i class="fas fa-qrcode"></i>
-                            <span>QR-Code</span>
-                        </button>
-                        <button class="action-btn" onclick="previewPublicPage()">
-                            <i class="fas fa-external-link-alt"></i>
-                            <span>Öffentliche Seite</span>
-                        </button>
                     </div>
                 </div>
             </section>

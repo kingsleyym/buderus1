@@ -16,16 +16,27 @@ function initializeApp() {
     console.log('🔧 DEBUG: Firebase Auth:', window.auth);
     console.log('🔧 DEBUG: Firebase Config:', window.app.options);
     
-    // Firebase Auth State Listener
+    // Firebase Auth State Listener mit Error Handling
     window.auth.onAuthStateChanged((user) => {
+        console.log('🔐 Auth State Changed:', user ? `Benutzer: ${user.uid}` : 'Kein Benutzer');
+        
         hideLoadingScreen();
         
         if (user) {
             currentUser = user;
+            console.log('✅ Benutzer authentifiziert, prüfe Status...');
             checkUserApprovalStatus(user);
         } else {
+            console.log('❌ Kein authentifizierter Benutzer');
+            currentUser = null;
+            currentEmployeeData = null;
             showLoginScreen();
         }
+    }, (error) => {
+        console.error('🚨 Auth State Listener Fehler:', error);
+        hideLoadingScreen();
+        showToast('error', 'Authentifizierungsfehler', 'Problem bei der Benutzerauthentifizierung');
+        showLoginScreen();
     });
     
     // Event Listeners für Auth Forms
@@ -192,28 +203,54 @@ async function handleRegister(e) {
 
 async function checkUserApprovalStatus(user) {
     try {
+        console.log('🔍 Überprüfe Benutzer-Status für:', user.uid);
+        
         const { doc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
         const userDocRef = doc(window.db, 'employees', user.uid);
         const userDoc = await getDoc(userDocRef);
         
         if (userDoc.exists()) {
             const userData = userDoc.data();
+            console.log('✅ Employee-Daten gefunden:', userData);
+            
             if (userData.approved) {
                 currentEmployeeData = userData;
                 showDashboardScreen();
             } else {
+                console.log('⏳ Benutzer noch nicht genehmigt');
                 showPendingScreen();
             }
         } else {
-            // User existiert nicht in der Employee-Collection
-            showToast('error', 'Konto nicht gefunden', 'Ihr Konto wurde nicht gefunden. Bitte wenden Sie sich an einen Administrator.');
-            logout();
+            // User existiert nicht in der Employee-Collection - aber nicht automatisch ausloggen
+            console.warn('⚠️ Employee-Dokument nicht gefunden für:', user.uid);
+            showToast('warning', 'Profil wird erstellt', 'Ihr Mitarbeiterprofil wird gerade eingerichtet. Bitte warten Sie einen Moment.');
+            
+            // Retry nach 3 Sekunden
+            setTimeout(() => {
+                if (currentUser) {
+                    checkUserApprovalStatus(currentUser);
+                }
+            }, 3000);
         }
         
     } catch (error) {
         console.error('Fehler beim Überprüfen des Benutzer-Status:', error);
-        showToast('error', 'Fehler', 'Status konnte nicht überprüft werden');
-        logout();
+        
+        // Unterscheidung zwischen kritischen und temporären Fehlern
+        if (error.code === 'permission-denied') {
+            showToast('error', 'Keine Berechtigung', 'Sie haben keine Berechtigung auf diese Ressource.');
+            logout();
+        } else {
+            // Bei Netzwerk- oder temporären Fehlern nicht ausloggen
+            showToast('warning', 'Verbindungsproblem', 'Überprüfung wird wiederholt...');
+            
+            // Retry nach 5 Sekunden
+            setTimeout(() => {
+                if (currentUser) {
+                    checkUserApprovalStatus(currentUser);
+                }
+            }, 5000);
+        }
     }
 }
 
@@ -279,6 +316,7 @@ async function generateQRCode() {
     if (!currentEmployeeData) return;
     
     try {
+        console.log('🔄 Generiere QR Code für:', currentUser.uid);
         const { httpsCallable } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js');
         const generateEmployeeQR = httpsCallable(window.functions, 'generateEmployeeQR');
         
@@ -290,11 +328,13 @@ async function generateQRCode() {
             // QR Code anzeigen
             const qrCodeDisplay = document.getElementById('qrCodeDisplay');
             qrCodeDisplay.innerHTML = `<img src="${result.data.qrCodeUrl}" alt="QR Code" style="width: 100%; height: 100%; object-fit: contain;">`;
+            console.log('✅ QR Code erfolgreich generiert');
         }
         
     } catch (error) {
         console.error('QR Code Generation Fehler:', error);
-        showToast('error', 'QR Code Fehler', 'QR Code konnte nicht generiert werden');
+        // Kein Logout bei QR-Code Fehlern
+        showToast('warning', 'QR Code Fehler', 'QR Code konnte nicht generiert werden. Wird später wiederholt.');
     }
 }
 
@@ -302,6 +342,7 @@ async function loadStatistics() {
     if (!currentEmployeeData) return;
     
     try {
+        console.log('📊 Lade Statistiken für:', currentUser.uid);
         const { httpsCallable } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js');
         const getEmployeeStats = httpsCallable(window.functions, 'getEmployeeStats');
         
@@ -314,10 +355,15 @@ async function loadStatistics() {
             document.getElementById('totalScans').textContent = stats.totalScans || 0;
             document.getElementById('todayScans').textContent = stats.todayScans || 0;
             document.getElementById('weekScans').textContent = stats.weekScans || 0;
+            console.log('✅ Statistiken erfolgreich geladen');
         }
         
     } catch (error) {
         console.error('Statistiken Fehler:', error);
+        // Kein Logout bei Statistik-Fehlern - zeige Standardwerte
+        document.getElementById('totalScans').textContent = '-';
+        document.getElementById('todayScans').textContent = '-';
+        document.getElementById('weekScans').textContent = '-';
     }
 }
 
@@ -619,7 +665,7 @@ function previewChanges() {
 
 function previewPublicPage() {
     if (currentEmployeeData) {
-        const publicUrl = `../mitarbeiter/${currentEmployeeData.firstName.toLowerCase()}-${currentEmployeeData.lastName.toLowerCase()}.html`;
+        const publicUrl = `https://buderus-systeme.de/mitarbeiter/${currentEmployeeData.firstName.toLowerCase()}-${currentEmployeeData.lastName.toLowerCase()}.html`;
         window.open(publicUrl, '_blank');
     }
 }
@@ -634,7 +680,7 @@ function shareBusinessCard() {
         navigator.share({
             title: `${currentEmployeeData.firstName} ${currentEmployeeData.lastName} - E-Werke`,
             text: `Kontakt zu ${currentEmployeeData.firstName} ${currentEmployeeData.lastName}`,
-            url: window.location.origin + `/mitarbeiter/${currentEmployeeData.firstName.toLowerCase()}-${currentEmployeeData.lastName.toLowerCase()}.html`
+            url: `https://buderus-systeme.de/mitarbeiter/${currentEmployeeData.firstName.toLowerCase()}-${currentEmployeeData.lastName.toLowerCase()}.html`
         });
     } else {
         showToast('info', 'Teilen', 'Teilen-Funktion wird in einer zukünftigen Version verfügbar sein');
