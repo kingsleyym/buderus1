@@ -249,13 +249,13 @@ exports.generateEmployeeQR = functions.https.onCall(async (data, context) => {
         });
         
         // QR-Code Tracking aktualisieren
-        await admin.firestore().collection('qr_codes').doc(employeeId).set({
-            employeeId: employeeId,
-            profileUrl: profileUrl,
+        await admin.firestore().collection('employee_qr_codes').doc(employeeId).set({
+            employeeId,
+            profileUrl,
             qrCodeUrl: qrCodeDataUrl,
             generatedAt: admin.firestore.FieldValue.serverTimestamp(),
-            scans: admin.firestore.FieldValue.increment(0) // Initialisierung
-        }, { merge: true });
+            scans: 0
+        });
         
         console.log(`QR-Code generiert für: ${employeeData.firstName} ${employeeData.lastName}`);
         
@@ -290,7 +290,7 @@ exports.getEmployeeStats = functions.https.onCall(async (data, context) => {
         }
         
         // QR-Code Statistiken laden
-        const qrDoc = await admin.firestore().collection('qr_codes').doc(employeeId).get();
+        const qrDoc = await admin.firestore().collection('employee_qr_codes').doc(employeeId).get();
         
         let stats = {
             totalScans: 0,

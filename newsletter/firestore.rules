@@ -34,8 +34,13 @@ service cloud.firestore {
       allow read, write: if true;
     }
     
-    // QR-Codes Collection - nur für authentifizierte User
+    // QR-Codes Collection - nur für authentifizierte User (Admin QR-Codes)
     match /qr-codes/{document} {
+      allow read, write: if request.auth != null;
+    }
+    
+    // Employee QR-Codes Collection - nur für authentifizierte User
+    match /employee_qr_codes/{document} {
       allow read, write: if request.auth != null;
     }
     

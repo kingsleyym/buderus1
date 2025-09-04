@@ -21,11 +21,37 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Firebase v8 SDK -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-functions.js"></script>
+    <!-- Firebase v10 SDK -->
+    <script type="module">
+        // Firebase v10 Configuration
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+        import { getAuth } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+        import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+        import { getFunctions } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyC2rZEPOYBLj5L1o_t_Lj9hsF5DXqZBHKg",
+            authDomain: "buderus-systeme.firebaseapp.com",
+            projectId: "buderus-systeme",
+            storageBucket: "buderus-systeme.appspot.com",
+            messagingSenderId: "1004719150308",
+            appId: "1:1004719150308:web:de85f6e8b3b0b5f2"
+        };
+
+        // Initialize Firebase v10
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const functions = getFunctions(app);
+
+        // Make globally available
+        window.app = app;
+        window.auth = auth;
+        window.db = db;
+        window.functions = functions;
+        
+        console.log('🔧 DEBUG: Firebase v10 initialisiert');
+    </script>
     
     <!-- QR Code Library - Erweiterte Version für besseres Design -->
     <script src="https://unpkg.com/qr-code-styling@1.6.0/lib/qr-code-styling.js" 
@@ -421,7 +447,7 @@
                     // Fallback zu Standard QRCode Library
                     const hasQRCode = typeof QRCode !== 'undefined' && QRCode.toCanvas;
                     const hasAdminBase = typeof AdminBase !== 'undefined';
-                    const hasFirebase = typeof firebase !== 'undefined' && firebase.firestore;
+                    const hasFirebase = window.app && window.auth && window.db;
                     
                     console.log('🔧 DEBUG: Checking libraries:', { 
                         hasQRCodeStyling, 
@@ -465,27 +491,94 @@
         waitForLibraries().then(() => {
             console.log('🔧 DEBUG: Starte QRCodeManager nach Library Load');
             
-            class QRCodeManager extends AdminBase {
-            constructor() {
-                console.log('🔧 DEBUG: QRCodeManager Constructor gestartet');
-                super(); // Call AdminBase constructor first
-                console.log('🔧 DEBUG: AdminBase initialisiert');
-                this.currentQRCode = null;
-                this.currentLogoDataUrl = null;
+            class QRCodeManager {
+                constructor() {
+                    console.log('🔧 DEBUG: QRCodeManager Constructor gestartet');
+                    
+                    // Firebase v10 direkt verwenden
+                    this.app = window.app;
+                    this.auth = window.auth;
+                    this.db = window.db;
+                    this.functions = window.functions;
+                    
+                    console.log('🔧 DEBUG: Firebase v10 initialisiert', !!this.db);
+                    this.currentQRCode = null;
+                    this.currentLogoDataUrl = null;
+                    
+                    // Auth Setup zuerst - Event Listeners werden nach Auth geladen
+                    this.setupAuth();
+                    
+                    // Mobile Navigation Setup
+                    this.setupMobileNavigation();
+                }
+            
+            async setupAuth() {
+                // Import Firebase Auth functions dynamically
+                const { onAuthStateChanged, signOut } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
                 
-                // Event Listeners erst nach DOM ready
-                if (document.readyState === 'loading') {
-                    console.log('🔧 DEBUG: Warte auf DOMContentLoaded...');
-                    document.addEventListener('DOMContentLoaded', () => {
-                        console.log('🔧 DEBUG: DOM ready - initialisiere Event Listeners');
+                onAuthStateChanged(this.auth, async (user) => {
+                    console.log('🔧 AUTH: User State Changed:', user ? user.email : 'null');
+                    
+                    if (!user) {
+                        console.log('🔧 AUTH: Kein User - redirect zur Login');
+                        // Nur umleiten wenn wir nicht schon auf der Login-Seite sind
+                        if (!window.location.pathname.includes('/admin/index.html') && 
+                            !window.location.pathname.includes('/admin/')) {
+                            window.location.href = '/admin/index.html';
+                        }
+                        return;
+                    }
+                    
+                    // User ist eingeloggt - QR-Codes laden
+                    console.log('🔧 AUTH: User eingeloggt:', user.email);
+                    
+                    // Event Listeners erst nach erfolgreicher Auth
+                    if (document.readyState === 'loading') {
+                        document.addEventListener('DOMContentLoaded', () => {
+                            this.initializeEventListeners();
+                            this.loadQRCodes();
+                        });
+                    } else {
                         this.initializeEventListeners();
                         this.loadQRCodes();
+                    }
+                });
+                
+                // Logout Setup
+                this.setupLogout();
+            }
+            
+            setupLogout() {
+                const logoutBtns = document.querySelectorAll('.logout-btn, [onclick*="logout"]');
+                logoutBtns.forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        e.preventDefault();
+                        try {
+                            const { signOut } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+                            await signOut(this.auth);
+                            window.location.href = '/admin/index.html';
+                        } catch (error) {
+                            console.error('Logout Fehler:', error);
+                        }
                     });
-                } else {
-                    console.log('🔧 DEBUG: DOM bereits ready - initialisiere sofort');
-                    this.initializeEventListeners();
-                    this.loadQRCodes();
+                });
+            }
+            
+            setupMobileNavigation() {
+                // Mobile Navigation Toggle
+                const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
+                const navigationMenu = document.querySelector('.navigation-menu');
+                
+                if (mobileMenuToggle && navigationMenu) {
+                    mobileMenuToggle.addEventListener('click', () => {
+                        navigationMenu.classList.toggle('active');
+                    });
                 }
+            }
+            
+            // Firebase v10 Helper Methods
+            async getFirestoreImports() {
+                return await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
             }
             
             initializeEventListeners() {
@@ -582,15 +675,30 @@
                 try {
                     console.log('🔧 DEBUG: loadQRCodes gestartet, db:', !!this.db);
                     
-                    // AdminBase hat bereits Firebase initialisiert
-                    const qrCodesRef = this.db.collection('qr-codes');
-                    const q = qrCodesRef.orderBy('createdAt', 'desc');
-                    const snapshot = await q.get();
+                    // Firebase v10 imports
+                    const { collection, query, orderBy, getDocs } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+                    
+                    const qrCodesRef = collection(this.db, 'qr-codes');
+                    console.log('🔧 DEBUG: Collection Reference erstellt');
+                    
+                    const q = query(qrCodesRef, orderBy('createdAt', 'desc'));
+                    console.log('🔧 DEBUG: Query erstellt');
+                    
+                    const snapshot = await getDocs(q);
+                    console.log('🔧 DEBUG: Snapshot erhalten, empty:', snapshot.empty, 'size:', snapshot.size);
                     
                     const qrCodesGrid = document.getElementById('qrCodesGrid');
+                    console.log('🔧 DEBUG: Grid Element gefunden:', !!qrCodesGrid);
+                    
+                    if (!qrCodesGrid) {
+                        console.error('🚨 QR Codes Grid Element nicht gefunden!');
+                        return;
+                    }
+                    
                     qrCodesGrid.innerHTML = '';
                     
                     if (snapshot.empty) {
+                        console.log('🔧 DEBUG: Snapshot ist leer - zeige Leermeldung');
                         qrCodesGrid.innerHTML = `
                             <div style="grid-column: 1 / -1; text-align: center; padding: 3rem;">
                                 <h3>Noch keine QR-Codes erstellt</h3>
@@ -600,13 +708,29 @@
                         return;
                     }
                     
-                    snapshot.forEach((doc) => {
+                    console.log('🔧 DEBUG: Lade', snapshot.size, 'QR-Codes');
+                    snapshot.forEach((doc, index) => {
                         const qrData = { id: doc.id, ...doc.data() };
+                        console.log('🔧 DEBUG: QR-Code', index + 1, ':', qrData.name);
                         this.createQRCardElement(qrData);
                     });
                     
+                    console.log('✅ QR-Codes erfolgreich geladen');
+                    
                 } catch (error) {
-                    console.error('Fehler beim Laden der QR-Codes:', error);
+                    console.error('🚨 Fehler beim Laden der QR-Codes:', error);
+                    
+                    // Fallback-Anzeige bei Fehler
+                    const qrCodesGrid = document.getElementById('qrCodesGrid');
+                    if (qrCodesGrid) {
+                        qrCodesGrid.innerHTML = `
+                            <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: red;">
+                                <h3>Fehler beim Laden der QR-Codes</h3>
+                                <p>Fehler: ${error.message}</p>
+                                <button onclick="location.reload()">Seite neu laden</button>
+                            </div>
+                        `;
+                    }
                 }
             }
             
@@ -1034,8 +1158,11 @@
             
             async saveQRCode() {
                 try {
+                    // Firebase v10 imports
+                    const { collection, doc, addDoc, updateDoc, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+                    
                     const formData = new FormData(document.getElementById('qrCodeForm'));
-                    const isTransparent = document.getElementById('qrTransparent').checked;
+                    const isTransparent = document.getElementById('transparentBg').checked;
                     
                     const qrData = {
                         name: formData.get('name'),
@@ -1049,7 +1176,7 @@
                             transparent: isTransparent
                         },
                         scanCount: 0,
-                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        updatedAt: serverTimestamp()
                     };
                     
                     if (this.currentLogoDataUrl) {
@@ -1058,13 +1185,13 @@
                     
                     if (this.currentQRCode) {
                         // Update existing QR code
-                        const qrRef = this.db.collection('qr-codes').doc(this.currentQRCode.id);
-                        await qrRef.update(qrData);
+                        const qrRef = doc(this.db, 'qr-codes', this.currentQRCode.id);
+                        await updateDoc(qrRef, qrData);
                         alert('QR-Code erfolgreich aktualisiert!');
                     } else {
                         // Create new QR code
-                        qrData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-                        await this.db.collection('qr-codes').add(qrData);
+                        qrData.createdAt = serverTimestamp();
+                        await addDoc(collection(this.db, 'qr-codes'), qrData);
                         alert('QR-Code erfolgreich erstellt!');
                     }
                     
@@ -1079,7 +1206,11 @@
             
             async editQRCode(qrId) {
                 try {
-                    const qrDoc = await this.db.collection('qr-codes').doc(qrId).get();
+                    // Firebase v10 imports
+                    const { doc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+                    
+                    const qrDocRef = doc(this.db, 'qr-codes', qrId);
+                    const qrDoc = await getDoc(qrDocRef);
                     
                     if (qrDoc.exists) {
                         this.openQRCodeModal({ id: qrId, ...qrDoc.data() });
@@ -1091,11 +1222,14 @@
             
             async toggleQRStatus(qrId, currentStatus) {
                 try {
+                    // Firebase v10 imports
+                    const { doc, updateDoc, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+                    
                     const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
-                    const qrRef = this.db.collection('qr-codes').doc(qrId);
-                    await qrRef.update({ 
+                    const qrRef = doc(this.db, 'qr-codes', qrId);
+                    await updateDoc(qrRef, { 
                         status: newStatus,
-                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        updatedAt: serverTimestamp()
                     });
                     
                     this.loadQRCodes();
@@ -1110,7 +1244,10 @@
                 }
                 
                 try {
-                    await this.db.collection('qr-codes').doc(qrId).delete();
+                    // Firebase v10 imports
+                    const { doc, deleteDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+                    
+                    await deleteDoc(doc(this.db, 'qr-codes', qrId));
                     this.loadQRCodes();
                     alert('QR-Code gelöscht');
                 } catch (error) {
@@ -1140,10 +1277,14 @@
             
             async downloadQRCodeById(qrId, format) {
                 try {
-                    // Generate QR code for specific ID and download
-                    const qrDoc = await this.db.collection('qr-codes').doc(qrId).get();
+                    // Firebase v10 imports
+                    const { doc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
                     
-                    if (!qrDoc.exists) return;
+                    // Generate QR code for specific ID and download
+                    const qrDocRef = doc(this.db, 'qr-codes', qrId);
+                    const qrDoc = await getDoc(qrDocRef);
+                    
+                    if (!qrDoc.exists()) return;
                     const qrData = qrDoc.data();
                     
                     // WICHTIG: Verwende Short-Link für Download!
