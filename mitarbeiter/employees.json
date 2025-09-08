@@ -163,5 +163,16 @@
     "company": "Buderus Systeme",
     "website": "https://buderus-systeme.de",
     "avatarExt": "png"
+  },
+  {
+    "id": "luca-schweiger",
+    "uid": "jZWsgDlfdaaknKz04R4ras07l9X2",
+    "name": "luca schweiger",
+    "title": "Technischer Fachberater",
+    "phone": "0176418280",
+    "email": "luca.schweiger@buderus-systeme.de",
+    "company": "Buderus Systeme",
+    "website": "https://buderus-systeme.de",
+    "avatarExt": "webp"
   }
 ]
