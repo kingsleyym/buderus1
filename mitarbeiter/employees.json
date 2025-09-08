@@ -174,5 +174,16 @@
     "company": "Buderus Systeme",
     "website": "https://buderus-systeme.de",
     "avatarExt": "webp"
+  },
+  {
+    "id": "lukas-blanck",
+    "uid": "PNLCc2Q1SVTGG7uI6okzQaZ6G7o1",
+    "name": "Lukas Blanck",
+    "title": "Vertrieb",
+    "phone": "017655569373",
+    "email": "lb@lukasblanck.de",
+    "company": "Buderus Systeme",
+    "website": "https://buderus-systeme.de",
+    "avatarExt": "jpg"
   }
 ]
