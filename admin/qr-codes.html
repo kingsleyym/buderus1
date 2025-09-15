@@ -1162,7 +1162,8 @@
                     const { collection, doc, addDoc, updateDoc, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
                     
                     const formData = new FormData(document.getElementById('qrCodeForm'));
-                    const isTransparent = document.getElementById('transparentBg').checked;
+                    const transparentCheckbox = document.getElementById('qrTransparent');
+                    const isTransparent = transparentCheckbox ? transparentCheckbox.checked : false;
                     
                     const qrData = {
                         name: formData.get('name'),

@@ -7,24 +7,32 @@ const functions = require('firebase-functions');
  * Team-Übersicht rendern (ersetzt /mitarbeiter/index.html)
  * URL: helios-energy.web.app/team
  */
-exports.renderTeamList = functions.https.onRequest(async (req, res) => {
+const renderTeamList = functions.https.onRequest(async (req, res) => {
   try {
+    console.log('🔍 Team-Liste wird geladen...'); // Debug Log
     // Employee-Daten aus Firestore laden (nur genehmigte)
     const employeesSnapshot = await admin.firestore()
       .collection('employees')
       .where('approved', '==', true)
-      .where('status', '==', 'active')
       .orderBy('lastName')
       .get();
     
     const employees = [];
     employeesSnapshot.forEach(doc => {
       const data = doc.data();
+      // Namen bereinigen (Leerzeichen entfernen) und lowercase
+      const firstName = data.firstName ? data.firstName.trim() : '';
+      const lastName = data.lastName ? data.lastName.trim() : '';
+      const slug = `${firstName.toLowerCase()}-${lastName.toLowerCase()}`;
+      
       employees.push({
         id: doc.id,
         ...data,
+        // Bereinigte Namen für Display
+        firstName: firstName,
+        lastName: lastName,
         // URL-freundlicher Slug generieren
-        slug: `${data.firstName.toLowerCase()}-${data.lastName.toLowerCase()}`
+        slug: slug
       });
     });
 
@@ -43,14 +51,17 @@ exports.renderTeamList = functions.https.onRequest(async (req, res) => {
 });
 
 /**
- * Individual Employee-Seite rendern (ersetzt /mitarbeiter/[name].html)  
- * URL: helios-energy.web.app/team/max-mustermann
+ * Einzelner Mitarbeiter rendern (ersetzt individuelle .html Dateien)
+ * URL: helios-energy.web.app/team/firstname-lastname
  */
-exports.renderEmployee = functions.https.onRequest(async (req, res) => {
+const renderEmployee = functions.https.onRequest(async (req, res) => {
   try {
-    // Employee-Name aus URL extrahieren
+    // Employee-Name aus URL extrahieren und dekodieren
     const pathParts = req.path.split('/');
-    const employeeSlug = pathParts[pathParts.length - 1]; // letzter Teil der URL
+    let employeeSlug = pathParts[pathParts.length - 1]; // letzter Teil der URL
+    
+    // URL-Dekodierung für Leerzeichen und Sonderzeichen
+    employeeSlug = decodeURIComponent(employeeSlug);
     
     console.log('🔍 Suche Employee mit Slug:', employeeSlug);
     
@@ -58,13 +69,18 @@ exports.renderEmployee = functions.https.onRequest(async (req, res) => {
     const employeesSnapshot = await admin.firestore()
       .collection('employees')
       .where('approved', '==', true)
-      .where('status', '==', 'active')
       .get();
     
     let employee = null;
     employeesSnapshot.forEach(doc => {
       const data = doc.data();
-      const slug = `${data.firstName.toLowerCase()}-${data.lastName.toLowerCase()}`;
+      // Namen bereinigen (Leerzeichen entfernen) und lowercase
+      const firstName = data.firstName ? data.firstName.trim().toLowerCase() : '';
+      const lastName = data.lastName ? data.lastName.trim().toLowerCase() : '';
+      const slug = `${firstName}-${lastName}`;
+      
+      console.log('🔍 Vergleiche Slugs:', { generiert: slug, gesucht: employeeSlug });
+      
       if (slug === employeeSlug) {
         employee = {
           id: doc.id,
@@ -97,10 +113,10 @@ exports.renderEmployee = functions.https.onRequest(async (req, res) => {
 });
 
 /**
- * vCard Download API
- * URL: helios-energy.web.app/api/vcard/max-mustermann
+ * vCard Generation (ersetzt contact.js download feature)
+ * URL: helios-energy.web.app/api/vcard/firstname-lastname
  */
-exports.generateVCard = functions.https.onRequest(async (req, res) => {
+const generateVCard = functions.https.onRequest(async (req, res) => {
   try {
     const pathParts = req.path.split('/');
     const employeeSlug = pathParts[pathParts.length - 1];
@@ -140,10 +156,10 @@ exports.generateVCard = functions.https.onRequest(async (req, res) => {
 });
 
 /**
- * Avatar-API für Employee-Bilder
- * URL: helios-energy.web.app/api/avatar/employee-id
+ * Employee Avatar API (Avatar-Bilder servieren)
+ * URL: helios-energy.web.app/api/avatar/firstname-lastname
  */
-exports.getEmployeeAvatar = functions.https.onRequest(async (req, res) => {
+const getEmployeeAvatar = functions.https.onRequest(async (req, res) => {
   try {
     const pathParts = req.path.split('/');
     const employeeId = pathParts[pathParts.length - 1];
@@ -181,57 +197,78 @@ exports.getEmployeeAvatar = functions.https.onRequest(async (req, res) => {
   }
 });
 
-// HTML-Template-Funktionen
+// HTML-Template-Funktionen (1:1 wie originale GitHub Pages)
 function generateTeamOverviewHTML(employees) {
   return `
 <!DOCTYPE html>
 <html lang="de">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unser Team | Helios Energy</title>
+    <title>Team | Buderus Systeme</title>
     <meta name="theme-color" content="#181A23">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="msapplication-navbutton-color" content="#181A23">
     <meta name="apple-mobile-web-app-capable" content="yes">
     
-    <!-- SEO Meta-Tags -->
-    <meta name="description" content="Lernen Sie unser kompetentes Team bei Helios Energy kennen. Erfahrene Berater für moderne Heiztechnik und Energielösungen.">
-    <meta name="keywords" content="Helios Energy Team, Heiztechnik Berater, Energieberatung, Fachberater">
-    
-    <!-- Open Graph -->
-    <meta property="og:title" content="Unser Team | Helios Energy">
-    <meta property="og:description" content="Lernen Sie unser kompetentes Team bei Helios Energy kennen.">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://helios-energy.web.app/team">
-    
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="/assets/favicon-ico-data.ico">
     <link rel="apple-touch-icon" href="/assets/apple-touch-icon-png-data.png">
     
-    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/mitarbeiter/styles.css">
     <link rel="stylesheet" href="/mitarbeiter/employee-directory.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Structured Data -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Organization",
-      "name": "Helios Energy",
-      "url": "https://helios-energy.web.app",
-      "employee": [
-        ${employees.map(emp => `{
-          "@type": "Person",
-          "name": "${emp.firstName} ${emp.lastName}",
-          "jobTitle": "${emp.position}",
-          "email": "${emp.email}",
-          "telephone": "${emp.phone}"
-        }`).join(',')}
-      ]
-    }
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Hintergrund mit Verlauf -->
+        <div class="background"></div>
+
+        <!-- Schwarzer Container -->
+        <div class="header-container">
+            <!-- Think Text oben links -->
+            <div class="think-text">
+                Think intelligent.<br>
+                Think blue.
+            </div>
+
+            <!-- Logo oben rechts -->
+            <div class="logo">
+                <img src="/assets/logo.png" alt="Logo">
+            </div>
+        </div>
+
+        <!-- Hauptinhalt -->
+        <div class="content">
+            <!-- Überschrift -->
+            <h1 class="name">Unser Team</h1>
+            <p class="job-description">Wählen Sie einen Mitarbeiter aus</p>
+
+            <!-- Mitarbeiter-Liste -->
+            <div class="employee-list">
+                ${employees.map(employee => `
+                <a href="/team/${employee.slug}" class="employee-card">
+                    <div class="employee-avatar">
+                        <img src="/assets/avatars/${employee.slug}.png" alt="${employee.firstName} ${employee.lastName}" 
+                             onerror="this.src='/assets/avatar.png'">
+                    </div>
+                    <div class="employee-info">
+                        <h3>${employee.firstName} ${employee.lastName}</h3>
+                        <p>${employee.position}</p>
+                    </div>
+                </a>
+                `).join('')}
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>`;
     </script>
 </head>
 <body>
@@ -576,3 +613,11 @@ function generateNotFoundHTML(slug) {
 </body>
 </html>`;
 }
+
+// Exports für Firebase Functions
+module.exports = {
+  renderTeamList,
+  renderEmployee,
+  generateVCard,
+  getEmployeeAvatar
+};

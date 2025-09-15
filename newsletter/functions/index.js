@@ -9,8 +9,11 @@ if (!admin.apps.length) {
 }
 const db = admin.firestore();
 
-// Team-Functions importieren (bereits als exports definiert)
-require('./team-functions');
+// Team-Functions importieren (GitHub Pages Ersatz)
+const teamFunctions = require('./team-functions');
+
+// Team Functions als Top-Level Exports
+Object.assign(exports, teamFunctions);
 
 // E-Mail Transporter (wird später konfiguriert)
 let transporter = null;
