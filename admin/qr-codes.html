@@ -30,13 +30,13 @@
         import { getFunctions } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js';
 
         const firebaseConfig = {
-            apiKey: "AIzaSyC2rZEPOYBLj5L1o_t_Lj9hsF5DXqZBHKg",
-            authDomain: "buderus-systeme.firebaseapp.com",
-            projectId: "buderus-systeme",
-            storageBucket: "buderus-systeme.appspot.com",
-            messagingSenderId: "1004719150308",
-            appId: "1:1004719150308:web:de85f6e8b3b0b5f2"
-        };
+    apiKey: "AIzaSyAp4fAQr-t2VbTTD2AJ_TLzTxeMnIDSt5o",
+    authDomain: "helios-energy.firebaseapp.com",
+    projectId: "helios-energy",
+    storageBucket: "helios-energy.firebasestorage.app", 
+    messagingSenderId: "446328459321",
+    appId: "1:446328459321:web:dbf5621e8c4ec2a9af7de8"
+};
 
         // Initialize Firebase v10
         const app = initializeApp(firebaseConfig);
@@ -736,7 +736,7 @@
             
             createQRCardElement(qrData) {
                 const qrCodesGrid = document.getElementById('qrCodesGrid');
-                const shortLink = `https://buderus-systeme.web.app/q/${qrData.id}`;
+                const shortLink = `https://helios-energy.web.app/q/${qrData.id}`;
                 
                 const cardElement = document.createElement('div');
                 cardElement.className = 'qr-card';
@@ -782,7 +782,7 @@
                 if (!canvas) return;
                 
                 // WICHTIG: Verwende immer den Short-Link für QR-Codes!
-                const shortLink = `https://buderus-systeme.web.app/q/${qrData.id}`;
+                const shortLink = `https://helios-energy.web.app/q/${qrData.id}`;
                 
                 try {
                     if (window.qrLibraryType === 'styling' && typeof QRCodeStyling !== 'undefined') {
@@ -964,10 +964,10 @@
                 // WICHTIG: Verwende Short-Link, nicht die direkte URL!
                 let qrCodeUrl = targetUrl;
                 if (this.currentQRCode && this.currentQRCode.id) {
-                    qrCodeUrl = `https://buderus-systeme.web.app/q/${this.currentQRCode.id}`;
+                    qrCodeUrl = `https://helios-energy.web.app/q/${this.currentQRCode.id}`;
                     console.log('🔧 DEBUG: Verwende bestehenden Short-Link:', qrCodeUrl);
                 } else {
-                    qrCodeUrl = `https://buderus-systeme.web.app/q/preview`;
+                    qrCodeUrl = `https://helios-energy.web.app/q/preview`;
                     console.log('🔧 DEBUG: Verwende Vorschau-Link:', qrCodeUrl);
                 }
                 
@@ -1288,7 +1288,7 @@
                     const qrData = qrDoc.data();
                     
                     // WICHTIG: Verwende Short-Link für Download!
-                    const shortLink = `https://buderus-systeme.web.app/q/${qrId}`;
+                    const shortLink = `https://helios-energy.web.app/q/${qrId}`;
                     
                     if (window.qrLibraryType === 'styling' && typeof QRCodeStyling !== 'undefined') {
                         // Erweiterte Library - unterstützt PNG, JPEG, WEBP, SVG

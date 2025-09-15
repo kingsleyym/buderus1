@@ -725,7 +725,7 @@ async function sendAdminSetupEmail(email, tempPassword) {
           </div>
           
           <div style="text-align: center; margin: 2rem 0;">
-            <a href="https://buderus-systeme.web.app/admin/" style="background: #007bff; color: white; padding: 1rem 2rem; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 500;">
+            <a href="https://helios-energy.web.app/admin/" style="background: #007bff; color: white; padding: 1rem 2rem; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 500;">
               🚀 Zum Admin-Dashboard
             </a>
           </div>

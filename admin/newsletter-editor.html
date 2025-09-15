@@ -1,21 +1,24 @@
 <!DOCTYPE html>
 <html lang="de">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Newsletter Editor | Buderus Systeme</title>
     <meta name="theme-color" content="#181A23">
     <meta name="robots" content="noindex, nofollow">
-    
+
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="/assets/favicon-ico-data.ico">
-    
+
     <link rel="stylesheet" href="/styles.css">
     <link rel="stylesheet" href="/admin/admin.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap"
+        rel="stylesheet">
 </head>
+
 <body class="admin-body">
     <div class="admin-dashboard">
         <!-- Sidebar -->
@@ -25,7 +28,7 @@
                 <h2 class="sidebar-title">Admin Dashboard</h2>
                 <p class="sidebar-subtitle">Newsletter Management</p>
             </div>
-            
+
             <div class="sidebar-nav">
                 <a href="/admin/dashboard.html" class="nav-item">
                     <i>📊</i> Dashboard
@@ -49,21 +52,21 @@
                     <i>📈</i> Statistiken
                 </a>
             </div>
-            
+
             <div class="sidebar-footer">
                 <button id="logoutBtn" class="logout-btn">
                     <i>🚪</i> Abmelden
                 </button>
             </div>
         </nav>
-        
+
         <!-- Main Content -->
         <main class="admin-main">
             <div class="dashboard-header">
                 <h1 class="dashboard-title">Newsletter erstellen</h1>
                 <p class="dashboard-subtitle">Erstellen Sie professionelle Newsletter mit unserem Editor</p>
             </div>
-            
+
             <!-- Editor Container -->
             <div class="editor-container">
                 <!-- Editor Panel -->
@@ -71,21 +74,24 @@
                     <div class="editor-toolbar">
                         <h3 style="margin: 0; color: #333;">Newsletter Editor</h3>
                         <div style="display: flex; gap: 0.5rem;">
-                            <button id="saveTemplate" class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.8rem;">
+                            <button id="saveTemplate" class="btn btn-secondary"
+                                style="padding: 0.5rem 1rem; font-size: 0.8rem;">
                                 💾 Vorlage speichern
                             </button>
-                            <button id="loadTemplate" class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.8rem;">
+                            <button id="loadTemplate" class="btn btn-secondary"
+                                style="padding: 0.5rem 1rem; font-size: 0.8rem;">
                                 📁 Vorlage laden
                             </button>
                         </div>
                     </div>
-                    
+
                     <div class="editor-content">
                         <form id="newsletterForm">
                             <div class="form-row">
                                 <div class="form-group">
                                     <label class="form-label">Betreff</label>
-                                    <input type="text" id="subject" class="form-input" placeholder="Newsletter Betreff..." required>
+                                    <input type="text" id="subject" class="form-input"
+                                        placeholder="Newsletter Betreff..." required>
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label">Empfänger</label>
@@ -96,11 +102,13 @@
                                     </select>
                                 </div>
                             </div>
-                            
+
                             <div class="form-group">
                                 <label class="form-label">Newsletter Inhalt</label>
-                                <div id="editorToolbar" style="border: 2px solid #e1e5e9; border-bottom: 1px solid #e1e5e9; border-radius: 6px 6px 0 0; padding: 0.5rem; background: #f8f9fa;">
-                                    <button type="button" class="toolbar-btn" data-command="bold"><strong>B</strong></button>
+                                <div id="editorToolbar"
+                                    style="border: 2px solid #e1e5e9; border-bottom: 1px solid #e1e5e9; border-radius: 6px 6px 0 0; padding: 0.5rem; background: #f8f9fa;">
+                                    <button type="button" class="toolbar-btn"
+                                        data-command="bold"><strong>B</strong></button>
                                     <button type="button" class="toolbar-btn" data-command="italic"><em>I</em></button>
                                     <button type="button" class="toolbar-btn" data-command="underline"><u>U</u></button>
                                     <span style="margin: 0 0.5rem; color: #ccc;">|</span>
@@ -108,24 +116,28 @@
                                     <button type="button" class="toolbar-btn" data-command="justifyCenter">▬</button>
                                     <button type="button" class="toolbar-btn" data-command="justifyRight">▶</button>
                                     <span style="margin: 0 0.5rem; color: #ccc;">|</span>
-                                    <button type="button" class="toolbar-btn" data-command="insertUnorderedList">• List</button>
-                                    <button type="button" class="toolbar-btn" data-command="insertOrderedList">1. List</button>
+                                    <button type="button" class="toolbar-btn" data-command="insertUnorderedList">•
+                                        List</button>
+                                    <button type="button" class="toolbar-btn" data-command="insertOrderedList">1.
+                                        List</button>
                                     <span style="margin: 0 0.5rem; color: #ccc;">|</span>
                                     <button type="button" class="toolbar-btn" id="insertSignature">✍️ Signatur</button>
                                 </div>
-                                <div id="editor" contenteditable="true" style="min-height: 400px; border: 2px solid #e1e5e9; border-top: none; border-radius: 0 0 6px 6px; padding: 1rem; font-family: Arial, sans-serif; line-height: 1.6;">
+                                <div id="editor" contenteditable="true"
+                                    style="min-height: 400px; border: 2px solid #e1e5e9; border-top: none; border-radius: 0 0 6px 6px; padding: 1rem; font-family: Arial, sans-serif; line-height: 1.6;">
                                     <h2>Willkommen zu unserem Newsletter!</h2>
                                     <p>Liebe Abonnenten,</p>
-                                    <p>hier ist Ihr Newsletter von Buderus Systeme mit den neuesten Updates und Informationen.</p>
+                                    <p>hier ist Ihr Newsletter von Buderus Systeme mit den neuesten Updates und
+                                        Informationen.</p>
                                     <p>Mit freundlichen Grüßen,<br>Ihr Buderus Systeme Team</p>
                                 </div>
                             </div>
-                            
+
                             <div class="form-row">
                                 <div class="form-group">
                                     <label class="form-label">Ihre Signatur</label>
-                                    <textarea id="signature" class="form-textarea" placeholder="Ihre persönliche Signatur..."
-                                              rows="4">Mit freundlichen Grüßen,
+                                    <textarea id="signature" class="form-textarea"
+                                        placeholder="Ihre persönliche Signatur..." rows="4">Mit freundlichen Grüßen,
 
 [Ihr Name]
 Buderus Systeme
@@ -150,7 +162,7 @@ E-Mail: [Ihre E-Mail]</textarea>
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <div style="display: flex; gap: 1rem; margin-top: 2rem;">
                                 <button type="submit" class="btn btn-primary" style="flex: 1;">
                                     📧 Newsletter senden
@@ -162,22 +174,24 @@ E-Mail: [Ihre E-Mail]</textarea>
                         </form>
                     </div>
                 </div>
-                
+
                 <!-- Preview Panel -->
                 <div class="preview-panel">
                     <div class="preview-header">
                         <h3 style="margin: 0; color: #333;">Live Vorschau</h3>
                     </div>
                     <div class="preview-content">
-                        <div id="preview" style="border: 1px solid #ddd; background: white; min-height: 400px; font-family: 'Poppins', Arial, sans-serif;">
+                        <div id="preview"
+                            style="border: 1px solid #ddd; background: white; min-height: 400px; font-family: 'Poppins', Arial, sans-serif;">
                             <!-- Live preview will be inserted here -->
                         </div>
                     </div>
                 </div>
             </div>
-            
+
             <!-- Status Messages -->
-            <div id="statusMessage" style="display: none; position: fixed; top: 20px; right: 20px; z-index: 1000;"></div>
+            <div id="statusMessage" style="display: none; position: fixed; top: 20px; right: 20px; z-index: 1000;">
+            </div>
         </main>
     </div>
 
@@ -191,20 +205,20 @@ E-Mail: [Ihre E-Mail]</textarea>
             cursor: pointer;
             font-size: 0.8rem;
         }
-        
+
         .toolbar-btn:hover {
             background: #f0f0f0;
         }
-        
+
         .toolbar-btn:active {
             background: #e0e0e0;
         }
-        
+
         #editor:focus {
             outline: none;
             border-color: #007bff;
         }
-        
+
         .template-item {
             background: white;
             border: 1px solid #ddd;
@@ -214,18 +228,18 @@ E-Mail: [Ihre E-Mail]</textarea>
             cursor: pointer;
             transition: all 0.3s ease;
         }
-        
+
         .template-item:hover {
             border-color: #007bff;
             box-shadow: 0 2px 8px rgba(0, 123, 255, 0.1);
         }
-        
+
         .template-title {
             font-weight: 600;
             color: #333;
             margin-bottom: 0.5rem;
         }
-        
+
         .template-preview {
             font-size: 0.8rem;
             color: #666;
@@ -239,35 +253,35 @@ E-Mail: [Ihre E-Mail]</textarea>
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
         import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
         import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js';
-        
+
         // Firebase Config
         const firebaseConfig = {
-            apiKey: "AIzaSyDW_tTYVrU-8pZPqmFcx5BKhgZVs0pTzSQ",
-            authDomain: "buderus-systeme.firebaseapp.com",
-            projectId: "buderus-systeme",
-            storageBucket: "buderus-systeme.firebasestorage.app",
-            messagingSenderId: "384964671486",
-            appId: "1:384964671486:web:648152b8b7effb95df72af"
+            apiKey: "AIzaSyAp4fAQr-t2VbTTD2AJ_TLzTxeMnIDSt5o",
+            authDomain: "helios-energy.firebaseapp.com",
+            projectId: "helios-energy",
+            storageBucket: "helios-energy.firebasestorage.app",
+            messagingSenderId: "446328459321",
+            appId: "1:446328459321:web:dbf5621e8c4ec2a9af7de8"
         };
-        
+
         // Firebase initialisieren
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const functions = getFunctions(app);
-        
+
         class NewsletterEditor {
             constructor() {
                 this.editor = document.getElementById('editor');
                 this.preview = document.getElementById('preview');
                 this.form = document.getElementById('newsletterForm');
                 this.signature = document.getElementById('signature');
-                
+
                 this.checkAuth();
                 this.initializeEditor();
                 this.initializeEventListeners();
                 this.updatePreview();
             }
-            
+
             checkAuth() {
                 onAuthStateChanged(auth, (user) => {
                     if (!user) {
@@ -275,7 +289,7 @@ E-Mail: [Ihre E-Mail]</textarea>
                     }
                 });
             }
-            
+
             initializeEditor() {
                 // Toolbar buttons
                 document.querySelectorAll('.toolbar-btn[data-command]').forEach(btn => {
@@ -286,13 +300,13 @@ E-Mail: [Ihre E-Mail]</textarea>
                         this.updatePreview();
                     });
                 });
-                
+
                 // Editor content changes
                 this.editor.addEventListener('input', () => {
                     this.updatePreview();
                 });
             }
-            
+
             initializeEventListeners() {
                 // Logout
                 document.getElementById('logoutBtn').addEventListener('click', async () => {
@@ -303,53 +317,53 @@ E-Mail: [Ihre E-Mail]</textarea>
                         console.error('Logout Fehler:', error);
                     }
                 });
-                
+
                 // Form submission
                 this.form.addEventListener('submit', (e) => {
                     e.preventDefault();
                     this.sendNewsletter();
                 });
-                
+
                 // Insert signature
                 document.getElementById('insertSignature').addEventListener('click', () => {
                     this.insertSignature();
                 });
-                
+
                 // Preview button
                 document.getElementById('previewBtn').addEventListener('click', () => {
                     this.showPreview();
                 });
-                
+
                 // Subject and signature changes
                 document.getElementById('subject').addEventListener('input', () => {
                     this.updatePreview();
                 });
-                
+
                 this.signature.addEventListener('input', () => {
                     this.updatePreview();
                 });
             }
-            
+
             insertSignature() {
                 const signatureText = this.signature.value.replace(/\n/g, '<br>');
                 const selection = window.getSelection();
                 const range = selection.getRangeAt(0);
-                
+
                 const signatureDiv = document.createElement('div');
                 signatureDiv.innerHTML = '<br><hr style="margin: 2rem 0; border: none; border-top: 1px solid #eee;"><div>' + signatureText + '</div>';
-                
+
                 range.insertNode(signatureDiv);
                 this.updatePreview();
             }
-            
+
             updatePreview() {
                 const subject = document.getElementById('subject').value || 'Newsletter Betreff';
                 const content = this.editor.innerHTML;
-                
+
                 const previewHtml = this.generateEmailTemplate(subject, content);
                 this.preview.innerHTML = previewHtml;
             }
-            
+
             generateEmailTemplate(subject, content) {
                 return `
                     <div style="font-family: 'Poppins', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: white;">
@@ -373,7 +387,7 @@ E-Mail: [Ihre E-Mail]</textarea>
                     </div>
                 `;
             }
-            
+
             showPreview() {
                 const previewWindow = window.open('', '_blank', 'width=800,height=600');
                 previewWindow.document.write(`
@@ -393,25 +407,25 @@ E-Mail: [Ihre E-Mail]</textarea>
                 `);
                 previewWindow.document.close();
             }
-            
+
             async sendNewsletter() {
                 const subject = document.getElementById('subject').value;
                 const content = this.generateEmailTemplate(subject, this.editor.innerHTML);
                 const recipients = document.getElementById('recipients').value;
                 const sendOption = document.querySelector('input[name="sendOption"]:checked').value;
-                
+
                 if (!subject.trim()) {
                     this.showMessage('Bitte geben Sie einen Betreff ein.', 'error');
                     return;
                 }
-                
+
                 if (!this.editor.textContent.trim()) {
                     this.showMessage('Bitte geben Sie Newsletter-Inhalt ein.', 'error');
                     return;
                 }
-                
+
                 this.showMessage('Newsletter wird versendet...', 'info');
-                
+
                 try {
                     const sendNewsletterFunction = httpsCallable(functions, 'sendNewsletter');
                     const result = await sendNewsletterFunction({
@@ -420,10 +434,10 @@ E-Mail: [Ihre E-Mail]</textarea>
                         recipientFilter: recipients,
                         testMode: sendOption === 'test'
                     });
-                    
+
                     if (result.data.success) {
                         this.showMessage(result.data.message, 'success');
-                        
+
                         if (sendOption !== 'test') {
                             // Reset form after successful send
                             setTimeout(() => {
@@ -438,7 +452,7 @@ E-Mail: [Ihre E-Mail]</textarea>
                     this.showMessage('Fehler beim Senden des Newsletters.', 'error');
                 }
             }
-            
+
             resetForm() {
                 document.getElementById('subject').value = '';
                 this.editor.innerHTML = `
@@ -449,23 +463,24 @@ E-Mail: [Ihre E-Mail]</textarea>
                 `;
                 this.updatePreview();
             }
-            
+
             showMessage(message, type) {
                 const statusDiv = document.getElementById('statusMessage');
                 statusDiv.className = `alert alert-${type === 'error' ? 'error' : type === 'success' ? 'success' : 'info'}`;
                 statusDiv.textContent = message;
                 statusDiv.style.display = 'block';
-                
+
                 setTimeout(() => {
                     statusDiv.style.display = 'none';
                 }, 5000);
             }
         }
-        
+
         // Initialize when DOM is ready
         document.addEventListener('DOMContentLoaded', () => {
             new NewsletterEditor();
         });
     </script>
 </body>
+
 </html>

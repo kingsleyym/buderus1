@@ -233,7 +233,7 @@ exports.generateEmployeeQR = functions.https.onCall(async (data, context) => {
         
         // QR-Code URL erstellen
         const fileName = `${employeeData.firstName.toLowerCase()}-${employeeData.lastName.toLowerCase()}`;
-        const profileUrl = `https://buderus-systeme.web.app/mitarbeiter/${fileName}.html`;
+        const profileUrl = `https://helios-energy.web.app/mitarbeiter/${fileName}.html`;
         
         // QR-Code generieren
         const qrCodeDataUrl = await QRCode.toDataURL(profileUrl, {

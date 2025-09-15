@@ -16,6 +16,22 @@
         "function": "qrRedirect"
       },
       {
+        "source": "/team",
+        "function": "renderTeamList"
+      },
+      {
+        "source": "/team/**",
+        "function": "renderEmployee"
+      },
+      {
+        "source": "/api/vcard/**",
+        "function": "generateVCard"
+      },
+      {
+        "source": "/api/avatar/**",
+        "function": "getEmployeeAvatar"
+      },
+      {
         "source": "/newsletter/**",
         "destination": "/newsletter/index.html"
       }

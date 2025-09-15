@@ -9,6 +9,9 @@ if (!admin.apps.length) {
 }
 const db = admin.firestore();
 
+// Team-Functions importieren (bereits als exports definiert)
+require('./team-functions');
+
 // E-Mail Transporter (wird später konfiguriert)
 let transporter = null;
 
@@ -412,7 +415,7 @@ async function sendConfirmationEmail(email, token, userData) {
         console.log('E-Mail Transporter erstellt');
     }
 
-    const confirmUrl = `https://buderus-systeme.web.app/newsletter/confirm.html?token=${token}&email=${encodeURIComponent(email)}`;
+    const confirmUrl = `https://helios-energy.web.app/newsletter/confirm.html?token=${token}&email=${encodeURIComponent(email)}`;
     const name = userData.firstName ? ` ${userData.firstName}` : '';
     
     console.log('Bestätigungs-URL erstellt:', confirmUrl);
@@ -480,7 +483,7 @@ async function sendWelcomeEmail(email, userData) {
     if (!transporter) return; // Transporter Setup erforderlich
 
     const name = userData.firstName ? ` ${userData.firstName}` : '';
-    const unsubscribeUrl = `https://buderus-systeme.web.app/newsletter/unsubscribe.html?email=${encodeURIComponent(email)}`;
+    const unsubscribeUrl = `https://helios-energy.web.app/newsletter/unsubscribe.html?email=${encodeURIComponent(email)}`;
 
     const mailOptions = {
         from: '"Buderus Systeme" <newsletter@buderus-systeme.de>',
@@ -504,7 +507,7 @@ async function sendWelcomeEmail(email, userData) {
           </ul>
           
           <div style="text-align: center; margin: 2rem 0;">
-            <a href="https://buderus-systeme.web.app" style="background: #007bff; color: white; padding: 1rem 2rem; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 500;">
+            <a href="https://helios-energy.web.app" style="background: #007bff; color: white; padding: 1rem 2rem; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 500;">
               Unsere Website besuchen
             </a>
           </div>
@@ -574,3 +577,5 @@ exports.generateEmployeeQR = employeeFunctions.generateEmployeeQR;
 exports.getEmployeeStats = employeeFunctions.getEmployeeStats;
 exports.getAllEmployees = employeeFunctions.getAllEmployees;
 exports.sendOrderConfirmationEmail = employeeFunctions.sendOrderConfirmationEmail;
+
+

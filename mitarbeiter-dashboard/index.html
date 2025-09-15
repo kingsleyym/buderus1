@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="de">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -7,11 +8,13 @@
     <link rel="icon" type="image/x-icon" href="../assets/logo.png">
     <link rel="stylesheet" href="css/dashboard.css">
     <link rel="stylesheet" href="css/employee-card.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 </head>
+
 <body>
     <div id="loadingScreen" class="loading-screen">
         <div class="loading-spinner"></div>
@@ -91,7 +94,8 @@
                     <div class="input-group">
                         <i class="fas fa-lock"></i>
                         <input type="password" id="registerConfirmPassword" placeholder="Passwort bestätigen" required>
-                        <button type="button" class="password-toggle" onclick="togglePassword('registerConfirmPassword')">
+                        <button type="button" class="password-toggle"
+                            onclick="togglePassword('registerConfirmPassword')">
                             <i class="fas fa-eye"></i>
                         </button>
                     </div>
@@ -105,7 +109,8 @@
                     </button>
                     <div class="registration-note">
                         <i class="fas fa-info-circle"></i>
-                        <p>Ihre Registrierung muss von einem Administrator genehmigt werden. Sie erhalten eine E-Mail-Benachrichtigung.</p>
+                        <p>Ihre Registrierung muss von einem Administrator genehmigt werden. Sie erhalten eine
+                            E-Mail-Benachrichtigung.</p>
                     </div>
                 </form>
             </div>
@@ -122,7 +127,7 @@
             </div>
             <div class="nav-user">
                 <span id="userDisplayName">Max Mustermann</span>
-                
+
                 <!-- Shopping Cart Icon -->
                 <div class="cart-icon-container">
                     <button class="cart-icon-btn" onclick="openCartDialog()" title="Warenkorb">
@@ -130,7 +135,7 @@
                         <span id="cartBadge" class="cart-badge hidden">0</span>
                     </button>
                 </div>
-                
+
                 <div class="user-dropdown">
                     <button class="user-btn" onclick="toggleUserMenu()">
                         <img id="userAvatar" src="../assets/avatar.png" alt="User Avatar" class="user-avatar">
@@ -221,13 +226,15 @@
 
                     <div class="input-group">
                         <label for="profileBio">Kurzbeschreibung (optional)</label>
-                        <textarea id="profileBio" rows="3" placeholder="Kurze Beschreibung Ihrer Tätigkeit..."></textarea>
+                        <textarea id="profileBio" rows="3"
+                            placeholder="Kurze Beschreibung Ihrer Tätigkeit..."></textarea>
                     </div>
 
                     <div class="avatar-section">
                         <label>Profilbild</label>
                         <div class="avatar-upload">
-                            <img id="profileAvatarPreview" src="../assets/avatar.png" alt="Profil Vorschau" class="avatar-preview">
+                            <img id="profileAvatarPreview" src="../assets/avatar.png" alt="Profil Vorschau"
+                                class="avatar-preview">
                             <input type="file" id="profileAvatarInput" accept="image/*" onchange="previewAvatar(this)">
                             <label for="profileAvatarInput" class="upload-btn">
                                 <i class="fas fa-camera"></i>
@@ -263,11 +270,11 @@
                         <i class="fas fa-spinner fa-spin"></i>
                         <p>Bestellungen werden geladen...</p>
                     </div>
-                    
+
                     <div id="ordersList" class="orders-list">
                         <!-- Bestellungen werden hier dynamisch eingefügt -->
                     </div>
-                    
+
                     <div id="noOrders" class="empty-message" style="display: none;">
                         <i class="fas fa-shopping-cart"></i>
                         <h3>Noch keine Bestellungen</h3>
@@ -297,7 +304,7 @@
                             <p>Ausweis wird geladen...</p>
                         </div>
                     </div>
-                    
+
                     <div class="card-actions">
                         <button class="order-btn" onclick="orderEmployeeCard()">
                             <i class="fas fa-shopping-cart"></i>
@@ -404,7 +411,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Bottom Action -->
                     <div class="shop-footer">
                         <button class="view-cart-btn" onclick="openCartDialog()">
@@ -414,60 +421,60 @@
                     </div>
                 </div>
             </section>
-                </div>
-            </section>
+    </div>
+    </section>
 
-            <!-- QR Code Section -->
-            <section id="qrCodeSection" class="dashboard-section">
-                <div class="section-header">
-                    <h2>Ihr QR-Code</h2>
-                    <button class="back-btn" onclick="showWelcome()">
-                        <i class="fas fa-arrow-left"></i> Zurück
-                    </button>
-                </div>
+    <!-- QR Code Section -->
+    <section id="qrCodeSection" class="dashboard-section">
+        <div class="section-header">
+            <h2>Ihr QR-Code</h2>
+            <button class="back-btn" onclick="showWelcome()">
+                <i class="fas fa-arrow-left"></i> Zurück
+            </button>
+        </div>
 
-                <div class="qr-container">
-                    <div class="qr-display">
-                        <div id="qrCodeDisplay" class="qr-code">
-                            <!-- QR Code wird hier generiert -->
-                        </div>
-                        <p class="qr-info">Scannen Sie diesen Code, um direkt zu Ihrer Profilseite zu gelangen</p>
+        <div class="qr-container">
+            <div class="qr-display">
+                <div id="qrCodeDisplay" class="qr-code">
+                    <!-- QR Code wird hier generiert -->
+                </div>
+                <p class="qr-info">Scannen Sie diesen Code, um direkt zu Ihrer Profilseite zu gelangen</p>
+            </div>
+
+            <div class="qr-actions">
+                <button class="action-btn" onclick="downloadQRCode()">
+                    <i class="fas fa-download"></i>
+                    QR-Code speichern
+                </button>
+                <button class="action-btn" onclick="printQRCode()">
+                    <i class="fas fa-print"></i>
+                    Drucken
+                </button>
+                <button class="action-btn" onclick="regenerateQRCode()">
+                    <i class="fas fa-sync"></i>
+                    Neu generieren
+                </button>
+            </div>
+
+            <div class="qr-stats">
+                <h3>Scan-Statistiken</h3>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span class="stat-number" id="totalScans">0</span>
+                        <span class="stat-label">Gesamt-Scans</span>
                     </div>
-
-                    <div class="qr-actions">
-                        <button class="action-btn" onclick="downloadQRCode()">
-                            <i class="fas fa-download"></i>
-                            QR-Code speichern
-                        </button>
-                        <button class="action-btn" onclick="printQRCode()">
-                            <i class="fas fa-print"></i>
-                            Drucken
-                        </button>
-                        <button class="action-btn" onclick="regenerateQRCode()">
-                            <i class="fas fa-sync"></i>
-                            Neu generieren
-                        </button>
+                    <div class="stat-item">
+                        <span class="stat-number" id="todayScans">0</span>
+                        <span class="stat-label">Heute</span>
                     </div>
-
-                    <div class="qr-stats">
-                        <h3>Scan-Statistiken</h3>
-                        <div class="stats-grid">
-                            <div class="stat-item">
-                                <span class="stat-number" id="totalScans">0</span>
-                                <span class="stat-label">Gesamt-Scans</span>
-                            </div>
-                            <div class="stat-item">
-                                <span class="stat-number" id="todayScans">0</span>
-                                <span class="stat-label">Heute</span>
-                            </div>
-                            <div class="stat-item">
-                                <span class="stat-number" id="weekScans">0</span>
-                                <span class="stat-label">Diese Woche</span>
-                            </div>
-                        </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="weekScans">0</span>
+                        <span class="stat-label">Diese Woche</span>
+                    </div>
                 </div>
-            </section>
-        </main>
+            </div>
+    </section>
+    </main>
     </div>
 
     <!-- Pending Approval Screen -->
@@ -477,7 +484,8 @@
                 <i class="fas fa-clock"></i>
             </div>
             <h2>Registrierung eingereicht</h2>
-            <p>Ihre Registrierung wurde erfolgreich eingereicht und wartet auf die Genehmigung durch einen Administrator.</p>
+            <p>Ihre Registrierung wurde erfolgreich eingereicht und wartet auf die Genehmigung durch einen
+                Administrator.</p>
             <p>Sie erhalten eine E-Mail-Benachrichtigung, sobald Ihr Konto aktiviert wurde.</p>
             <button class="back-to-login-btn" onclick="backToLogin()">
                 <i class="fas fa-arrow-left"></i>
@@ -496,7 +504,7 @@
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            
+
             <div class="cart-dialog-body" id="cartDialogBody">
                 <div class="empty-cart-message">
                     <i class="fas fa-shopping-cart"></i>
@@ -504,7 +512,7 @@
                     <p>Fügen Sie Artikel aus dem Shop hinzu</p>
                 </div>
             </div>
-            
+
             <div class="cart-dialog-footer" id="cartDialogFooter">
                 <div class="cart-total-info">
                     <span>Gesamt: <strong id="cartTotalItems">0 Artikel</strong></span>
@@ -533,12 +541,12 @@
         import { getStorage } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js';
 
         const firebaseConfig = {
-            apiKey: "AIzaSyDW_tTYVrU-8pZPqmFcx5BKhgZVs0pTzSQ",
-            authDomain: "buderus-systeme.firebaseapp.com",
-            projectId: "buderus-systeme",
-            storageBucket: "buderus-systeme.firebasestorage.app",
-            messagingSenderId: "384964671486",
-            appId: "1:384964671486:web:648152b8b7effb95df72af"
+            apiKey: "AIzaSyAp4fAQr-t2VbTTD2AJ_TLzTxeMnIDSt5o",
+            authDomain: "helios-energy.firebaseapp.com",
+            projectId: "helios-energy",
+            storageBucket: "helios-energy.firebasestorage.app",
+            messagingSenderId: "446328459321",
+            appId: "1:446328459321:web:dbf5621e8c4ec2a9af7de8"
         };
 
         window.app = initializeApp(firebaseConfig);
@@ -550,4 +558,5 @@
     <script src="js/dashboard.js"></script>
     <script src="js/employee-card.js"></script>
 </body>
+
 </html>

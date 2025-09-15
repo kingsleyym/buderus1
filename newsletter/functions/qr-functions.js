@@ -239,7 +239,7 @@ exports.exportQRCodes = functions.https.onCall(async (data, context) => {
         id: doc.id,
         name: data.name,
         targetUrl: data.targetUrl,
-        shortUrl: `https://buderus-systeme.web.app/q/${doc.id}`,
+        shortUrl: `https://helios-energy.web.app/q/${doc.id}`,
         status: data.status,
         scanCount: data.scanCount || 0,
         createdAt: data.createdAt?.toDate().toISOString() || '',
