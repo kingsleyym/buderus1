@@ -1,0 +1,33 @@
+{
+  "name": "buderus-admin-functions",
+  "version": "2.0.0",
+  "description": "Professional Newsletter & Campaign System Functions",
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "tsc",
+    "serve": "firebase emulators:start",
+    "shell": "firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "18"
+  },
+  "dependencies": {
+    "firebase-admin": "^11.10.1",
+    "firebase-functions": "^4.5.0",
+    "nodemailer": "^6.9.7",
+    "@types/nodemailer": "^6.4.13",
+    "uuid": "^9.0.1",
+    "@types/uuid": "^9.0.6",
+    "cheerio": "^1.0.0-rc.12",
+    "@types/cheerio": "^0.22.35"
+  },
+  "devDependencies": {
+    "typescript": "^5.2.2",
+    "@types/node": "^20.8.7",
+    "firebase-functions-test": "^3.1.0"
+  },
+  "private": true
+}

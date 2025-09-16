@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 
 const AdminDashboard: React.FC = () => {
-  const [stats, setStats] = useState({
+  const [stats] = useState({
     totalSubscribers: '-',
     subscribersChange: '+0 diese Woche',
     totalEmails: '-',

@@ -1,15 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
   BarChart3, 
   PenTool, 
   Users, 
-  Mail, 
   QrCode, 
   UserCheck, 
   Gift, 
   TrendingUp,
-  LogOut
+  LogOut,
+  ChevronDown,
+  ChevronRight,
+  Megaphone,
+  Send
 } from 'lucide-react';
 
 interface AdminSidebarProps {
@@ -18,16 +21,28 @@ interface AdminSidebarProps {
 
 const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen }) => {
   const location = useLocation();
+  const [expandedSections, setExpandedSections] = useState<string[]>(['marketing']);
 
-  const navItems = [
+  const toggleSection = (section: string) => {
+    setExpandedSections(prev => 
+      prev.includes(section) 
+        ? prev.filter(s => s !== section)
+        : [...prev, section]
+    );
+  };
+
+  const mainNavItems = [
     { path: '/admin', icon: BarChart3, label: 'Dashboard' },
-    { path: '/admin/newsletter-editor', icon: PenTool, label: 'Newsletter erstellen' },
-    { path: '/admin/subscribers', icon: Users, label: 'Abonnenten' },
-    { path: '/admin/campaigns', icon: Mail, label: 'Kampagnen' },
-    { path: '/admin/qr-codes', icon: QrCode, label: 'QR-Codes' },
     { path: '/admin/employees', icon: UserCheck, label: 'Mitarbeiter' },
-    { path: '/admin/rewards', icon: Gift, label: 'Belohnungen' },
+    { path: '/admin/qr-codes', icon: QrCode, label: 'QR-Codes' },
     { path: '/admin/analytics', icon: TrendingUp, label: 'Statistiken' },
+  ];
+
+  const marketingItems = [
+    { path: '/admin/marketing/newsletter-editor', icon: PenTool, label: 'Newsletter erstellen' },
+    { path: '/admin/marketing/subscribers', icon: Users, label: 'Abonnenten' },
+    { path: '/admin/marketing/campaigns', icon: Send, label: 'Kampagnen' },
+    { path: '/admin/marketing/rewards', icon: Gift, label: 'Belohnungen' },
   ];
 
   const handleLogout = () => {
@@ -43,8 +58,9 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen }) => {
         <p className="sidebar-subtitle">Newsletter Management</p>
       </div>
       
-      <div className="sidebar-nav">
-        {navItems.map((item) => {
+            <div className="sidebar-nav">
+        {/* Main Navigation */}
+        {mainNavItems.map((item) => {
           const IconComponent = item.icon;
           return (
             <Link
@@ -52,10 +68,58 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen }) => {
               to={item.path}
               className={`nav-item ${location.pathname === item.path ? 'active' : ''}`}
             >
-              <IconComponent size={18} className="nav-icon" /> {item.label}
+              <IconComponent size={18} />
+              <span>{item.label}</span>
             </Link>
           );
         })}
+
+        {/* Marketing Section */}
+        <div className="nav-section">
+          {/* Marketing Main Link */}
+          <Link
+            to="/admin/marketing"
+            className={`nav-item ${location.pathname.startsWith('/admin/marketing') ? 'active' : ''}`}
+            style={{ marginBottom: '0.5rem' }}
+          >
+            <Megaphone size={18} />
+            <span>Marketing</span>
+          </Link>
+          
+          {/* Marketing Submenu Toggle */}
+          <button 
+            className={`nav-section-header ${expandedSections.includes('marketing') ? 'expanded' : ''}`}
+            onClick={() => toggleSection('marketing')}
+            style={{ paddingLeft: '2rem', fontSize: '0.8rem' }}
+          >
+            <div className="nav-section-title">
+              <span>Bereiche</span>
+            </div>
+            {expandedSections.includes('marketing') ? (
+              <ChevronDown size={14} />
+            ) : (
+              <ChevronRight size={14} />
+            )}
+          </button>
+          
+          {expandedSections.includes('marketing') && (
+            <div className="nav-section-items">
+              {marketingItems.map((item) => {
+                const IconComponent = item.icon;
+                return (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className={`nav-item nav-sub-item ${location.pathname === item.path ? 'active' : ''}`}
+                  >
+                    <IconComponent size={16} />
+                    <span>{item.label}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
+        </div>
       </div>
       
       <div className="sidebar-footer">
