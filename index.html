@@ -4,24 +4,154 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E-Werke Fachhändler Portal</title>
+    <title>Helios Energy - Weiterleitung</title>
 
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="assets/favicon-ico-data.ico">
     <link rel="apple-touch-icon" href="assets/apple-touch-icon-png-data.png">
 
-    <link rel="stylesheet" href="root-placeholder.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap"
-        rel="stylesheet">
+    <!-- Automatische Weiterleitung nach 3 Sekunden -->
+    <meta http-equiv="refresh" content="3;url=https://helios-energygmbh.de">
+    
+    <!-- Für Suchmaschinen -->
+    <link rel="canonical" href="https://helios-energygmbh.de">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #F1C40F 0%, #F39C12 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #2C3E50;
+        }
+
+        .redirect-container {
+            text-align: center;
+            background: white;
+            padding: 60px 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #F1C40F;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .tagline {
+            font-size: 1.1rem;
+            color: #7F8C8D;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+
+        .redirect-text {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .countdown {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #F1C40F;
+            margin: 20px 0;
+        }
+
+        .manual-link {
+            display: inline-block;
+            background: #F1C40F;
+            color: #2C3E50;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .manual-link:hover {
+            background: #F39C12;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(241, 196, 15, 0.3);
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #F1C40F;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 
 <body>
-    <div class="placeholder-container">
-        <div class="placeholder-title">E-Werke Fachhändler Portal</div>
-        <div class="placeholder-text">Hier entsteht die Seite für Fachhändler von E-Werke. </div>
+    <div class="redirect-container">
+        <div class="logo">HELIOS ENERGY</div>
+        <div class="tagline">Think intelligent. Think yellow.</div>
+        
+        <div class="redirect-text">
+            Sie werden automatisch zu unserer Hauptseite weitergeleitet...
+        </div>
+        
+        <div class="spinner"></div>
+        
+        <div class="countdown" id="countdown">3</div>
+        
+        <p style="margin: 20px 0; color: #7F8C8D;">
+            Falls die Weiterleitung nicht funktioniert:
+        </p>
+        
+        <a href="https://helios-energygmbh.de" class="manual-link">
+            Zur Hauptseite →
+        </a>
     </div>
+
+    <script>
+        // Countdown Timer
+        let timeLeft = 3;
+        const countdownElement = document.getElementById('countdown');
+        
+        const countdown = setInterval(() => {
+            timeLeft--;
+            countdownElement.textContent = timeLeft;
+            
+            if (timeLeft <= 0) {
+                clearInterval(countdown);
+                countdownElement.textContent = '0';
+                // Zusätzliche JavaScript-Weiterleitung als Backup
+                window.location.href = 'https://helios-energygmbh.de';
+            }
+        }, 1000);
+        
+        // Sofortige Weiterleitung bei Klick
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                window.location.href = 'https://helios-energygmbh.de';
+            }
+        });
+    </script>
 </body>
 
 </html>
