@@ -4,17 +4,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Helios Energy - Weiterleitung</title>
+    <title>Helios Energy - Wärmepumpen & Förderung bis 70% | München</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Helios Energy München - Ihr Experte für Wärmepumpen mit bis zu 70% Förderung. KfW, BAFA Zuschüsse für Luft-Wasser, Sole-Wasser & Wasser-Wasser Wärmepumpen. Kostenlose Beratung!">
+    <meta name="keywords" content="Wärmepumpe München, Wärmepumpe Förderung, KfW Förderung, BAFA Zuschuss, Wärmepumpe Installation, Heizung München, Energieberatung, CO2 sparen, Luft-Wasser Wärmepumpe, Erdwärmepumpe, Wärmepumpe Kosten, BEG Förderung, Klimabonus, Wärmepumpe 2025">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Lokale SEO -->
+    <meta name="geo.region" content="DE-BY">
+    <meta name="geo.placename" content="München">
+    <meta name="geo.position" content="48.1351;11.5820">
+    <meta name="ICBM" content="48.1351, 11.5820">
 
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="assets/favicon-ico-data.ico">
     <link rel="apple-touch-icon" href="assets/apple-touch-icon-png-data.png">
 
-    <!-- Automatische Weiterleitung nach 3 Sekunden -->
-    <meta http-equiv="refresh" content="3;url=https://helios-energygmbh.de">
+    <!-- Sofortige Weiterleitung (kein Countdown) -->
+    <meta http-equiv="refresh" content="0;url=https://helios-energygmbh.de">
     
     <!-- Für Suchmaschinen -->
     <link rel="canonical" href="https://helios-energygmbh.de">
+    
+    <!-- Open Graph für Social Media -->
+    <meta property="og:title" content="Helios Energy - Wärmepumpen & Förderung bis 70% | München">
+    <meta property="og:description" content="Professionelle Wärmepumpen-Installation mit maximaler Förderung. Bis zu 70% Zuschuss durch KfW & BAFA. Kostenlose Beratung in München.">
+    <meta property="og:url" content="https://helios-energygmbh.de">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="de_DE">
+
+    <!-- Schema.org Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Helios Energy GmbH",
+        "description": "Spezialist für Wärmepumpen und nachhaltige Heiztechnik in München",
+        "url": "https://helios-energygmbh.de",
+        "logo": "https://helios-energygmbh.de/logo.png",
+        "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "München",
+            "addressRegion": "Bayern",
+            "addressCountry": "DE"
+        },
+        "contactPoint": {
+            "@type": "ContactPoint",
+            "telephone": "+49-89-123456789",
+            "contactType": "customer service",
+            "availableLanguage": "German"
+        },
+        "sameAs": [
+            "https://helios-nrg.de"
+        ],
+        "service": [
+            {
+                "@type": "Service",
+                "name": "Wärmepumpen Installation",
+                "description": "Professionelle Installation von Luft-Wasser, Sole-Wasser und Wasser-Wasser Wärmepumpen"
+            },
+            {
+                "@type": "Service", 
+                "name": "Förderberatung",
+                "description": "Beratung zu KfW, BAFA und BEG Förderungen für Wärmepumpen"
+            }
+        ]
+    }
+    </script>
 
     <style>
         * {
@@ -31,126 +88,167 @@
             align-items: center;
             justify-content: center;
             color: #2C3E50;
+            /* Unsichtbar für Benutzer - nur für SEO */
+            opacity: 0;
+            transition: opacity 0.1s ease;
         }
 
-        .redirect-container {
+        .content {
             text-align: center;
             background: white;
-            padding: 60px 40px;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
-            max-width: 500px;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
             width: 90%;
         }
 
-        .logo {
-            font-size: 2.5rem;
+        h1 {
+            font-size: 2.2rem;
             font-weight: bold;
             color: #F1C40F;
-            margin-bottom: 20px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 15px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
         }
 
         .tagline {
-            font-size: 1.1rem;
+            font-size: 1rem;
             color: #7F8C8D;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             font-style: italic;
         }
 
-        .redirect-text {
-            font-size: 1.2rem;
-            margin-bottom: 30px;
-            line-height: 1.6;
-        }
-
-        .countdown {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #F1C40F;
+        .benefits {
+            text-align: left;
             margin: 20px 0;
+            color: #2C3E50;
         }
 
-        .manual-link {
-            display: inline-block;
+        .benefits h2 {
+            color: #F39C12;
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+
+        .benefits ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .benefits li {
+            padding: 5px 0;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .benefits li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #27AE60;
+            font-weight: bold;
+        }
+
+        .cta {
             background: #F1C40F;
             color: #2C3E50;
             padding: 15px 30px;
             text-decoration: none;
             border-radius: 50px;
             font-weight: bold;
-            transition: all 0.3s ease;
+            display: inline-block;
             margin-top: 20px;
+            transition: all 0.3s ease;
         }
 
-        .manual-link:hover {
+        .cta:hover {
             background: #F39C12;
             transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(241, 196, 15, 0.3);
+            box-shadow: 0 10px 20px rgba(241, 196, 15, 0.3);
         }
 
-        .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #F1C40F;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        /* Versteckter SEO Content */
+        .seo-content {
+            display: none;
+            font-size: 0;
+            line-height: 0;
+            opacity: 0;
+            height: 0;
+            overflow: hidden;
         }
     </style>
 </head>
 
 <body>
-    <div class="redirect-container">
-        <div class="logo">HELIOS ENERGY</div>
+    <!-- Sichtbarer Content (wird sofort weitergeleitet) -->
+    <div class="content">
+        <h1>HELIOS ENERGY</h1>
         <div class="tagline">Think intelligent. Think yellow.</div>
         
-        <div class="redirect-text">
-            Sie werden automatisch zu unserer Hauptseite weitergeleitet...
+        <div class="benefits">
+            <h2>🏡 Wärmepumpen mit bis zu 70% Förderung</h2>
+            <ul>
+                <li>KfW & BAFA Förderung bis zu 21.000€ Zuschuss</li>
+                <li>Klimabonus & Effizienzbonus möglich</li>
+                <li>Luft-Wasser, Sole-Wasser & Wasser-Wasser</li>
+                <li>Kostenlose Energieberatung München</li>
+                <li>Professionelle Installation & Service</li>
+            </ul>
         </div>
         
-        <div class="spinner"></div>
-        
-        <div class="countdown" id="countdown">3</div>
-        
-        <p style="margin: 20px 0; color: #7F8C8D;">
-            Falls die Weiterleitung nicht funktioniert:
-        </p>
-        
-        <a href="https://helios-energygmbh.de" class="manual-link">
-            Zur Hauptseite →
+        <a href="https://helios-energygmbh.de" class="cta">
+            Jetzt kostenlos beraten lassen →
         </a>
     </div>
 
+    <!-- Versteckter SEO Content für Suchmaschinen -->
+    <div class="seo-content">
+        <h1>Wärmepumpe München - Förderung bis 70% | Helios Energy</h1>
+        <h2>Wärmepumpen Förderung 2025 - Bis zu 21.000€ Zuschuss</h2>
+        <p>Helios Energy München ist Ihr Spezialist für Wärmepumpen mit maximaler Förderung. Profitieren Sie von der BEG Förderung (Bundesförderung für effiziente Gebäude) mit bis zu 70% Zuschuss für Ihre neue Wärmepumpe.</p>
+        
+        <h3>Wärmepumpen Förderung im Detail:</h3>
+        <ul>
+            <li>Grundförderung: 30% für Wärmepumpen</li>
+            <li>Klimageschwindigkeits-Bonus: +20% bei Heizungstausch</li> 
+            <li>Effizienz-Bonus: +5% für besonders effiziente Geräte</li>
+            <li>Einkommens-Bonus: +15% für Haushalte bis 40.000€</li>
+            <li>Maximaler Zuschuss: bis zu 21.000€</li>
+        </ul>
+
+        <h3>Unsere Wärmepumpen-Leistungen:</h3>
+        <ul>
+            <li>Luft-Wasser Wärmepumpe Installation München</li>
+            <li>Sole-Wasser Wärmepumpe (Erdwärme) München</li>
+            <li>Wasser-Wasser Wärmepumpe München</li>
+            <li>Förderberatung KfW & BAFA</li>
+            <li>Energieberatung für Wärmepumpen</li>
+            <li>Wärmepumpe Wartung & Service</li>
+        </ul>
+
+        <h3>Warum Wärmepumpe mit Helios Energy?</h3>
+        <p>Als zertifizierter Energieberater und Wärmepumpen-Spezialist in München begleiten wir Sie von der Planung bis zur Inbetriebnahme. Wir übernehmen die komplette Förderabwicklung für KfW und BAFA Zuschüsse.</p>
+
+        <h3>Wärmepumpe Kosten & Förderung München:</h3>
+        <p>Die Gesamtkosten einer Wärmepumpe in München liegen zwischen 15.000€ und 35.000€. Mit der maximalen Förderung von 70% reduzieren sich Ihre Kosten auf 4.500€ bis 10.500€. Zusätzlich sparen Sie jährlich bis zu 1.500€ Heizkosten.</p>
+
+        <h3>Keywords für SEO:</h3>
+        <p>Wärmepumpe München, Wärmepumpen Förderung Bayern, KfW Förderung Wärmepumpe, BAFA Zuschuss Heizung, BEG Förderung 2025, Luft Wasser Wärmepumpe München, Erdwärmepumpe München, Wärmepumpe Installation, Heizung München, Energieberatung München, CO2 Heizung, nachhaltig heizen, Wärmepumpe Kosten, Klimabonus Wärmepumpe, Effizienzbonus Heizung</p>
+    </div>
+
     <script>
-        // Countdown Timer
-        let timeLeft = 3;
-        const countdownElement = document.getElementById('countdown');
-        
-        const countdown = setInterval(() => {
-            timeLeft--;
-            countdownElement.textContent = timeLeft;
-            
-            if (timeLeft <= 0) {
-                clearInterval(countdown);
-                countdownElement.textContent = '0';
-                // Zusätzliche JavaScript-Weiterleitung als Backup
+        // Sofortige Weiterleitung für echte Benutzer
+        if (!navigator.userAgent.toLowerCase().includes('bot') && 
+            !navigator.userAgent.toLowerCase().includes('crawler') &&
+            !navigator.userAgent.toLowerCase().includes('spider')) {
+            window.location.replace('https://helios-energygmbh.de');
+        } else {
+            // Für Suchmaschinen-Bots: Content kurz anzeigen
+            document.body.style.opacity = '1';
+            setTimeout(() => {
                 window.location.href = 'https://helios-energygmbh.de';
-            }
-        }, 1000);
-        
-        // Sofortige Weiterleitung bei Klick
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Enter' || event.key === ' ') {
-                window.location.href = 'https://helios-energygmbh.de';
-            }
-        });
+            }, 2000);
+        }
     </script>
 </body>
 
