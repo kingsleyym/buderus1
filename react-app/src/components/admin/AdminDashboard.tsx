@@ -9,6 +9,7 @@ import {
   Send,
   UserPlus
 } from 'lucide-react';
+import DashboardStats from './dashboard/DashboardStats';
 
 const AdminDashboard: React.FC = () => {
   const [stats] = useState({
@@ -55,53 +56,59 @@ const AdminDashboard: React.FC = () => {
     <>
       <div className="dashboard-header">
         <h1 className="dashboard-title">Dashboard</h1>
-        <p className="dashboard-subtitle">Willkommen zurück! Hier ist eine Übersicht Ihrer Newsletter-Aktivitäten.</p>
+        <p className="dashboard-subtitle">Willkommen zurück! Hier ist eine Übersicht Ihrer Geschäfts-Aktivitäten.</p>
       </div>
 
-      {/* Statistics Cards */}
-      <div className="stats-grid">
-        <div className="stat-card">
-          <div className="stat-header">
-            <div className="stat-icon subscribers">
-              <Users size={24} />
+      {/* CRM Statistics */}
+      <DashboardStats />
+
+      {/* Legacy Newsletter Statistics */}
+      <div className="legacy-stats" style={{ marginTop: '2rem', opacity: 0.7 }}>
+        <h2 style={{ fontSize: '1.2rem', marginBottom: '1rem', color: '#666' }}>Newsletter Statistiken (Legacy)</h2>
+        <div className="stats-grid">
+          <div className="stat-card">
+            <div className="stat-header">
+              <div className="stat-icon subscribers">
+                <Users size={24} />
+              </div>
             </div>
+            <h3 className="stat-value" id="totalSubscribers">{stats.totalSubscribers}</h3>
+            <p className="stat-label">Abonnenten</p>
+            <p className="stat-change positive" id="subscribersChange">{stats.subscribersChange}</p>
           </div>
-          <h3 className="stat-value" id="totalSubscribers">{stats.totalSubscribers}</h3>
-          <p className="stat-label">Abonnenten</p>
-          <p className="stat-change positive" id="subscribersChange">{stats.subscribersChange}</p>
-        </div>
-        
-        <div className="stat-card">
-          <div className="stat-header">
-            <div className="stat-icon emails">
-              <Mail size={24} />
+          
+          <div className="stat-card">
+            <div className="stat-header">
+              <div className="stat-icon emails">
+                <Mail size={24} />
+              </div>
             </div>
+            <h3 className="stat-value" id="totalEmails">{stats.totalEmails}</h3>
+            <p className="stat-label">Newsletter versendet</p>
+            <p className="stat-change positive" id="emailsChange">{stats.emailsChange}</p>
           </div>
-          <h3 className="stat-value" id="totalEmails">{stats.totalEmails}</h3>
-          <p className="stat-label">Newsletter versendet</p>
-          <p className="stat-change positive" id="emailsChange">{stats.emailsChange}</p>
-        </div>
-        
-        <div className="stat-card">
-          <div className="stat-header">
-            <div className="stat-icon opens">
-              <Eye size={24} />
+          
+          <div className="stat-card">
+            <div className="stat-header">
+              <div className="stat-icon opens">
+                <Eye size={24} />
+              </div>
             </div>
+            <h3 className="stat-value" id="avgOpenRate">{stats.avgOpenRate}</h3>
+            <p className="stat-label">Öffnungsrate</p>
+            <p className="stat-change positive" id="openRateChange">{stats.openRateChange}</p>
           </div>
-          <h3 className="stat-value" id="avgOpenRate">{stats.avgOpenRate}</h3>
-          <p className="stat-label">Öffnungsrate</p>
-          <p className="stat-change positive" id="openRateChange">{stats.openRateChange}</p>
-        </div>
-        
-        <div className="stat-card">
-          <div className="stat-header">
-            <div className="stat-icon clicks">
-              <Gift size={24} />
+          
+          <div className="stat-card">
+            <div className="stat-header">
+              <div className="stat-icon clicks">
+                <Gift size={24} />
+              </div>
             </div>
+            <h3 className="stat-value" id="rewardsClaimed">{stats.rewardsClaimed}</h3>
+            <p className="stat-label">Belohnungen eingelöst</p>
+            <p className="stat-change positive" id="rewardsChange">{stats.rewardsChange}</p>
           </div>
-          <h3 className="stat-value" id="rewardsClaimed">{stats.rewardsClaimed}</h3>
-          <p className="stat-label">Belohnungen eingelöst</p>
-          <p className="stat-change positive" id="rewardsChange">{stats.rewardsChange}</p>
         </div>
       </div>
 
@@ -137,112 +144,84 @@ const AdminDashboard: React.FC = () => {
                 <Send size={16} style={{ marginRight: '8px' }} />
                 Test-E-Mail senden
               </button>
-              <a href="/admin/rewards" className="btn btn-primary">
+              <a href="/admin/partners" className="btn btn-primary">
                 <Gift size={16} style={{ marginRight: '8px' }} />
-                Belohnungen verwalten
+                Fachpartner verwalten
               </a>
-            </div>
-            
-            <div className="alert alert-info" style={{ marginTop: '1.5rem' }}>
-              <strong>💡 Tipp:</strong> Nutzen Sie das Belohnungssystem, um die Engagement-Rate zu steigern! 
-              Bestätigte Newsletter-Abonnenten erhalten automatisch einen Belohnungscode.
+              <a href="/admin/analytics" className="btn btn-secondary">
+                <Eye size={16} style={{ marginRight: '8px' }} />
+                Analytics anzeigen
+              </a>
             </div>
           </div>
         </div>
-        
+
         <div className="content-card">
           <div className="card-header">
-            <h3 className="card-title">Neueste Aktivitäten</h3>
+            <h3 className="card-title">Aktuelle Aktivitäten</h3>
           </div>
           <div className="card-content">
-            <div id="recentActivity" style={{ fontSize: '0.9rem' }}>
-              <div className="activity-item" style={{ padding: '0.75rem 0', borderBottom: '1px solid #e9ecef' }}>
-                <div style={{ fontWeight: 500, display: 'flex', alignItems: 'center' }}>
-                  <Mail size={16} style={{ marginRight: '8px', color: '#6c757d' }} />
-                  Newsletter versendet
-                </div>
-                <div style={{ color: '#666', fontSize: '0.8rem', marginLeft: '24px' }}>vor 2 Stunden</div>
-              </div>
-              <div className="activity-item" style={{ padding: '0.75rem 0', borderBottom: '1px solid #e9ecef' }}>
-                <div style={{ fontWeight: 500, display: 'flex', alignItems: 'center' }}>
-                  <UserPlus size={16} style={{ marginRight: '8px', color: '#6c757d' }} />
-                  Neue Anmeldung
-                </div>
-                <div style={{ color: '#666', fontSize: '0.8rem', marginLeft: '24px' }}>vor 3 Stunden</div>
-              </div>
-              <div className="activity-item" style={{ padding: '0.75rem 0', borderBottom: '1px solid #e9ecef' }}>
-                <div style={{ fontWeight: 500, display: 'flex', alignItems: 'center' }}>
-                  <Gift size={16} style={{ marginRight: '8px', color: '#6c757d' }} />
-                  Belohnung eingelöst
-                </div>
-                <div style={{ color: '#666', fontSize: '0.8rem', marginLeft: '24px' }}>vor 5 Stunden</div>
-              </div>
-            </div>
+            <p style={{ color: '#6b7280', fontStyle: 'italic' }}>Keine aktuellen Aktivitäten</p>
           </div>
         </div>
       </div>
 
-      {/* Modal für manuelle E-Mail-Eingabe */}
+      {/* Modal für manuellen Subscriber */}
       {isModalOpen && (
-        <div id="manualSubscriberModal" className="modal" style={{ display: 'block' }}>
-          <div className="modal-content">
+        <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3>E-Mail manuell hinzufügen</h3>
-              <span className="close" onClick={() => setIsModalOpen(false)}>&times;</span>
+              <button 
+                className="modal-close"
+                onClick={() => setIsModalOpen(false)}
+              >
+                ×
+              </button>
             </div>
-            <div className="modal-body">
-              <div className="alert alert-info">
-                <strong>💡 Hinweis:</strong> Diese Funktion ist für physische Anmeldungen 
-                (Losboxen, Events, persönliche Gespräche) gedacht. Die E-Mail wird direkt 
-                bestätigt und der Kontakt erhält keinen Bestätigungslink.
+            
+            <form onSubmit={handleSubmitManualSubscriber}>
+              <div className="form-group">
+                <label htmlFor="manualEmail">E-Mail Adresse *</label>
+                <input
+                  type="email"
+                  id="manualEmail"
+                  value={manualSubscriber.email}
+                  onChange={(e) => setManualSubscriber({...manualSubscriber, email: e.target.value})}
+                  required
+                />
               </div>
               
-              <form id="manualSubscriberForm" onSubmit={handleSubmitManualSubscriber}>
-                <div className="form-group">
-                  <label htmlFor="manualEmail">E-Mail-Adresse *</label>
-                  <input 
-                    type="email" 
-                    id="manualEmail" 
-                    name="email" 
-                    required
-                    value={manualSubscriber.email}
-                    onChange={(e) => setManualSubscriber({...manualSubscriber, email: e.target.value})}
-                  />
-                </div>
-                
-                <div className="form-row">
-                  <div className="form-group">
-                    <label htmlFor="manualFirstName">Vorname</label>
-                    <input 
-                      type="text" 
-                      id="manualFirstName" 
-                      name="firstName"
-                      value={manualSubscriber.firstName}
-                      onChange={(e) => setManualSubscriber({...manualSubscriber, firstName: e.target.value})}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="manualLastName">Nachname</label>
-                    <input 
-                      type="text" 
-                      id="manualLastName" 
-                      name="lastName"
-                      value={manualSubscriber.lastName}
-                      onChange={(e) => setManualSubscriber({...manualSubscriber, lastName: e.target.value})}
-                    />
-                  </div>
-                </div>
-                
-                <div className="modal-footer">
-                  <button type="button" className="btn btn-secondary" onClick={() => setIsModalOpen(false)}>
-                    Abbrechen
-                  </button>
-                  <button type="submit" className="btn btn-primary">
-                    Hinzufügen
-                  </button>
-                </div>
-              </form>
-            </div>
+              <div className="form-group">
+                <label htmlFor="manualFirstName">Vorname</label>
+                <input
+                  type="text"
+                  id="manualFirstName"
+                  value={manualSubscriber.firstName}
+                  onChange={(e) => setManualSubscriber({...manualSubscriber, firstName: e.target.value})}
+                />
+              </div>
+              
+              <div className="form-group">
+                <label htmlFor="manualLastName">Nachname</label>
+                <input
+                  type="text"
+                  id="manualLastName"
+                  value={manualSubscriber.lastName}
+                  onChange={(e) => setManualSubscriber({...manualSubscriber, lastName: e.target.value})}
+                />
+              </div>
+              
+              <div className="modal-actions">
+                <button type="button" className="btn btn-secondary" onClick={() => setIsModalOpen(false)}>
+                  Abbrechen
+                </button>
+                <button type="submit" className="btn btn-primary">
+                  <UserPlus size={16} style={{ marginRight: '8px' }} />
+                  Hinzufügen
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

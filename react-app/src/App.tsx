@@ -4,6 +4,9 @@ import AdminLayout from './components/admin/AdminLayout';
 import AdminDashboard from './components/admin/AdminDashboard';
 import AdminEmployees from './components/admin/employees/AdminEmployees';
 import MarketingDashboard from './components/admin/marketing/MarketingDashboard';
+import LeadsListAdvanced from './components/admin/leads/LeadsListAdvanced';
+import PartnerDashboard from './components/admin/partners/PartnerDashboard';
+import PartnerDetail from './components/admin/partners/PartnerDetail';
 import './App.css';
 
 function App() {
@@ -22,6 +25,32 @@ function App() {
           <Route path="/admin/marketing/*" element={
             <AdminLayout>
               <MarketingDashboard />
+            </AdminLayout>
+          } />
+          
+          {/* Leads Routes */}
+          <Route path="/admin/leads" element={
+            <AdminLayout>
+              <LeadsListAdvanced />
+            </AdminLayout>
+          } />
+          
+          {/* Partners Routes */}
+          <Route path="/admin/partners" element={
+            <AdminLayout>
+              <PartnerDashboard />
+            </AdminLayout>
+          } />
+          
+          <Route path="/admin/partners/:id" element={
+            <AdminLayout>
+              <PartnerDetail />
+            </AdminLayout>
+          } />
+          
+          <Route path="/admin/partners/:id/edit" element={
+            <AdminLayout>
+              <PartnerDetail />
             </AdminLayout>
           } />
           

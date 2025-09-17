@@ -12,7 +12,9 @@ import {
   ChevronDown,
   ChevronRight,
   Megaphone,
-  Send
+  Send,
+  UserPlus,
+  Building2
 } from 'lucide-react';
 
 interface AdminSidebarProps {
@@ -33,6 +35,8 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen }) => {
 
   const mainNavItems = [
     { path: '/admin', icon: BarChart3, label: 'Dashboard' },
+    { path: '/admin/leads', icon: UserPlus, label: 'Leads' },
+    { path: '/admin/partners', icon: Building2, label: 'Fachpartner' },
     { path: '/admin/employees', icon: UserCheck, label: 'Mitarbeiter' },
     { path: '/admin/qr-codes', icon: QrCode, label: 'QR-Codes' },
     { path: '/admin/analytics', icon: TrendingUp, label: 'Statistiken' },
