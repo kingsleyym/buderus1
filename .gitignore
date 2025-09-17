@@ -4,6 +4,23 @@ _site/
 .jekyll-cache/
 .jekyll-metadata
 
+# React App Development (nicht für GitHub Pages)
+react-app/node_modules/
+react-app/build/
+react-app/.env.local
+react-app/.env.development.local
+react-app/.env.test.local
+react-app/.env.production.local
+react-app/npm-debug.log*
+react-app/yarn-debug.log*
+react-app/yarn-error.log*
+
+# Firebase Functions (nicht für GitHub Pages)
+react-app/functions/node_modules/
+react-app/functions/lib/
+react-app/functions/.env*
+react-app/functions/*.log
+
 # OS
 .DS_Store
 Thumbs.db
