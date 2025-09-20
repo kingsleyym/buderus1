@@ -34,19 +34,20 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen }) => {
   };
 
   const mainNavItems = [
-    { path: '/admin', icon: BarChart3, label: 'Dashboard' },
-    { path: '/admin/leads', icon: UserPlus, label: 'Leads' },
-    { path: '/admin/partners', icon: Building2, label: 'Fachpartner' },
-    { path: '/admin/employees', icon: UserCheck, label: 'Mitarbeiter' },
-    { path: '/admin/qr-codes', icon: QrCode, label: 'QR-Codes' },
-    { path: '/admin/analytics', icon: TrendingUp, label: 'Statistiken' },
+    { path: '/', icon: BarChart3, label: 'Dashboard' },
+    { path: '/leads', icon: UserPlus, label: 'Leads' },
+    { path: '/fachpartner', icon: Building2, label: 'Fachpartner' },
+    { path: '/employees', icon: UserCheck, label: 'Mitarbeiter' },
+    { path: '/products', icon: Users, label: 'Produkte' },
+    { path: '/qr-codes', icon: QrCode, label: 'QR-Codes' },
+    { path: '/analytics', icon: TrendingUp, label: 'Analytics' },
   ];
 
   const marketingItems = [
-    { path: '/admin/marketing/newsletter-editor', icon: PenTool, label: 'Newsletter erstellen' },
-    { path: '/admin/marketing/subscribers', icon: Users, label: 'Abonnenten' },
-    { path: '/admin/marketing/campaigns', icon: Send, label: 'Kampagnen' },
-    { path: '/admin/marketing/rewards', icon: Gift, label: 'Belohnungen' },
+    { path: '/marketing/newsletter-editor', icon: PenTool, label: 'Newsletter erstellen' },
+    { path: '/marketing/subscribers', icon: Users, label: 'Abonnenten' },
+    { path: '/marketing/campaigns', icon: Send, label: 'Kampagnen' },
+    { path: '/marketing/rewards', icon: Gift, label: 'Belohnungen' },
   ];
 
   const handleLogout = () => {

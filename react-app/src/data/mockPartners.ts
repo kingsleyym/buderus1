@@ -1,12 +1,57 @@
 // Mock-Daten für Fachpartner
-import { Partner } from '../components/admin/partners/partner-types';
+
+// Export Partner Interface 
+export interface Partner {
+  id: string;
+  name: string;
+  logo?: string;
+  contactInfo: {
+    email: string;
+    phone: string;
+    representative: string;
+  };
+  discountRates: {
+    standard: number;
+    volume: number;
+    seasonal: number;
+  };
+  establishedYear?: number;
+  employees?: number;
+  annualRevenue?: number;
+  certifications?: string[];
+  regions?: string[];
+  specialties?: string[];
+  performance?: {
+    orderVolume: {
+      lastMonth: number;
+      lastQuarter: number;
+      lastYear: number;
+    };
+    paymentTerms: {
+      averageDays: number;
+      overdueCount: number;
+    };
+    qualityRating: number;
+    responseTime: number;
+    supportTickets?: {
+      open: number;
+      resolved: number;
+      avgResolutionTime: number;
+    };
+  };
+  isActive: boolean;
+  notes?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  contactHistory?: any[];
+  contracts?: any[];
+}
 
 export const mockPartners: Partner[] = [
   {
     id: 'buderus',
     name: 'Buderus',
     logo: '/assets/manufacturers/buderus-logo.png',
-    partnershipLevel: 'premium',
     contactInfo: {
       email: 'partner@buderus.de',
       phone: '+49 2771 81-0',
@@ -84,7 +129,6 @@ export const mockPartners: Partner[] = [
     id: 'viessmann',
     name: 'Viessmann',
     logo: '/assets/manufacturers/viessmann-logo.png',
-    partnershipLevel: 'premium',
     contactInfo: {
       email: 'partner@viessmann.de',
       phone: '+49 6452 70-0',
@@ -153,7 +197,6 @@ export const mockPartners: Partner[] = [
     id: 'wolf',
     name: 'Wolf Heiztechnik',
     logo: '/assets/manufacturers/wolf-logo.png',
-    partnershipLevel: 'standard',
     contactInfo: {
       email: 'service@wolf.eu',
       phone: '+49 8741 808-0',
@@ -221,7 +264,6 @@ export const mockPartners: Partner[] = [
     id: 'vaillant',
     name: 'Vaillant Group',
     logo: '/assets/manufacturers/vaillant-logo.png',
-    partnershipLevel: 'premium',
     contactInfo: {
       email: 'partnership@vaillant.de',
       phone: '+49 2103 901-0',
@@ -290,7 +332,6 @@ export const mockPartners: Partner[] = [
     id: 'junkers',
     name: 'Junkers Bosch',
     logo: '/assets/manufacturers/junkers-logo.png',
-    partnershipLevel: 'basic',
     contactInfo: {
       email: 'info@junkers.com',
       phone: '+49 7154 1309-0',

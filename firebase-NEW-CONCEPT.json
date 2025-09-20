@@ -5,8 +5,12 @@
       "public": ".",
       "ignore": [
         "firebase.json",
-        "**/.*", 
+        "**/.*",
         "**/node_modules/**",
+        "newsletter/functions/**",
+        "newsletter/firestore.*",
+        "newsletter/package*.json",
+        "newsletter/README.md",
         "react-app/**"
       ],
       "rewrites": [
@@ -19,7 +23,7 @@
           "function": "renderTeamList"
         },
         {
-          "source": "/team/**", 
+          "source": "/team/**",
           "function": "renderEmployee"
         },
         {
@@ -29,7 +33,7 @@
       ]
     },
     {
-      "target": "login",
+      "target": "admin",
       "public": "react-app/build",
       "ignore": [
         "firebase.json",
@@ -41,26 +45,37 @@
           "source": "**",
           "destination": "/index.html"
         }
-      ]
-    },
-    {
-      "target": "admin", 
-      "public": "react-app/build",
-      "ignore": [
-        "firebase.json",
-        "**/.*",
-        "**/node_modules/**"
       ],
-      "rewrites": [
+      "headers": [
         {
-          "source": "**",
-          "destination": "/index.html"
+          "source": "**/*.@(js|css)",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "max-age=31536000"
+            }
+          ]
         }
       ]
     },
     {
       "target": "employee",
-      "public": "react-app/build", 
+      "public": "react-app/build",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "rewrites": [
+        {
+          "source": "**",
+          "destination": "/index.html"
+        }
+      ]
+    },
+    {
+      "target": "login",
+      "public": "react-app/build",
       "ignore": [
         "firebase.json",
         "**/.*",

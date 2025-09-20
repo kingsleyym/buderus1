@@ -1,483 +1,355 @@
 import React, { useState, useMemo } from 'react';
 import { 
   Search, 
-  Grid3X3, 
-  List, 
+  Plus, 
   Eye, 
   Edit, 
-  Phone,
-  Mail,
-  MapPin,
-  Building,
+  Building2, 
+  MapPin, 
+  Phone, 
+  Mail, 
   Star,
-  TrendingUp,
-  Users,
+  Grid,
+  List,
+  Filter,
   Award,
-  X,
-  FileText,
-  Calendar,
-  Euro,
-  Clock
+  TrendingUp,
+  DollarSign,
+  Package
 } from 'lucide-react';
-import { Partner } from './partner-types';
-import { mockPartners } from '../../../data/mockPartners';
-import './partners.css';
 
-// Helper functions
-const formatCurrency = (amount: number) => {
-  return new Intl.NumberFormat('de-DE', {
-    style: 'currency',
-    currency: 'EUR',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-  }).format(amount);
-};
-
-const formatDate = (date: Date) => {
-  return date.toLocaleDateString('de-DE', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric'
-  });
-};
-
-// Partner Detail Modal Component
-const PartnerDetailModal: React.FC<{ partner: Partner; onClose: () => void }> = ({ partner, onClose }) => {
-  return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content partner-detail-modal" onClick={e => e.stopPropagation()}>
-        <div className="modal-header">
-          <div className="partner-detail-header">
-            <div className="partner-detail-logo">
-              {partner.name.charAt(0)}
-            </div>
-            <div className="partner-detail-info">
-              <h2>{partner.name}</h2>
-              <span className={`partnership-level ${partner.partnershipLevel}`}>
-                {partner.partnershipLevel.toUpperCase()}-Partner
-              </span>
-            </div>
-          </div>
-          <button className="close-btn" onClick={onClose}>
-            <X size={20} />
-          </button>
-        </div>
-        
-        <div className="modal-body">
-          <div className="partner-detail-sections">
-            
-            {/* Contact Information */}
-            <div className="detail-section">
-              <h3><Building size={20} /> Kontaktinformationen</h3>
-              <div className="detail-grid">
-                <div className="detail-item">
-                  <Phone size={16} />
-                  <strong>Telefon:</strong>
-                  <span>{partner.contactInfo.phone}</span>
-                </div>
-                <div className="detail-item">
-                  <Mail size={16} />
-                  <strong>E-Mail:</strong>
-                  <span>{partner.contactInfo.email}</span>
-                </div>
-                <div className="detail-item">
-                  <Users size={16} />
-                  <strong>Ansprechpartner:</strong>
-                  <span>{partner.contactInfo.representative}</span>
-                </div>
-                <div className="detail-item">
-                  <Calendar size={16} />
-                  <strong>Gegründet:</strong>
-                  <span>{partner.establishedYear}</span>
-                </div>
-                <div className="detail-item">
-                  <Users size={16} />
-                  <strong>Mitarbeiter:</strong>
-                  <span>{partner.employees.toLocaleString('de-DE')}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Performance Metrics */}
-            <div className="detail-section">
-              <h3><TrendingUp size={20} /> Performance</h3>
-              <div className="detail-grid">
-                <div className="detail-item">
-                  <Euro size={16} />
-                  <strong>Umsatz (Jahr):</strong>
-                  <span>{formatCurrency(partner.performance.orderVolume.lastYear)}</span>
-                </div>
-                <div className="detail-item">
-                  <Euro size={16} />
-                  <strong>Umsatz (Quartal):</strong>
-                  <span>{formatCurrency(partner.performance.orderVolume.lastQuarter)}</span>
-                </div>
-                <div className="detail-item">
-                  <Star size={16} />
-                  <strong>Qualitäts-Rating:</strong>
-                  <span>{partner.performance.qualityRating}/5.0</span>
-                </div>
-                <div className="detail-item">
-                  <Clock size={16} />
-                  <strong>Antwortzeit:</strong>
-                  <span>{partner.performance.responseTime}h</span>
-                </div>
-                <div className="detail-item">
-                  <FileText size={16} />
-                  <strong>Support Tickets:</strong>
-                  <span>{partner.performance.supportTickets.open} offen, {partner.performance.supportTickets.resolved} gelöst</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Contract Information */}
-            <div className="detail-section">
-              <h3><FileText size={20} /> Verträge</h3>
-              <div className="detail-grid">
-                {partner.contracts.map(contract => (
-                  <div key={contract.id} className="detail-item">
-                    <Award size={16} />
-                    <strong>{contract.type}:</strong>
-                    <span>{contract.terms} ({contract.discountLevel}% Rabatt)</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Specialties & Regions */}
-            <div className="detail-section">
-              <h3><MapPin size={20} /> Regionen & Spezialisierung</h3>
-              <div className="detail-grid">
-                <div className="detail-item">
-                  <MapPin size={16} />
-                  <strong>Regionen:</strong>
-                  <span>{partner.regions.join(', ')}</span>
-                </div>
-                <div className="detail-item">
-                  <Award size={16} />
-                  <strong>Spezialisierung:</strong>
-                  <span>{partner.specialties.join(', ')}</span>
-                </div>
-                <div className="detail-item">
-                  <Star size={16} />
-                  <strong>Zertifizierungen:</strong>
-                  <span>{partner.certifications.join(', ')}</span>
-                </div>
-              </div>
-            </div>
-
-          </div>
-
-          {/* Recent Contact History */}
-          <div className="detail-section" style={{ gridColumn: '1 / -1', marginTop: '2rem' }}>
-            <h3><FileText size={20} /> Kontakt-Historie</h3>
-            <div className="contact-history">
-              {partner.contactHistory.slice(0, 3).map(contact => (
-                <div key={contact.id} className="contact-entry">
-                  <div className="contact-header">
-                    <strong>{contact.subject}</strong>
-                    <span className="contact-date">{formatDate(contact.date)}</span>
-                  </div>
-                  <div className="contact-details">
-                    <span className="contact-type">{contact.type}</span>
-                    <span className="contact-person">{contact.contactPerson}</span>
-                  </div>
-                  <p className="contact-description">{contact.description}</p>
-                  {contact.outcome && (
-                    <p className="contact-outcome"><strong>Ergebnis:</strong> {contact.outcome}</p>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {partner.notes && (
-            <div className="detail-section" style={{ gridColumn: '1 / -1', marginTop: '1rem' }}>
-              <h3><FileText size={20} /> Notizen</h3>
-              <p>{partner.notes}</p>
-            </div>
-          )}
-
-        </div>
-
-        <div className="modal-actions">
-          <button className="action-btn primary">
-            <Edit size={16} />
-            Bearbeiten
-          </button>
-          <button className="action-btn">
-            <Phone size={16} />
-            Kontaktieren
-          </button>
-          <button className="action-btn" onClick={onClose}>
-            Schließen
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
+// Import Partner Interface von den bestehenden Mock-Daten
+import { Partner, mockPartners } from '../../../data/mockPartners';
 
 const PartnerManagement: React.FC = () => {
-  const [partners] = useState<Partner[]>(mockPartners);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [levelFilter, setLevelFilter] = useState('all');
-  const [statusFilter, setStatusFilter] = useState('all');
+  // Verwende die bestehenden Mock-Daten
+  const allPartners: Partner[] = mockPartners;
+
+  // State Management
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showOnlyActive, setShowOnlyActive] = useState(false);
   const [selectedPartner, setSelectedPartner] = useState<Partner | null>(null);
-  const [showDetails, setShowDetails] = useState(false);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
 
-  // Filtered partners
+  // Gefilterte Partner
   const filteredPartners = useMemo(() => {
-    return partners.filter(partner => {
-      const matchesSearch = partner.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           partner.specialties.some(s => s.toLowerCase().includes(searchTerm.toLowerCase()));
+    return allPartners.filter(partner => {
+      // Aktiv Filter
+      if (showOnlyActive && !partner.isActive) {
+        return false;
+      }
       
-      const matchesLevel = levelFilter === 'all' || partner.partnershipLevel === levelFilter;
-      const matchesStatus = statusFilter === 'all' || 
-                           (statusFilter === 'active' && partner.isActive) ||
-                           (statusFilter === 'inactive' && !partner.isActive);
-
-      return matchesSearch && matchesLevel && matchesStatus;
+      // Suchbegriff Filter
+      if (searchTerm) {
+        const searchLower = searchTerm.toLowerCase();
+        return (
+          partner.name.toLowerCase().includes(searchLower) ||
+          partner.contactInfo.email.toLowerCase().includes(searchLower) ||
+          partner.contactInfo.representative.toLowerCase().includes(searchLower) ||
+          (partner.specialties && partner.specialties.some((s: string) => s.toLowerCase().includes(searchLower)))
+        );
+      }
+      
+      return true;
     });
-  }, [partners, searchTerm, levelFilter, statusFilter]);
+  }, [allPartners, showOnlyActive, searchTerm]);
 
-  // Statistics
-  const stats = useMemo(() => {
-    const active = partners.filter(p => p.isActive).length;
-    const premium = partners.filter(p => p.partnershipLevel === 'premium').length;
-    const totalRevenue = partners.reduce((sum, p) => sum + p.performance.orderVolume.lastYear, 0);
-    const avgRating = partners.reduce((sum, p) => sum + p.performance.qualityRating, 0) / partners.length;
-
-    return {
-      total: partners.length,
-      active,
-      premium,
-      totalRevenue,
-      avgRating
-    };
-  }, [partners]);
-
-  const handlePartnerClick = (partner: Partner) => {
-    setSelectedPartner(partner);
-    setShowDetails(true);
+  // Helper Functions
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('de-DE', {
+      style: 'currency',
+      currency: 'EUR',
+      notation: 'compact'
+    }).format(amount);
   };
 
-  const handleViewDetails = (partner: Partner, e: React.MouseEvent) => {
-    e.stopPropagation();
-    handlePartnerClick(partner);
+  // Statistiken
+  const statistics = useMemo(() => {
+    const totalPartners = allPartners.length;
+    const activePartners = allPartners.filter(p => p.isActive).length;
+    const totalRevenue = allPartners.reduce((sum, p) => sum + (p.performance?.orderVolume.lastYear || 0), 0);
+    const avgQuality = allPartners.reduce((sum, p) => sum + (p.performance?.qualityRating || 0), 0) / totalPartners;
+    
+    return {
+      totalPartners,
+      activePartners,
+      totalRevenue,
+      avgQuality: avgQuality.toFixed(1),
+      filteredCount: filteredPartners.length
+    };
+  }, [allPartners, filteredPartners]);
+
+  const handlePartnerSelect = (partner: Partner) => {
+    setSelectedPartner(partner);
+    setShowDetailsModal(true);
   };
 
   return (
-    <div className="partners-container">
+    <div className="admin-content">
       {/* Header */}
-      <div className="partners-header">
-        <div>
-          <h1>Fachpartner-Verwaltung</h1>
-          <p className="partners-subtitle">Verwalten Sie Ihre Hersteller und Vertriebspartner</p>
-        </div>
-        <button className="action-btn primary">
-          <Building size={16} />
-          Neuer Partner
-        </button>
-      </div>
-
-      {/* Statistics */}
-      <div className="partners-stats">
-        <div className="stat-card">
-          <div className="stat-value primary">{stats.total}</div>
-          <div className="stat-label">Gesamt Partner</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-value success">{stats.active}</div>
-          <div className="stat-label">Aktive Partner</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-value warning">{stats.premium}</div>
-          <div className="stat-label">Premium Partner</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-value primary">{formatCurrency(stats.totalRevenue)}</div>
-          <div className="stat-label">Jahresumsatz</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-value success">{stats.avgRating.toFixed(1)}/5.0</div>
-          <div className="stat-label">Ø Bewertung</div>
-        </div>
-      </div>
-
-      {/* Filters */}
-      <div className="partners-filters">
-        <div className="filter-row">
-          <div className="search-input">
-            <Search className="search-icon" size={20} />
-            <input
-              type="text"
-              placeholder="Partner suchen..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+      <div className="admin-header">
+        <div className="admin-header-content">
+          <div className="admin-header-left">
+            <h1 className="admin-title">Fachpartner</h1>
+            <p className="admin-subtitle">
+              Verwalten Sie Ihr Partnernetzwerk und deren Performance
+            </p>
           </div>
           
-          <select 
-            className="filter-select"
-            value={levelFilter}
-            onChange={(e) => setLevelFilter(e.target.value)}
-          >
-            <option value="all">Alle Level</option>
-            <option value="premium">Premium</option>
-            <option value="standard">Standard</option>
-            <option value="basic">Basic</option>
-          </select>
+          <div className="admin-header-actions">
+            {/* View Mode Toggle */}
+            <div className="view-toggle">
+              <button
+                onClick={() => setViewMode('grid')}
+                className={`view-toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}
+              >
+                <Grid className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setViewMode('list')}
+                className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
+              >
+                <List className="w-4 h-4" />
+              </button>
+            </div>
 
-          <select 
-            className="filter-select"
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-          >
-            <option value="all">Alle Status</option>
-            <option value="active">Aktiv</option>
-            <option value="inactive">Inaktiv</option>
-          </select>
+            <button className="btn btn-primary">
+              <Plus className="w-4 h-4" />
+              <span>Neuer Partner</span>
+            </button>
+          </div>
+        </div>
 
-          <div className="filter-info">
-            {filteredPartners.length} von {partners.length} Partner
+        {/* Statistiken */}
+        <div className="admin-stats">
+          <div className="stat-card">
+            <div className="stat-value">{statistics.totalPartners}</div>
+            <div className="stat-label">Gesamt</div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-value text-success">{statistics.activePartners}</div>
+            <div className="stat-label">Aktiv</div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-value text-primary">{formatCurrency(statistics.totalRevenue)}</div>
+            <div className="stat-label">Jahresumsatz</div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-value text-warning">{statistics.avgQuality}</div>
+            <div className="stat-label">Ø Qualität</div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-value text-info">{statistics.filteredCount}</div>
+            <div className="stat-label">Gefiltert</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Filter */}
+      <div className="admin-filter-section">
+        <div className="admin-filter-header">
+          <div className="admin-filter-title">
+            <Filter className="w-5 h-5" />
+            <h3>Filter</h3>
+          </div>
+        </div>
+
+        <div className="admin-filter-content">
+          {/* Suchfeld */}
+          <div className="form-group">
+            <label className="form-label">Suche</label>
+            <div className="search-input-wrapper">
+              <Search className="search-icon" />
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Name, Email..."
+                className="form-input search-input"
+              />
+            </div>
           </div>
 
-          <div className="view-toggle">
-            <button 
-              className={`view-btn ${viewMode === 'grid' ? 'active' : ''}`}
-              onClick={() => setViewMode('grid')}
+          {/* Aktiv Filter */}
+          <div className="form-group">
+            <div className="checkbox-wrapper">
+              <input
+                type="checkbox"
+                id="onlyActive"
+                checked={showOnlyActive}
+                onChange={(e) => setShowOnlyActive(e.target.checked)}
+                className="form-checkbox"
+              />
+              <label htmlFor="onlyActive" className="checkbox-label">
+                Nur aktive Partner
+              </label>
+            </div>
+          </div>
+
+          {/* Reset Button */}
+          <div className="form-group">
+            <button
+              onClick={() => {
+                setSearchTerm('');
+                setShowOnlyActive(false);
+              }}
+              className="btn btn-secondary btn-sm"
             >
-              <Grid3X3 size={16} />
-              Grid
-            </button>
-            <button 
-              className={`view-btn ${viewMode === 'list' ? 'active' : ''}`}
-              onClick={() => setViewMode('list')}
-            >
-              <List size={16} />
-              Liste
+              Zurücksetzen
             </button>
           </div>
         </div>
       </div>
 
-      {/* Partners Content */}
-      <div className="partners-content">
-        {viewMode === 'grid' ? (
-          <div className="partners-grid">
-            {filteredPartners.map(partner => (
-              <div 
-                key={partner.id} 
-                className="partner-card"
-                onClick={() => handlePartnerClick(partner)}
-              >
-                <div className="partner-card-header">
-                  <div className="partner-logo">
-                    {partner.name.charAt(0)}
-                  </div>
-                  <div className="partner-info">
-                    <h3>{partner.name}</h3>
-                    <span className={`partnership-level ${partner.partnershipLevel}`}>
-                      {partner.partnershipLevel.toUpperCase()}
-                    </span>
-                  </div>
+      {/* Partner Liste */}
+      {filteredPartners.length === 0 ? (
+        <div className="empty-state">
+          <Building2 className="empty-state-icon" />
+          <h3 className="empty-state-title">Keine Partner gefunden</h3>
+          <p className="empty-state-text">
+            Versuchen Sie, die Filter zu ändern oder zurückzusetzen.
+          </p>
+        </div>
+      ) : viewMode === 'grid' ? (
+        <div className="admin-grid">
+          {filteredPartners.map((partner) => (
+            <div key={partner.id} className="admin-card">
+              {/* Header */}
+              <div className="admin-card-header">
+                <div className="admin-card-avatar">
+                  <Building2 className="w-6 h-6" />
                 </div>
-
-                <div className="partner-metrics">
-                  <div className="metric">
-                    <div className="metric-value">{formatCurrency(partner.performance.orderVolume.lastYear)}</div>
-                    <div className="metric-label">Jahresumsatz</div>
+                <div className="admin-card-info">
+                  <h3 className="admin-card-name">{partner.name}</h3>
+                  <div className="admin-card-meta">
+                    {partner.establishedYear ? `Gegründet ${partner.establishedYear}` : 'Hersteller'}
                   </div>
-                  <div className="metric">
-                    <div className="metric-value">{partner.performance.qualityRating}/5</div>
-                    <div className="metric-label">Bewertung</div>
-                  </div>
-                </div>
-
-                <div className="partner-tags">
-                  {partner.specialties.slice(0, 3).map(specialty => (
-                    <span key={specialty} className="tag">{specialty}</span>
-                  ))}
-                </div>
-
-                <div className="partner-actions">
-                  <button 
-                    className="action-btn"
-                    onClick={(e) => handleViewDetails(partner, e)}
-                  >
-                    <Eye size={16} />
-                    Details
-                  </button>
-                  <button 
-                    className="action-btn"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <Edit size={16} />
-                    Bearbeiten
-                  </button>
                 </div>
               </div>
-            ))}
-          </div>
-        ) : (
-          <table className="partners-table">
+
+              {/* Kontaktinfo */}
+              <div className="admin-card-details">
+                <div className="detail-item">
+                  <Mail className="detail-icon" />
+                  <span className="detail-text">{partner.contactInfo.email}</span>
+                </div>
+                <div className="detail-item">
+                  <Phone className="detail-icon" />
+                  <span className="detail-text">{partner.contactInfo.phone}</span>
+                </div>
+                <div className="detail-item">
+                  <span className="detail-label">Ansprechpartner:</span>
+                  <span className="detail-text">{partner.contactInfo.representative}</span>
+                </div>
+              </div>
+
+              {/* Performance */}
+              {partner.performance && (
+                <div className="admin-card-stats">
+                  <div className="stat-item">
+                    <div className="stat-value">
+                      {formatCurrency(partner.performance.orderVolume.lastYear)}
+                    </div>
+                    <div className="stat-label">Jahresumsatz</div>
+                  </div>
+                  <div className="stat-item">
+                    <div className="stat-value text-warning">
+                      {partner.performance.qualityRating}
+                    </div>
+                    <div className="stat-label">Qualität</div>
+                  </div>
+                </div>
+              )}
+
+              {/* Rabatte */}
+              <div className="admin-card-tags">
+                <div className="tag-label">Rabatte</div>
+                <div className="tags">
+                  <span className="tag tag-primary">
+                    Standard: {partner.discountRates.standard}%
+                  </span>
+                  <span className="tag tag-success">
+                    Volumen: {partner.discountRates.volume}%
+                  </span>
+                </div>
+              </div>
+
+              {/* Aktionen */}
+              <div className="admin-card-actions">
+                <button
+                  onClick={() => handlePartnerSelect(partner)}
+                  className="btn btn-primary btn-sm"
+                >
+                  <Eye className="w-4 h-4" />
+                  <span>Details</span>
+                </button>
+                <button className="btn btn-secondary btn-sm">
+                  <Edit className="w-4 h-4" />
+                  <span>Bearbeiten</span>
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="admin-table-container">
+          <table className="admin-table">
             <thead>
               <tr>
                 <th>Partner</th>
-                <th>Level</th>
+                <th>Informationen</th>
                 <th>Jahresumsatz</th>
-                <th>Bewertung</th>
-                <th>Status</th>
-                <th>Aktionen</th>
+                <th>Qualität</th>
+                <th className="text-right">Aktionen</th>
               </tr>
             </thead>
             <tbody>
-              {filteredPartners.map(partner => (
-                <tr key={partner.id} onClick={() => handlePartnerClick(partner)}>
+              {filteredPartners.map((partner) => (
+                <tr key={partner.id}>
                   <td>
-                    <div className="table-partner-info">
-                      <div className="table-partner-logo">
-                        {partner.name.charAt(0)}
+                    <div className="table-user">
+                      <div className="table-user-avatar">
+                        <Building2 className="w-5 h-5" />
                       </div>
-                      <div className="table-partner-details">
-                        <h4>{partner.name}</h4>
-                        <p>{partner.specialties.slice(0, 2).join(', ')}</p>
+                      <div className="table-user-info">
+                        <div className="table-user-name">{partner.name}</div>
+                        <div className="table-user-meta">{partner.contactInfo.representative}</div>
                       </div>
                     </div>
                   </td>
                   <td>
-                    <span className={`partnership-level ${partner.partnershipLevel}`}>
-                      {partner.partnershipLevel.toUpperCase()}
+                    <span className="table-meta">
+                      {partner.establishedYear ? `Seit ${partner.establishedYear}` : 'Hersteller'}
                     </span>
                   </td>
-                  <td>{formatCurrency(partner.performance.orderVolume.lastYear)}</td>
                   <td>
-                    <div className="rating-display">
-                      <Star size={16} fill="currentColor" />
-                      {partner.performance.qualityRating}/5
-                    </div>
+                    <span className="table-value">
+                      {partner.performance ? formatCurrency(partner.performance.orderVolume.lastYear) : '-'}
+                    </span>
                   </td>
                   <td>
-                    <div className="status-indicator">
-                      <div className={`status-dot ${partner.isActive ? 'active' : 'inactive'}`}></div>
-                      {partner.isActive ? 'Aktiv' : 'Inaktiv'}
+                    <div className="table-rating">
+                      <Star className="w-4 h-4 text-warning" />
+                      <span className="rating-value">
+                        {partner.performance?.qualityRating || '-'}
+                      </span>
                     </div>
                   </td>
-                  <td>
+                  <td className="text-right">
                     <div className="table-actions">
-                      <button 
-                        className="action-btn"
-                        onClick={(e) => handleViewDetails(partner, e)}
+                      <button
+                        onClick={() => handlePartnerSelect(partner)}
+                        className="btn-icon btn-icon-primary"
+                        title="Details anzeigen"
                       >
-                        <Eye size={16} />
+                        <Eye className="w-4 h-4" />
                       </button>
                       <button 
-                        className="action-btn"
-                        onClick={(e) => e.stopPropagation()}
+                        className="btn-icon btn-icon-secondary"
+                        title="Bearbeiten"
                       >
-                        <Edit size={16} />
+                        <Edit className="w-4 h-4" />
                       </button>
                     </div>
                   </td>
@@ -485,15 +357,132 @@ const PartnerManagement: React.FC = () => {
               ))}
             </tbody>
           </table>
-        )}
-      </div>
+        </div>
+      )}
 
-      {/* Partner Detail Modal */}
-      {showDetails && selectedPartner && (
-        <PartnerDetailModal 
-          partner={selectedPartner} 
-          onClose={() => setShowDetails(false)} 
-        />
+      {/* Details Modal */}
+      {showDetailsModal && selectedPartner && (
+        <div className="modal-overlay">
+          <div className="modal modal-lg">
+            <div className="modal-header">
+              <h2 className="modal-title">{selectedPartner.name}</h2>
+              <button
+                onClick={() => setShowDetailsModal(false)}
+                className="modal-close"
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div className="modal-body">
+              <div className="modal-grid">
+                {/* Grunddaten */}
+                <div className="info-section">
+                  <h3 className="info-section-title">Grunddaten</h3>
+                  <div className="info-items">
+                    <div className="info-item">
+                      <span className="info-label">Gegründet:</span>
+                      <p className="info-value">{selectedPartner.establishedYear}</p>
+                    </div>
+                    <div className="info-item">
+                      <span className="info-label">Mitarbeiter:</span>
+                      <p className="info-value">{selectedPartner.employees?.toLocaleString()}</p>
+                    </div>
+                    <div className="info-item">
+                      <span className="info-label">Jahresumsatz:</span>
+                      <p className="info-value">{selectedPartner.annualRevenue ? formatCurrency(selectedPartner.annualRevenue) : '-'}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Kontaktdaten */}
+                <div className="info-section">
+                  <h3 className="info-section-title">Kontakt</h3>
+                  <div className="info-items">
+                    <div className="info-item">
+                      <Mail className="info-icon" />
+                      <span className="info-value">{selectedPartner.contactInfo.email}</span>
+                    </div>
+                    <div className="info-item">
+                      <Phone className="info-icon" />
+                      <span className="info-value">{selectedPartner.contactInfo.phone}</span>
+                    </div>
+                    <div className="info-item">
+                      <span className="info-label">Ansprechpartner:</span>
+                      <p className="info-value">{selectedPartner.contactInfo.representative}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Performance */}
+                {selectedPartner.performance && (
+                  <div className="info-section info-section-full">
+                    <h3 className="info-section-title">Performance</h3>
+                    <div className="performance-grid">
+                      <div className="performance-item">
+                        <div className="performance-value">
+                          {formatCurrency(selectedPartner.performance.orderVolume.lastMonth)}
+                        </div>
+                        <div className="performance-label">Letzter Monat</div>
+                      </div>
+                      <div className="performance-item">
+                        <div className="performance-value">
+                          {formatCurrency(selectedPartner.performance.orderVolume.lastQuarter)}
+                        </div>
+                        <div className="performance-label">Letztes Quartal</div>
+                      </div>
+                      <div className="performance-item">
+                        <div className="performance-value text-warning">
+                          {selectedPartner.performance.qualityRating}
+                        </div>
+                        <div className="performance-label">Qualitätsbewertung</div>
+                      </div>
+                      <div className="performance-item">
+                        <div className="performance-value text-primary">
+                          {selectedPartner.performance.responseTime}h
+                        </div>
+                        <div className="performance-label">Ø Antwortzeit</div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Rabattstruktur */}
+                <div className="info-section">
+                  <h3 className="info-section-title">Rabattstruktur</h3>
+                  <div className="info-items">
+                    <div className="info-item-row">
+                      <span className="info-label">Standard:</span>
+                      <span className="info-value">{selectedPartner.discountRates.standard}%</span>
+                    </div>
+                    <div className="info-item-row">
+                      <span className="info-label">Volumen:</span>
+                      <span className="info-value">{selectedPartner.discountRates.volume}%</span>
+                    </div>
+                    <div className="info-item-row">
+                      <span className="info-label">Saison:</span>
+                      <span className="info-value">{selectedPartner.discountRates.seasonal}%</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Spezialisierungen */}
+                {selectedPartner.specialties && (
+                  <div className="info-section">
+                    <h3 className="info-section-title">Spezialisierungen</h3>
+                    <div className="tags">
+                      {selectedPartner.specialties.map((specialty: string, index: number) => (
+                        <span key={index} className="tag tag-primary">
+                          {specialty}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

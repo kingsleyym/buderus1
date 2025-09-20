@@ -1,5 +1,24 @@
 {
   "projects": {
     "default": "helios-energy"
-  }
+  },
+  "targets": {
+    "helios-energy": {
+      "hosting": {
+        "main": [
+          "helios-energy"
+        ],
+        "admin": [
+          "admin-helios-energy"
+        ],
+        "employee": [
+          "employee-helios-energy"
+        ],
+        "login": [
+          "login-helios-energy-8752e"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }
