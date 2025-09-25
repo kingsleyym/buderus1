@@ -15,13 +15,14 @@ import { auth, db } from '../config/firebase';
 export type UserRole = 'admin' | 'employee' | 'partner';
 
 export interface UserProfile {
-  uid: string;
   email: string;
   role: UserRole;
-  name?: string;
-  department?: string;
+  isActive: boolean;
   createdAt: Date;
   lastLogin: Date;
+  uid?: string;  // Optional, falls vorhanden
+  name?: string; // Optional
+  department?: string; // Optional
 }
 
 export interface AuthState {
@@ -47,7 +48,21 @@ export const useAuth = () => {
           // Load user profile from Firestore
           const profileDoc = await getDoc(doc(db, 'users', user.uid));
           if (profileDoc.exists()) {
-            const profileData = profileDoc.data() as UserProfile;
+            const profileData = profileDoc.data();
+            
+            // Konvertiere Firestore Zeitstempel zu Dates
+            const profile: UserProfile = {
+              email: profileData.email,
+              role: profileData.role,
+              isActive: profileData.isActive,
+              createdAt: profileData.createdAt?.toDate ? profileData.createdAt.toDate() : new Date(profileData.createdAt),
+              lastLogin: profileData.lastLogin?.toDate ? profileData.lastLogin.toDate() : new Date(profileData.lastLogin),
+              uid: profileData.uid,
+              name: profileData.name,
+              department: profileData.department
+            };
+            
+            console.log('🔍 Loaded profile from Firestore:', profile);
             
             // Update last login
             await setDoc(doc(db, 'users', user.uid), {
@@ -57,7 +72,7 @@ export const useAuth = () => {
             
             setAuthState({
               user,
-              profile: profileData,
+              profile: profile,
               loading: false,
               error: null
             });
@@ -172,13 +187,14 @@ export const useAuth = () => {
       
       // Create user profile in Firestore
       const userProfile: UserProfile = {
-        uid: userCredential.user.uid,
         email: email,
         role: role,
-        name: name,
-        department: department,
+        isActive: true,
         createdAt: new Date(),
-        lastLogin: new Date()
+        lastLogin: new Date(),
+        uid: userCredential.user.uid,
+        name: name,
+        department: department
       };
       
       await setDoc(doc(db, 'users', userCredential.user.uid), userProfile);
@@ -204,7 +220,9 @@ export const useAuth = () => {
 
   // Helper Functions
   const isAuthenticated = (): boolean => {
-    return authState.user !== null && authState.profile !== null;
+    return authState.user !== null && 
+           authState.profile !== null && 
+           authState.profile.isActive === true;
   };
 
   const hasRole = (requiredRole: UserRole): boolean => {

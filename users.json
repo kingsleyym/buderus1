@@ -1,0 +1,24 @@
+{"users": [
+{
+  "localId": "YpY1sei7vmN5JzrOdQHIf59e7s02",
+  "email": "lucakingsley@gmail.com",
+  "emailVerified": false,
+  "passwordHash": "yFJCYPvQX5ijgRk0JyL2RP1j1/oDc2prJdjRoyYDXqVMPjFj2UmmPaUdr501EZHRS2zboHIQMwryYt6fG8ej/w==",
+  "salt": "ee/JGuPzGQH30A==",
+  "lastSignedInAt": "1758552450010",
+  "createdAt": "1757938784351",
+  "disabled": false,
+  "providerUserInfo": []
+},
+{
+  "localId": "j0jB8UrsGRSBPNsqTA9hI3a2qtj2",
+  "email": "lucakingsley@me.com",
+  "emailVerified": false,
+  "passwordHash": "z5+8xv/q1/9xzGWXYzBWDhVuIV/DikkH4RO7JKR0r3H0wy33nMiBFt2Z37rniSUOjMlF82coT0MBgQcm3tobHA==",
+  "salt": "610Xa52cVDJmiw==",
+  "displayName": "Luca  Schweiger ",
+  "lastSignedInAt": "1758118057373",
+  "createdAt": "1757593153845",
+  "disabled": false,
+  "providerUserInfo": []
+}]}

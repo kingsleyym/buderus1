@@ -21,7 +21,7 @@ import './App.css';
 function App() {
   // Domain-Detection
   const hostname = window.location.hostname;
-  
+
   // Development: localhost routing mit /admin, /employee etc.
   if (hostname === 'localhost' || hostname === '127.0.0.1') {
     return (
@@ -36,20 +36,20 @@ function App() {
       </Router>
     );
   }
-  
+
   // Production: Domain-based routing
   if (hostname === 'admin.helios-nrg.de' || hostname.includes('admin-helios-nrg')) {
     return <AdminRoutes />;
   }
-  
+
   if (hostname === 'employee.helios-nrg.de' || hostname.includes('employee-helios-nrg')) {
     return <div>Employee Dashboard - Coming Soon</div>;
   }
-  
+
   if (hostname === 'login.helios-nrg.de' || hostname.includes('login-helios-nrg')) {
     return <LoginPage />;
   }
-  
+
   // Fallback
   return <div>Domain nicht erkannt: {hostname}</div>;
 }
@@ -64,31 +64,31 @@ function AdminRoutes() {
             <AdminDashboard />
           </AdminLayout>
         } />
-        
+
         <Route path="/marketing/*" element={
           <AdminLayout>
             <MarketingDashboard />
           </AdminLayout>
         } />
-        
+
         <Route path="/leads" element={
           <AdminLayout>
             <LeadsListAdvanced />
           </AdminLayout>
         } />
-        
+
         <Route path="/fachpartner" element={
           <AdminLayout>
             <PartnerDashboard />
           </AdminLayout>
         } />
-        
+
         <Route path="/products" element={
           <AdminLayout>
             <ProductCatalog />
           </AdminLayout>
         } />
-        
+
         <Route path="/employees" element={
           <AdminLayout>
             <AdminEmployees />

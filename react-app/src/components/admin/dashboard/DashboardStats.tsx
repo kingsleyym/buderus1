@@ -144,7 +144,7 @@ const calculateRealStats = (): DashboardStats => {
   };
 };
 
-const DashboardStats: React.FC = () => {
+const DashboardStatsComponent: React.FC = () => {
   const [stats, setStats] = useState<DashboardStats>(calculateRealStats());
   const [loading, setLoading] = useState(false);
 
@@ -340,4 +340,4 @@ const DashboardStats: React.FC = () => {
   );
 };
 
-export default DashboardStats;
+export default DashboardStatsComponent;

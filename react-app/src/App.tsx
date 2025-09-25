@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 // Auth Components
 import LoginPage from './pages/auth/LoginPage';
+import { useAuth } from './hooks/useAuth';
 
 // Admin Components
 import AdminLayout from './components/admin/AdminLayout';
@@ -16,13 +17,19 @@ import PartnerDashboard from './components/admin/partners/PartnerDashboard';
 import ProductCatalog from './components/admin/products/ProductCatalog';
 import './App.css';
 
-// Admin Routes - DEFINIERT VOR App()
+// Admin Routes - zeigt Login oder Dashboard basierend auf Auth-Status
 const AdminRoutes: React.FC = () => {
   return (
     <Router>
       <Routes>
-        {/* Dashboard - Root */}
-        <Route path="/" element={
+        {/* Root Route - zeigt Login oder Dashboard */}
+        <Route path="/" element={<AdminAuthChecker />} />
+        
+        {/* Explizite Login Route */}
+        <Route path="/login" element={<LoginPage />} />
+        
+        {/* Dashboard Routes (nur wenn angemeldet) */}
+        <Route path="/dashboard" element={
           <AdminLayout>
             <AdminDashboard />
           </AdminLayout>
@@ -48,55 +55,18 @@ const AdminRoutes: React.FC = () => {
             <ProductCatalog />
           </AdminLayout>
         } />
-        
-        {/* Partner Routes */}
-        <Route path="/fachpartner" element={
+
+        {/* Partners Route */}
+        <Route path="/partners" element={
           <AdminLayout>
             <PartnerDashboard />
           </AdminLayout>
         } />
-        
-        {/* Employees Route */}
+
+        {/* Employee Management */}
         <Route path="/employees" element={
           <AdminLayout>
             <AdminEmployees />
-          </AdminLayout>
-        } />
-        
-        {/* Analytics Route - Coming Soon */}
-        <Route path="/analytics" element={
-          <AdminLayout>
-            <div style={{ padding: '2rem', textAlign: 'center' }}>
-              <h2>📈 Analytics Dashboard</h2>
-              <p>Coming Soon...</p>
-            </div>
-          </AdminLayout>
-        } />
-        
-        {/* QR-Codes Route - Coming Soon */}
-        <Route path="/qr-codes" element={
-          <AdminLayout>
-            <div style={{ padding: '2rem', textAlign: 'center' }}>
-              <h2>📱 QR-Code Generator</h2>
-              <p>Coming Soon...</p>
-            </div>
-          </AdminLayout>
-        } />
-        
-        {/* Rewards Route - Coming Soon */}
-        <Route path="/rewards" element={
-          <AdminLayout>
-            <div style={{ padding: '2rem', textAlign: 'center' }}>
-              <h2>🎁 Belohnungssystem</h2>
-              <p>Coming Soon...</p>
-            </div>
-          </AdminLayout>
-        } />
-        
-        {/* Fallback - zurück zum Dashboard */}
-        <Route path="*" element={
-          <AdminLayout>
-            <AdminDashboard />
           </AdminLayout>
         } />
       </Routes>
@@ -104,42 +74,75 @@ const AdminRoutes: React.FC = () => {
   );
 };
 
-function App() {
-  // Domain-Detection
-  const hostname = window.location.hostname;
+// Auth Checker Component - entscheidet zwischen Login und Dashboard
+const AdminAuthChecker: React.FC = () => {
+  const { isAuthenticated, loading, isAdmin } = useAuth();
   
-  console.log('🌐 Current hostname:', hostname);
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <div>� Lade...</div>
+      </div>
+    );
+  }
   
-  // LOGIN DOMAIN
-  if (hostname === 'login.localhost' || 
-      hostname === 'login.helios-nrg.de' || 
-      hostname.includes('login-helios') ||
-      hostname.startsWith('login-')) {
+  // Nicht angemeldet oder kein Admin → Login Page
+  if (!isAuthenticated() || !isAdmin()) {
     return <LoginPage />;
   }
   
-  // ADMIN DOMAIN - mit bestehenden Routen
-  if (hostname === 'admin.localhost' || 
-      hostname === 'admin.helios-nrg.de' || 
-      hostname.includes('admin-helios') ||
-      hostname.startsWith('admin-')) {
+  // Angemeldet als Admin → Dashboard
+  return (
+    <AdminLayout>
+      <AdminDashboard />
+    </AdminLayout>
+  );
+};
+
+function App() {
+  // Domain-Detection
+  const hostname = window.location.hostname;
+  const urlParams = new URLSearchParams(window.location.search);
+  const isAdmin = urlParams.get('admin') === 'true';
+  const isEmployee = urlParams.get('employee') === 'true';
+
+  console.log('🌐 Current hostname:', hostname);
+  console.log('🔧 URL params:', { isAdmin, isEmployee });
+
+  // ADMIN DOMAIN - zeigt Login oder Dashboard basierend auf Auth-Status
+  if (hostname === 'admin.localhost' ||
+    hostname === 'admin.helios-nrg.de' ||
+    hostname.includes('admin-helios') ||
+    hostname.startsWith('admin-')) {
+    console.log('🔧 Admin domain detected - showing admin system');
+    return <AdminRoutes />;
+  }
+
+  // SAME-DOMAIN ROUTING mit URL-Parametern (für Fallback)
+  if (isAdmin) {
+    console.log('🔧 Showing AdminRoutes due to ?admin=true parameter');
     return <AdminRoutes />;
   }
   
-  // EMPLOYEE DOMAIN
-  if (hostname === 'employee.localhost' || 
-      hostname === 'employee.helios-nrg.de' || 
-      hostname.includes('employee-helios') ||
-      hostname.startsWith('employee-')) {
+  if (isEmployee) {
+    console.log('🔧 Showing EmployeeRoutes due to ?employee=true parameter');
     return <div>Employee Dashboard - Coming Soon</div>;
   }
-  
+
+  // EMPLOYEE DOMAIN
+  if (hostname === 'employee.localhost' ||
+    hostname === 'employee.helios-nrg.de' ||
+    hostname.includes('employee-helios') ||
+    hostname.startsWith('employee-')) {
+    return <div>Employee Dashboard - Coming Soon</div>;
+  }
+
   // FALLBACK für localhost ohne Subdomain
   if (hostname === 'localhost' || hostname === '127.0.0.1') {
     return (
-      <div style={{ 
-        padding: '2rem', 
-        textAlign: 'center', 
+      <div style={{
+        padding: '2rem',
+        textAlign: 'center',
         fontFamily: 'Arial, sans-serif',
         background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
         minHeight: '100vh',
@@ -148,39 +151,39 @@ function App() {
         <h1>🚀 Helios NRG - Subdomain Setup</h1>
         <p>Bitte verwende eine der Subdomains:</p>
         <div style={{ marginTop: '2rem', display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center' }}>
-          <a 
-            href="http://login.localhost:3003" 
-            style={{ 
-              padding: '1rem 2rem', 
-              background: 'white', 
-              color: '#333', 
-              textDecoration: 'none', 
+          <a
+            href="http://login.localhost:3003"
+            style={{
+              padding: '1rem 2rem',
+              background: 'white',
+              color: '#333',
+              textDecoration: 'none',
               borderRadius: '8px',
               minWidth: '300px'
             }}
           >
             🔐 login.localhost:3003
           </a>
-          <a 
-            href="http://admin.localhost:3003" 
-            style={{ 
-              padding: '1rem 2rem', 
-              background: 'white', 
-              color: '#333', 
-              textDecoration: 'none', 
+          <a
+            href="http://admin.localhost:3003"
+            style={{
+              padding: '1rem 2rem',
+              background: 'white',
+              color: '#333',
+              textDecoration: 'none',
               borderRadius: '8px',
               minWidth: '300px'
             }}
           >
             ⚡ admin.localhost:3003
           </a>
-          <a 
-            href="http://employee.localhost:3003" 
-            style={{ 
-              padding: '1rem 2rem', 
-              background: 'white', 
-              color: '#333', 
-              textDecoration: 'none', 
+          <a
+            href="http://employee.localhost:3003"
+            style={{
+              padding: '1rem 2rem',
+              background: 'white',
+              color: '#333',
+              textDecoration: 'none',
               borderRadius: '8px',
               minWidth: '300px'
             }}
@@ -197,7 +200,7 @@ function App() {
       </div>
     );
   }
-  
+
   // Unbekannte Domain
   return (
     <div style={{ padding: '2rem', textAlign: 'center' }}>

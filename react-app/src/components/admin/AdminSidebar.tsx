@@ -16,6 +16,7 @@ import {
   UserPlus,
   Building2
 } from 'lucide-react';
+import { useAuth } from '../../hooks/useAuth';
 
 interface AdminSidebarProps {
   isOpen: boolean;
@@ -23,7 +24,9 @@ interface AdminSidebarProps {
 
 const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen }) => {
   const location = useLocation();
-  const [expandedSections, setExpandedSections] = useState<string[]>(['marketing']);
+  const { logout } = useAuth();
+  const [isMarketingOpen, setIsMarketingOpen] = useState(false);
+  const [expandedSections, setExpandedSections] = useState<string[]>([]);
 
   const toggleSection = (section: string) => {
     setExpandedSections(prev => 
@@ -50,9 +53,19 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen }) => {
     { path: '/marketing/rewards', icon: Gift, label: 'Belohnungen' },
   ];
 
-  const handleLogout = () => {
-    // TODO: Implement logout functionality
-    console.log('Logout clicked');
+  const handleLogout = async () => {
+    try {
+      await logout();
+      // Nach erfolgreichem Logout zur korrekten Login-Seite weiterleiten
+      const loginUrl = window.location.hostname.includes('localhost')
+        ? 'http://localhost:3000'
+        : 'https://login-helios-energy-8752e.web.app';
+      
+      window.location.href = loginUrl;
+    } catch (error) {
+      console.error('Logout Fehler:', error);
+      alert('Fehler beim Abmelden. Bitte versuchen Sie es erneut.');
+    }
   };
 
   return (

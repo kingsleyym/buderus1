@@ -10,26 +10,45 @@ const LoginPage: React.FC = () => {
   const [resetEmail, setResetEmail] = useState('');
   const [resetSent, setResetSent] = useState(false);
   
-  const { login, resetPassword, loading, error, isAuthenticated } = useAuth();
+  const { login, resetPassword, loading, error, isAuthenticated, profile, user, logout } = useAuth();
 
-  // Redirect if already authenticated
+  // Debug logging
   useEffect(() => {
-    if (isAuthenticated()) {
-      // Determine correct admin domain
-      const currentHost = window.location.hostname;
+    console.log('🔄 LoginPage useEffect:', {
+      isAuthenticated: isAuthenticated(),
+      profile: profile?.email,
+      loading,
+      user: user?.email
+    });
+  }, [isAuthenticated, profile, loading, user]);
+
+  // Sichere Weiterleitung nach Login - MIT Rolle-Check
+  useEffect(() => {
+    if (!loading && isAuthenticated() && profile) {
+      console.log('✅ Login successful, checking role...', profile.role);
       
-      // For production (later): admin.helios-energy.de
-      // For Firebase testing: admin-helios-energy.web.app
-      if (currentHost.includes('localhost')) {
-        window.location.href = 'http://admin.localhost:3000';
-      } else if (currentHost.includes('helios-energy')) {
-        window.location.href = 'https://admin-helios-energy.web.app';
-      } else {
-        // Fallback to custom domain (when ready)
-        window.location.href = 'https://admin.helios-energy.de';
+      // SICHERHEITSCHECK: Nur Admins dürfen ins Admin-Panel
+      if (profile.role !== 'admin') {
+        console.log('❌ Access denied: User is not admin, role:', profile.role);
+        alert(`Zugriff verweigert!\n\nSie sind als "${profile.role}" angemeldet.\nNur Administratoren haben Zugriff auf diesen Bereich.`);
+        
+        // User ausloggen
+        logout().then(() => {
+          // KEIN RELOAD - nur zur Login-Seite
+          console.log('🔄 User logged out, staying on login page');
+        }).catch((error: any) => {
+          console.error('Logout error:', error);
+        });
+        return;
       }
+      
+      // Nur echte Admins kommen hier hin
+      console.log('✅ Admin access granted, redirecting to dashboard...');
+      
+      // Bleibe auf derselben Domain, gehe nur zur Root
+      window.location.href = '/dashboard';
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, profile, loading, logout]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,11 +58,15 @@ const LoginPage: React.FC = () => {
     }
 
     try {
+      console.log('🔄 Calling login function...');
       await login(email, password);
-      // Redirect wird durch useEffect gehandhabt
+      console.log('✅ Login successful!');
+      
+      // Weiterleitung wird durch useEffect gehandhabt, das auf profile wartet
+      
     } catch (error) {
+      console.error('❌ Login failed:', error);
       // Error wird durch useAuth Hook gehandhabt
-      console.log('Login error:', error);
     }
   };
 
